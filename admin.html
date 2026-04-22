@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a3a6b">
+<title>読谷村 自治会ボード｜管理者</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Firebase compat SDK (type="module"不要な従来版) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<style>
+:root {
+  --navy:       #1a3a6b;
+  --navy-mid:   #2a5298;
+  --navy-pale:  #e8eef8;
+  --navy-faint: #f2f5fb;
+  --green-deep: #1a6b3c;
+  --green-mid:  #2d8f54;
+  --green-pale: #e8f5ee;
+  --amber:      #e8a020;
+  --amber-pale: #fff8e8;
+  --red-soft:   #dc3545;
+  --red-pale:   #fff0f0;
+  --ink:        #1a1a1a;
+  --ink-mid:    #444;
+  --ink-light:  #777;
+  --ink-faint:  #aaa;
+  --surface:    #ffffff;
+  --bg:         #f0f4f8;
+  --border:     #ccd5e0;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; }
+body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+.header { background: var(--navy); padding: 0 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
+.header-inner { max-width: 520px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.logo-text h1 { font-size: 14px; font-weight: 700; color: white; font-family: 'Noto Serif JP', serif; }
+.logo-text p  { font-size: 10px; color: rgba(255,255,255,0.5); }
+.admin-badge { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.08em; }
+
+.main { max-width: 520px; margin: 0 auto; padding: 24px 16px 60px; }
+
+.login-card { background: var(--surface); border-radius: var(--radius-lg); border: 1.5px solid var(--border); padding: 28px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.login-title { font-size: 18px; font-weight: 700; color: var(--navy); font-family: 'Noto Serif JP', serif; text-align: center; margin-bottom: 6px; }
+.login-sub { font-size: 12px; color: var(--ink-light); text-align: center; margin-bottom: 24px; }
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 11px; font-weight: 700; color: var(--ink-mid); letter-spacing: 0.05em; margin-bottom: 6px; }
+.form-select, .form-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-md); background: var(--surface); font-size: 14px; font-family: inherit; color: var(--ink); outline: none; transition: border-color 0.12s; appearance: none; -webkit-appearance: none; }
+.form-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23777' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+.form-select:focus, .form-input:focus { border-color: var(--navy-mid); }
+.login-btn { width: 100%; padding: 13px; background: var(--navy); color: white; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.15s; }
+.login-btn:hover { background: var(--navy-mid); }
+.error-box { background: var(--red-pale); border: 1px solid #fcc; border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--red-soft); margin-bottom: 14px; display: none; }
+.error-box.show { display: block; }
+
+.admin-screen { display: none; }
+.admin-screen.show { display: block; }
+.admin-header-bar { background: var(--surface); border-radius: var(--radius-md); border: 1.5px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.admin-jichi-name { font-size: 16px; font-weight: 700; color: var(--navy); font-family: 'Noto Serif JP', serif; }
+.admin-jichi-sub { font-size: 11px; color: var(--ink-light); margin-top: 2px; }
+.logout-btn { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 6px 12px; font-size: 12px; font-family: inherit; cursor: pointer; color: var(--ink-mid); transition: all 0.12s; }
+.logout-btn:hover { border-color: var(--red-soft); color: var(--red-soft); }
+
+.post-box { background: var(--surface); border-radius: var(--radius-lg); border: 1.5px solid var(--border); padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.post-box-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+.post-textarea { width: 100%; min-height: 100px; padding: 12px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 14px; font-family: inherit; line-height: 1.7; resize: vertical; outline: none; transition: border-color 0.12s; color: var(--ink); }
+.post-textarea:focus { border-color: var(--navy-mid); }
+.post-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.char-count { font-size: 12px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.char-count.warn { color: var(--amber); }
+.char-count.over { color: var(--red-soft); }
+.post-btn { background: var(--green-deep); color: white; border: none; border-radius: var(--radius-md); padding: 9px 20px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.15s; }
+.post-btn:hover { background: var(--green-mid); }
+.post-btn:disabled { background: var(--ink-faint); cursor: not-allowed; }
+
+.msg-manage-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.msg-manage-title { font-size: 13px; font-weight: 700; color: var(--ink-mid); }
+.msg-limit-note { font-size: 11px; color: var(--ink-faint); }
+.admin-msg-list { display: flex; flex-direction: column; gap: 8px; }
+.admin-msg-card { background: var(--surface); border-radius: var(--radius-md); border: 1.5px solid var(--border); padding: 12px 14px; display: flex; gap: 10px; }
+.admin-msg-body { flex: 1; min-width: 0; }
+.admin-msg-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.admin-msg-num { font-size: 10px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.admin-msg-time { font-size: 11px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.admin-msg-age { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+.age-today { background: #e8f5ee; color: #1a6b3c; }
+.age-week  { background: #e6f0fa; color: #2a6cb5; }
+.age-month { background: #fff8e8; color: #e8a020; }
+.age-old   { background: #f0f0f0; color: #aaa; }
+.admin-msg-text { font-size: 13px; line-height: 1.7; color: var(--ink); white-space: pre-wrap; word-break: break-word; }
+.delete-btn { background: none; border: 1.5px solid var(--border); border-radius: var(--radius-sm); width: 30px; height: 30px; cursor: pointer; color: var(--ink-faint); font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.12s; }
+.delete-btn:hover { border-color: var(--red-soft); color: var(--red-soft); background: var(--red-pale); }
+.msg-empty-admin { text-align: center; color: var(--ink-faint); font-size: 13px; padding: 24px 0; }
+
+.fb-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+.fb-status.ok   { background: var(--green-pale); color: var(--green-deep); }
+.fb-status.warn { background: var(--amber-pale); color: var(--amber); }
+.fb-status.err  { background: var(--red-pale); color: var(--red-soft); }
+.fb-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: white; border-radius: 24px; padding: 10px 20px; font-size: 13px; font-weight: 500; z-index: 999; transition: transform 0.3s ease; pointer-events: none; white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🏛️</div>
+      <div class="logo-text">
+        <h1>読谷村 自治会ボード</h1>
+        <p>Community Board Admin</p>
+      </div>
+    </div>
+    <div class="admin-badge">🔒 管理者</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- ログイン画面 -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-title">🏘️ 管理者ログイン</div>
+      <div class="login-sub">自治会を選択してパスワードを入力してください</div>
+      <div class="error-box" id="err-box"></div>
+      <div class="form-group">
+        <label class="form-label">自治会を選択</label>
+        <select class="form-select" id="login-select">
+          <option value="">— 自治会を選んでください —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">パスワード</label>
+        <input class="form-input" type="password" id="login-pw" placeholder="パスワードを入力" autocomplete="current-password">
+      </div>
+      <button class="login-btn" onclick="doLogin()">ログイン</button>
+    </div>
+  </div>
+
+  <!-- 管理者画面 -->
+  <div class="admin-screen" id="admin-screen">
+    <div class="admin-header-bar">
+      <div>
+        <div class="admin-jichi-name" id="admin-name"></div>
+        <div class="admin-jichi-sub" id="admin-addr"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <span class="fb-status warn" id="fb-status"><span class="fb-dot"></span> 接続中...</span>
+        <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+      </div>
+    </div>
+
+    <div class="post-box">
+      <div class="post-box-title">✏️ 新しいお知らせを投稿</div>
+      <textarea class="post-textarea" id="post-text"
+        placeholder="お知らせ内容を入力してください（最大280文字）&#10;&#10;例：○月○日に地区清掃があります。午前9時に公民館前に集合してください。"
+        maxlength="280" oninput="updateCharCount()"></textarea>
+      <div class="post-footer">
+        <span class="char-count" id="char-count">0 / 280</span>
+        <button class="post-btn" id="post-btn" onclick="postMsg()" disabled>📢 投稿する</button>
+      </div>
+    </div>
+
+    <div class="msg-manage-header">
+      <div class="msg-manage-title">📝 投稿済みお知らせ</div>
+      <span class="msg-limit-note">最大10件まで</span>
+    </div>
+    <div class="admin-msg-list" id="admin-msg-list">
+      <div class="msg-empty-admin">読み込み中...</div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ▼▼▼ Firebase設定 — ここを書き換えてください ▼▼▼
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBuqb9l1sNOC8rV5bnbsB0IGQY02mm7NOk",
+  authDomain: "yomitan-jichikai-board.firebaseapp.com",
+  projectId: "yomitan-jichikai-board",
+  storageBucket: "yomitan-jichikai-board.firebasestorage.app",
+  messagingSenderId: "374597777571",
+  appId: "1:374597777571:web:a2937dfb13b8f11b226716"
+};
+/* ▲▲▲ Firebase設定ここまで ▲▲▲ */
+
+/* ── 自治会マスターデータ ── */
+var JICHIKAI = [
+  {id:"j01",name:"喜名自治会",    addr:"沖縄県中頭郡読谷村字喜名2207",          tel:"098-958-2236",password:"000000"},
+  {id:"j02",name:"親志自治会",    addr:"沖縄県中頭郡読谷村字座喜味2317",         tel:"098-958-2237",password:"000000"},
+  {id:"j03",name:"座喜味自治会",  addr:"沖縄県中頭郡読谷村字座喜味154",          tel:"098-958-2228",password:"000000"},
+  {id:"j04",name:"伊良皆自治会",  addr:"沖縄県中頭郡読谷村字伊良皆177-3",        tel:"098-956-2235",password:"000000"},
+  {id:"j05",name:"波平自治会",    addr:"沖縄県中頭郡読谷村字波平61",             tel:"098-958-2229",password:"000000"},
+  {id:"j06",name:"上地自治会",    addr:"沖縄県中頭郡読谷村字上地1",              tel:"098-958-0628",password:"000000"},
+  {id:"j07",name:"都屋自治会",    addr:"沖縄県中頭郡読谷村字都屋307",            tel:"098-956-2241",password:"000000"},
+  {id:"j08",name:"高志保自治会",  addr:"沖縄県中頭郡読谷村字高志保260",          tel:"098-958-4455",password:"000000"},
+  {id:"j09",name:"渡慶次自治会",  addr:"沖縄県中頭郡読谷村字渡慶次180",          tel:"098-958-4922",password:"000000"},
+  {id:"j10",name:"儀間自治会",    addr:"沖縄県中頭郡読谷村字長浜1409",           tel:"098-958-3002",password:"000000"},
+  {id:"j11",name:"宇座自治会",    addr:"沖縄県中頭郡読谷村字長浜1840-2",         tel:"098-958-2231",password:"000000"},
+  {id:"j12",name:"瀬名波自治会",  addr:"沖縄県中頭郡読谷村字瀬名波138",          tel:"098-958-2594",password:"000000"},
+  {id:"j13",name:"長浜自治会",    addr:"沖縄県中頭郡読谷村字長浜14",             tel:"098-958-4246",password:"000000"},
+  {id:"j14",name:"楚辺自治会",    addr:"沖縄県中頭郡読谷村字楚辺1928-1",         tel:"098-956-2326",password:"000000"},
+  {id:"j15",name:"古堅自治会",    addr:"沖縄県中頭郡読谷村字古堅75-3",           tel:"098-956-2238",password:"000000"},
+  {id:"j16",name:"渡具知自治会",  addr:"沖縄県中頭郡読谷村字渡具知246-2",        tel:"098-956-2240",password:"000000"},
+  {id:"j17",name:"大木自治会",    addr:"沖縄県中頭郡読谷村字大木294",            tel:"098-956-2020",password:"000000"},
+  {id:"j18",name:"比謝自治会",    addr:"沖縄県中頭郡読谷村字比謝26",             tel:"098-956-2234",password:"000000"},
+  {id:"j19",name:"大湾自治会",    addr:"沖縄県中頭郡読谷村字大湾425",            tel:"098-956-2233",password:"000000"},
+  {id:"j20",name:"比謝矼自治会",  addr:"沖縄県中頭郡読谷村字比謝矼3",           tel:"098-957-2172",password:"000000"},
+  {id:"j21",name:"長田自治会",    addr:"沖縄県中頭郡読谷村字大木313-9",          tel:"098-956-6550",password:"000000"},
+  {id:"j22",name:"牧原自治会",    addr:"沖縄県中頭郡読谷村字比謝315-4",          tel:"098-956-2328",password:"000000"},
+  {id:"j23",name:"大添自治会",    addr:"沖縄県中頭郡読谷村字楚辺1279-31",        tel:"098-956-9093",password:"000000"},
+  {id:"j24",name:"横田自治会",    addr:"沖縄県中頭郡読谷村字座喜味2713-115",     tel:"098-958-7111",password:"000000"}
+];
+
+var MAX_MSGS=10, MAX_CHARS=280;
+var db=null, firebaseOk=false, loggedInJid=null, unsubscribeMsgs=null;
+
+/* ── Firebase初期化 ── */
+function initFirebase(){
+  if(FIREBASE_CONFIG.apiKey==="YOUR_API_KEY"){
+    setFbStatus("warn","⚠ Firebase未設定"); return;
+  }
+  try{
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.firestore();
+    firebaseOk=true;
+    setFbStatus("ok","● Firebase接続OK");
+  }catch(e){
+    console.error(e); setFbStatus("err","✕ 接続エラー");
+  }
+}
+function setFbStatus(cls,text){
+  var el=document.getElementById("fb-status"); if(!el) return;
+  el.className="fb-status "+cls;
+  el.innerHTML='<span class="fb-dot"></span> '+text;
+}
+
+/* ── ログイン画面構築 ── */
+function buildLoginSelect(){
+  var sel=document.getElementById("login-select");
+  JICHIKAI.forEach(function(j,i){
+    var o=document.createElement("option");
+    o.value=j.id;
+    o.textContent=String(i+1).padStart(2,"0")+". "+j.name;
+    sel.appendChild(o);
+  });
+  document.getElementById("login-pw").addEventListener("keydown",function(e){
+    if(e.key==="Enter") doLogin();
+  });
+}
+
+/* ── ログイン ── */
+function doLogin(){
+  var jid=document.getElementById("login-select").value;
+  var pw=document.getElementById("login-pw").value;
+  var errEl=document.getElementById("err-box");
+  errEl.classList.remove("show"); errEl.textContent="";
+
+  if(!jid){ showErr("自治会を選択してください"); return; }
+  if(!pw)  { showErr("パスワードを入力してください"); return; }
+
+  var jichi=JICHIKAI.find(function(x){ return x.id===jid; });
+  if(!jichi||jichi.password!==pw){
+    showErr("パスワードが正しくありません");
+    document.getElementById("login-pw").value=""; return;
+  }
+
+  loggedInJid=jid;
+  document.getElementById("login-screen").style.display="none";
+  document.getElementById("admin-screen").classList.add("show");
+  document.getElementById("admin-name").textContent=jichi.name;
+  document.getElementById("admin-addr").textContent=jichi.addr;
+  updateCharCount();
+  subscribeAdminMsgs();
+}
+function showErr(msg){ var e=document.getElementById("err-box"); e.textContent=msg; e.classList.add("show"); }
+
+/* ── ログアウト ── */
+function doLogout(){
+  if(!confirm("ログアウトしますか？")) return;
+  if(unsubscribeMsgs){ unsubscribeMsgs(); unsubscribeMsgs=null; }
+  loggedInJid=null;
+  document.getElementById("admin-screen").classList.remove("show");
+  document.getElementById("login-screen").style.display="";
+  document.getElementById("login-pw").value="";
+  document.getElementById("post-text").value="";
+  updateCharCount();
+}
+
+/* ── メッセージ購読（管理画面）── */
+function subscribeAdminMsgs(){
+  if(!firebaseOk){ renderAdminMsgsFallback(); return; }
+  var q=db.collection("messages")
+          .where("jichiId","==",loggedInJid)
+          .orderBy("timestamp","desc")
+          .limit(MAX_MSGS+1);
+  unsubscribeMsgs=q.onSnapshot(function(snap){
+    var msgs=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    renderAdminMsgs(msgs);
+    setFbStatus("ok","● リアルタイム同期中");
+  },function(err){
+    console.error(err); setFbStatus("err","✕ 読み込みエラー");
+  });
+}
+
+/* ── 投稿 ── */
+function postMsg(){
+  var text=document.getElementById("post-text").value.trim();
+  if(!text||text.length>MAX_CHARS) return;
+  var btn=document.getElementById("post-btn");
+  btn.disabled=true; btn.textContent="投稿中...";
+
+  if(!firebaseOk){
+    // localStorageフォールバック
+    var msgs=getMsgsFallback(loggedInJid);
+    if(msgs.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です"); btn.disabled=false; btn.textContent="📢 投稿する"; return; }
+    msgs.unshift({id:String(Date.now()),text:text,timestamp:new Date().toISOString()});
+    localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
+    document.getElementById("post-text").value=""; updateCharCount(); renderAdminMsgsFallback(); showToast("📢 投稿しました！");
+    btn.disabled=false; btn.textContent="📢 投稿する"; return;
+  }
+
+  // 件数チェック
+  db.collection("messages").where("jichiId","==",loggedInJid).get().then(function(snap){
+    if(snap.size>=MAX_MSGS){
+      showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください");
+      btn.disabled=false; btn.textContent="📢 投稿する"; return;
+    }
+    return db.collection("messages").add({
+      jichiId: loggedInJid,
+      text: text,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }).then(function(docRef){
+    if(!docRef) return;
+    document.getElementById("post-text").value=""; updateCharCount(); showToast("📢 投稿しました！");
+    btn.disabled=false; btn.textContent="📢 投稿する";
+  }).catch(function(e){
+    console.error(e); showToast("❌ 投稿に失敗しました");
+    btn.disabled=false; btn.textContent="📢 投稿する";
+  });
+}
+
+/* ── 削除 ── */
+function deleteMsg(msgId){
+  if(!confirm("この投稿を削除しますか？")) return;
+  if(!firebaseOk){
+    var msgs=getMsgsFallback(loggedInJid).filter(function(m){ return m.id!==msgId; });
+    localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
+    renderAdminMsgsFallback(); showToast("🗑️ 削除しました"); return;
+  }
+  db.collection("messages").doc(msgId).delete().then(function(){
+    showToast("🗑️ 削除しました");
+  }).catch(function(e){
+    console.error(e); showToast("❌ 削除に失敗しました");
+  });
+}
+
+/* ── 管理画面描画 ── */
+function renderAdminMsgs(msgs){
+  var el=document.getElementById("admin-msg-list");
+  if(!msgs.length){ el.innerHTML='<div class="msg-empty-admin">📭 まだ投稿はありません</div>'; return; }
+  el.innerHTML=msgs.map(function(m,i){
+    var age=ageBadge(m.timestamp);
+    var d=m.timestamp&&m.timestamp.toDate?m.timestamp.toDate():new Date(m.timestamp);
+    var dateStr=d.toLocaleString("ja-JP",{year:"numeric",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    return'<div class="admin-msg-card">'
+      +'<div class="admin-msg-body">'
+      +'<div class="admin-msg-meta">'
+      +'<span class="admin-msg-num">#'+(i+1)+'</span>'
+      +'<span class="admin-msg-time">'+dateStr+'</span>'
+      +'<span class="admin-msg-age '+age.cls+'">'+age.label+'</span>'
+      +'</div>'
+      +'<div class="admin-msg-text">'+esc(m.text)+'</div>'
+      +'</div>'
+      +'<button class="delete-btn" onclick="deleteMsg(\''+m.id+'\')" title="削除">🗑️</button>'
+      +'</div>';
+  }).join("");
+}
+function getMsgsFallback(jid){ try{ return JSON.parse(localStorage.getItem("msgs_"+jid)||"[]"); }catch(e){ return []; } }
+function renderAdminMsgsFallback(){ renderAdminMsgs(getMsgsFallback(loggedInJid)); }
+
+/* ── ユーティリティ ── */
+function ageBadge(ts){
+  var t=ts&&ts.toDate?ts.toDate().getTime():new Date(ts).getTime();
+  var h=(Date.now()-t)/3600000;
+  if(h<24)  return{cls:"age-today", label:"今日"};
+  if(h<168) return{cls:"age-week",  label:"今週"};
+  if(h<720) return{cls:"age-month", label:"今月"};
+  return         {cls:"age-old",   label:"古い"};
+}
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function updateCharCount(){
+  var len=document.getElementById("post-text").value.length;
+  var el=document.getElementById("char-count");
+  el.textContent=len+" / "+MAX_CHARS;
+  el.className="char-count"+(len>MAX_CHARS?" over":len>240?" warn":"");
+  document.getElementById("post-btn").disabled=len===0||len>MAX_CHARS;
+}
+
+var toastTimer=null;
+function showToast(msg){
+  var el=document.getElementById("toast");
+  el.textContent=msg; el.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){ el.classList.remove("show"); },2800);
+}
+
+/* ── 初期化 ── */
+initFirebase();
+buildLoginSelect();
+</script>
+</body>
+</html>
