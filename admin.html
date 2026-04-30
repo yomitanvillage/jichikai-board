@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a3a6b">
+<title>読谷村 自治会ボード｜管理者</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+:root {
+  --navy:       #1a3a6b;
+  --navy-mid:   #2a5298;
+  --navy-pale:  #e8eef8;
+  --green-deep: #1a6b3c;
+  --green-mid:  #2d8f54;
+  --green-pale: #e8f5ee;
+  --amber:      #e8a020;
+  --amber-pale: #fff8e8;
+  --red-soft:   #dc3545;
+  --red-pale:   #fff0f0;
+  --ink:        #1a1a1a;
+  --ink-mid:    #444;
+  --ink-light:  #777;
+  --ink-faint:  #aaa;
+  --surface:    #ffffff;
+  --bg:         #f0f4f8;
+  --border:     #ccd5e0;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; }
+body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+.header { background: var(--navy); padding: 0 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
+.header-inner { max-width: 520px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 17px; }
+.logo-text h1 { font-size: 14px; font-weight: 700; color: white; font-family: 'Noto Serif JP', serif; }
+.logo-text p  { font-size: 10px; color: rgba(255,255,255,0.5); }
+.admin-badge { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.08em; }
+
+.main { max-width: 520px; margin: 0 auto; padding: 24px 16px 60px; }
+
+/* ── ログイン ── */
+.login-card { background: var(--surface); border-radius: var(--radius-lg); border: 1.5px solid var(--border); padding: 28px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.login-title { font-size: 18px; font-weight: 700; color: var(--navy); font-family: 'Noto Serif JP', serif; text-align: center; margin-bottom: 6px; }
+.login-sub { font-size: 12px; color: var(--ink-light); text-align: center; margin-bottom: 24px; }
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 11px; font-weight: 700; color: var(--ink-mid); letter-spacing: 0.05em; margin-bottom: 6px; }
+.form-select, .form-input {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-md); background: var(--surface); font-size: 14px;
+  font-family: inherit; color: var(--ink); outline: none; transition: border-color 0.12s;
+  appearance: none; -webkit-appearance: none;
+}
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23777' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+}
+.form-select:focus, .form-input:focus { border-color: var(--navy-mid); }
+.login-btn { width: 100%; padding: 13px; background: var(--navy); color: white; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.15s; }
+.login-btn:hover { background: var(--navy-mid); }
+.error-box { background: var(--red-pale); border: 1px solid #fcc; border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--red-soft); margin-bottom: 14px; display: none; }
+.error-box.show { display: block; }
+
+/* ── 管理画面 ── */
+.admin-screen { display: none; }
+.admin-screen.show { display: block; }
+.admin-header-bar { background: var(--surface); border-radius: var(--radius-md); border: 1.5px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.admin-jichi-name { font-size: 16px; font-weight: 700; color: var(--navy); font-family: 'Noto Serif JP', serif; }
+.admin-jichi-sub { font-size: 11px; color: var(--ink-light); margin-top: 2px; }
+.logout-btn { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 6px 12px; font-size: 12px; font-family: inherit; cursor: pointer; color: var(--ink-mid); transition: all 0.12s; }
+.logout-btn:hover { border-color: var(--red-soft); color: var(--red-soft); }
+
+/* ── 投稿ボックス ── */
+.post-box { background: var(--surface); border-radius: var(--radius-lg); border: 1.5px solid var(--border); padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.post-box-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+/* ▼ 入力エリアを広く */
+.post-textarea {
+  width: 100%; min-height: 160px; padding: 14px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-md);
+  font-size: 15px; font-family: inherit; line-height: 1.75;
+  resize: vertical; outline: none; transition: border-color 0.12s; color: var(--ink);
+}
+.post-textarea:focus { border-color: var(--navy-mid); }
+.post-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.char-count { font-size: 12px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.char-count.warn { color: var(--amber); }
+.char-count.over { color: var(--red-soft); }
+.post-btn { background: var(--green-deep); color: white; border: none; border-radius: var(--radius-md); padding: 10px 22px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.15s; }
+.post-btn:hover { background: var(--green-mid); }
+.post-btn:disabled { background: var(--ink-faint); cursor: not-allowed; }
+
+/* ── 重要度選択 ── */
+.priority-selector {
+  display: flex; gap: 8px; margin-bottom: 12px;
+}
+.priority-btn {
+  flex: 1; padding: 9px 8px; border-radius: var(--radius-md);
+  border: 1.5px solid var(--border); background: var(--surface);
+  font-size: 13px; font-weight: 700; font-family: inherit;
+  cursor: pointer; transition: all 0.15s; color: var(--ink-mid);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.priority-btn.selected-normal { border-color: var(--green-mid); background: var(--green-pale); color: var(--green-deep); }
+.priority-btn.selected-high   { border-color: #e8520a; background: #fff0e8; color: #e8520a; }
+
+/* ── メッセージ管理 ── */
+.msg-manage-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.msg-manage-title { font-size: 13px; font-weight: 700; color: var(--ink-mid); }
+.msg-limit-note { font-size: 11px; color: var(--ink-faint); }
+.admin-msg-list { display: flex; flex-direction: column; gap: 8px; }
+.admin-msg-card { background: var(--surface); border-radius: var(--radius-md); border: 1.5px solid var(--border); padding: 12px 14px; display: flex; gap: 10px; }
+.admin-msg-body { flex: 1; min-width: 0; }
+.admin-msg-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.admin-msg-num { font-size: 10px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.admin-msg-time { font-size: 11px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.admin-msg-age { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+/* 投稿時期バッジ色（閲覧側と統一）*/
+.age-today { background: #e8f5ee; color: #1a6b3c; }
+.age-week  { background: #e6f0fa; color: #2a6cb5; }
+.age-month { background: #fff8e8; color: #e8a020; }
+.age-old   { background: #f0f0f0; color: #aaa; }
+/* ▼ 投稿済みメッセージ本文も大きめに */
+.admin-msg-text { font-size: 15px; line-height: 1.75; color: var(--ink); white-space: pre-wrap; word-break: break-word; }
+.delete-btn { background: none; border: 1.5px solid var(--border); border-radius: var(--radius-sm); width: 32px; height: 32px; cursor: pointer; color: var(--ink-faint); font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.12s; }
+.delete-btn:hover { border-color: var(--red-soft); color: var(--red-soft); background: var(--red-pale); }
+.edit-btn { background: none; border: 1.5px solid var(--border); border-radius: var(--radius-sm); width: 32px; height: 32px; cursor: pointer; color: var(--ink-faint); font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.12s; }
+.edit-btn:hover { border-color: var(--navy-mid); color: var(--navy-mid); background: var(--navy-pale); }
+
+/* ── インライン編集エリア ── */
+.edit-area { margin-top: 10px; }
+.edit-textarea {
+  width: 100%; padding: 10px 12px; border: 1.5px solid var(--navy-mid);
+  border-radius: var(--radius-md); font-size: 15px; font-family: inherit;
+  line-height: 1.7; resize: vertical; outline: none; color: var(--ink);
+  min-height: 80px; background: var(--navy-faint);
+}
+.edit-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.edit-char-count { font-size: 11px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.edit-char-count.warn { color: var(--amber); }
+.edit-char-count.over { color: var(--red-soft); }
+.edit-actions { display: flex; gap: 6px; }
+.edit-save-btn {
+  background: var(--navy); color: white; border: none; border-radius: var(--radius-sm);
+  padding: 7px 16px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+  transition: background 0.15s;
+}
+.edit-save-btn:hover { background: var(--navy-mid); }
+.edit-save-btn:disabled { background: var(--ink-faint); cursor: not-allowed; }
+.edit-cancel-btn {
+  background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: 7px 14px; font-size: 13px; font-family: inherit; cursor: pointer;
+  color: var(--ink-mid); transition: all 0.12s;
+}
+.edit-cancel-btn:hover { border-color: var(--ink-mid); }
+
+/* 編集中カードのハイライト */
+.admin-msg-card.editing { border-color: var(--navy-mid) !important; border-width: 2px; }
+
+/* ── 重要度切替（編集モード内）── */
+.edit-priority-selector { display: flex; gap: 6px; margin-bottom: 8px; }
+.edit-pri-btn {
+  padding: 5px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: var(--surface); font-size: 12px; font-weight: 700;
+  font-family: inherit; cursor: pointer; transition: all 0.15s; color: var(--ink-faint);
+}
+.edit-pri-btn.sel-normal { border-color: var(--green-mid); background: var(--green-pale); color: var(--green-deep); }
+.edit-pri-btn.sel-high   { border-color: #e8520a; background: #fff0e8; color: #e8520a; }
+.msg-empty-admin { text-align: center; color: var(--ink-faint); font-size: 13px; padding: 24px 0; }
+
+/* ── Firebase状態 ── */
+.fb-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+.fb-status.ok   { background: var(--green-pale); color: var(--green-deep); }
+.fb-status.warn { background: var(--amber-pale); color: var(--amber); }
+.fb-status.err  { background: var(--red-pale); color: var(--red-soft); }
+.fb-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+/* ── Toast ── */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: white; border-radius: 24px; padding: 10px 20px; font-size: 13px; font-weight: 500; z-index: 999; transition: transform 0.3s ease; pointer-events: none; white-space: nowrap; display: flex; align-items: center; gap: 12px; }
+.toast.show { transform: translateX(-50%) translateY(0); pointer-events: auto; }
+.toast-msg { flex: 1; }
+.toast-undo-btn {
+  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+  color: white; border-radius: 14px; padding: 4px 12px;
+  font-size: 12px; font-weight: 700; font-family: inherit;
+  cursor: pointer; white-space: nowrap; transition: background 0.15s;
+  display: none;
+}
+.toast-undo-btn:hover { background: rgba(255,255,255,0.35); }
+.toast-undo-btn.show { display: inline-block; }
+
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🏛️</div>
+      <div class="logo-text">
+        <h1>読谷村 自治会ボード</h1>
+        <p>Community Board Admin</p>
+      </div>
+    </div>
+    <div class="admin-badge">🔒 管理者</div>
+  </div>
+</header>
+
+<main class="main">
+  <!-- ログイン画面 -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-title">🏘️ 管理者ログイン</div>
+      <div class="login-sub">自治会を選択してパスワードを入力してください</div>
+      <div class="error-box" id="err-box"></div>
+      <div class="form-group">
+        <label class="form-label">自治会を選択</label>
+        <select class="form-select" id="login-select">
+          <option value="">— 自治会を選んでください —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">パスワード</label>
+        <input class="form-input" type="password" id="login-pw" placeholder="パスワードを入力" autocomplete="current-password">
+      </div>
+      <button class="login-btn" onclick="doLogin()">ログイン</button>
+    </div>
+  </div>
+
+  <!-- 管理者画面 -->
+  <div class="admin-screen" id="admin-screen">
+    <div class="admin-header-bar">
+      <div>
+        <div class="admin-jichi-name" id="admin-name"></div>
+        <div class="admin-jichi-sub" id="admin-addr"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <span class="fb-status warn" id="fb-status"><span class="fb-dot"></span> 接続中...</span>
+        <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+      </div>
+    </div>
+
+    <div class="post-box">
+      <div class="post-box-title">✏️ 新しいお知らせを投稿</div>
+      <!-- 重要度選択 -->
+      <div class="priority-selector">
+        <button class="priority-btn selected-normal" id="pri-normal" onclick="selectPriority('normal')">📋 通常</button>
+        <button class="priority-btn" id="pri-high"   onclick="selectPriority('high')">🔴 重要</button>
+      </div>
+      <textarea class="post-textarea" id="post-text"
+        placeholder="お知らせ内容を入力してください（最大140文字）&#10;&#10;例：○月○日に地区清掃があります。午前9時に公民館前に集合してください。"
+        maxlength="140" oninput="updateCharCount()"></textarea>
+      <div class="post-footer">
+        <span class="char-count" id="char-count">0 / 280</span>
+        <button class="post-btn" id="post-btn" onclick="postMsg()" disabled>📢 投稿する</button>
+      </div>
+    </div>
+
+    <div class="msg-manage-header">
+      <div class="msg-manage-title">📝 投稿済みお知らせ</div>
+      <span class="msg-limit-note">最大10件まで</span>
+    </div>
+    <div class="admin-msg-list" id="admin-msg-list">
+      <div class="msg-empty-admin">読み込み中...</div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast">
+  <span class="toast-msg" id="toast-msg"></span>
+  <button class="toast-undo-btn" id="toast-undo-btn" onclick="undoDelete()">元に戻す</button>
+</div>
+
+<script>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ▼▼▼ Firebase設定 — ここを書き換えてください ▼▼▼
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBuqb9l1sNOC8rV5bnbsB0IGQY02mm7NOk",
+  authDomain: "yomitan-jichikai-board.firebaseapp.com",
+  projectId: "yomitan-jichikai-board",
+  storageBucket: "yomitan-jichikai-board.firebasestorage.app",
+  messagingSenderId: "374597777571",
+  appId: "1:374597777571:web:a2937dfb13b8f11b226716"
+};
+/* ▲▲▲ Firebase設定ここまで ▲▲▲ */
+
+var JICHIKAI = [
+  {id:"j01",name:"長浜自治会",  addr:"沖縄県中頭郡読谷村字長浜14",  tel:"098-958-4246",hash:"4f94010cb9e39a3b77ef5e3d85ad5dcd63d4317bdb0739179ded9183ce2798ab"},
+  {id:"j02",name:"瀬名波自治会",  addr:"沖縄県中頭郡読谷村字瀬名波138",  tel:"098-958-2594",hash:"1dd51a3204af0330b6bd13e80e04d56b5bec729c79bc38599b5f0240327c4917"},
+  {id:"j03",name:"宇座自治会",  addr:"沖縄県中頭郡読谷村字長浜1840-2",  tel:"098-958-2231",hash:"14664877830858fbc554d24a9e383c9403550ffa63dd3f85e5798889f966737e"},
+  {id:"j04",name:"儀間自治会",  addr:"沖縄県中頭郡読谷村字長浜1409",  tel:"098-958-3002",hash:"2925e3886ca94ddcc0f05eff19bd0a1fa790ddf0e1786bacd8f8ee4cd5634025"},
+  {id:"j05",name:"渡慶次自治会",  addr:"沖縄県中頭郡読谷村字渡慶次180",  tel:"098-958-4922",hash:"495caeed67aa1a14c6e4ff14bad7f8bb00c784b931bb2a00595b07147a788bb6"},
+  {id:"j06",name:"高志保自治会",  addr:"沖縄県中頭郡読谷村字高志保260",  tel:"098-958-4455",hash:"4948f97add0d096ec163cffd1c8905e97c2597d531c6a95fac9781be5b55d883"},
+  {id:"j07",name:"波平自治会",  addr:"沖縄県中頭郡読谷村字波平61",  tel:"098-958-2229",hash:"c507660c1f38009a19c345b2cbde6fc904e2304b3534f7b8b7e351fea1322135"},
+  {id:"j08",name:"上地自治会",  addr:"沖縄県中頭郡読谷村字上地1",  tel:"098-958-0628",hash:"cfbd262b5a49a61536c18f65db47de9f14c3ebe1f0155a75816984640caa1b0b"},
+  {id:"j09",name:"都屋自治会",  addr:"沖縄県中頭郡読谷村字都屋307",  tel:"098-956-2241",hash:"e3b71288d9ae018d0ee25dbfeec84bf7be9ef9d6ddf269bd968fe3ed3ea5307d"},
+  {id:"j10",name:"喜名自治会",  addr:"沖縄県中頭郡読谷村字喜名2207",  tel:"098-958-2236",hash:"690af74c60bba8123e1ad0d2915035cc0929f28a232789e727eca163c83647d8"},
+  {id:"j11",name:"親志自治会",  addr:"沖縄県中頭郡読谷村字座喜味2317",  tel:"098-958-2237",hash:"5fc1e6097657b83508680302ab830a5f7c16c93f457a19c2a69e47aeecb7b7b0"},
+  {id:"j12",name:"座喜味自治会",  addr:"沖縄県中頭郡読谷村字座喜味154",  tel:"098-958-2228",hash:"99b8d32427643c62bd416700fc654f16df9de06ac70d4da367c59ea40c21560a"},
+  {id:"j13",name:"横田自治会",  addr:"沖縄県中頭郡読谷村字座喜味2713-115",  tel:"098-958-7111",hash:"61a1057f2d9c66b5419a69afa9635df66af4fb6d9ee8bce4180925dcc456d6ac"},
+  {id:"j14",name:"楚辺自治会",  addr:"沖縄県中頭郡読谷村字楚辺1928-1",  tel:"098-956-2326",hash:"8810a50fa9ed965021883b64a0b8b06c23bbd93a3ddd9d98d013052fe0c6b854"},
+  {id:"j15",name:"大添自治会",  addr:"沖縄県中頭郡読谷村字楚辺1279-31",  tel:"098-956-9093",hash:"e07185467d86b21ee4aa798410d396eaeecb74506464fb116db9b7b37537e459"},
+  {id:"j16",name:"大木自治会",  addr:"沖縄県中頭郡読谷村字大木294",  tel:"098-956-2020",hash:"3e0829b65d6e89d23b912409b629deeef6436de552305bd46f69367370f88815"},
+  {id:"j17",name:"伊良皆自治会",  addr:"沖縄県中頭郡読谷村字伊良皆177-3",  tel:"098-956-2235",hash:"aa94955c39aef0da9cb0f0a1575d2520fe87221121598a2d0c1823211d123f96"},
+  {id:"j18",name:"牧原自治会",  addr:"沖縄県中頭郡読谷村字比謝315-4",  tel:"098-956-2328",hash:"3c3e6bebcca08890600fe98c904e3a9216cb32e21cd477ac0377678adc9ea472"},
+  {id:"j19",name:"長田自治会",  addr:"沖縄県中頭郡読谷村字大木313-1",  tel:"098-957-3752",hash:"dd774b8cfe5322b3f89c7f56101daf052f0c7627faa319394e4c554a940578e0"},
+  {id:"j20",name:"渡具知自治会",  addr:"沖縄県中頭郡読谷村字渡具知246-2",  tel:"098-956-2240",hash:"f461df4a20c86807e2e7e3597df91d6c6c59730626ac8e2d5083b28619d88dd5"},
+  {id:"j21",name:"古堅自治会",  addr:"沖縄県中頭郡読谷村字古堅75-3",  tel:"098-956-2238",hash:"35fa5fe77f6712b2f1fe08d95ebf4288f39f980b194047d20b1cd267fafad1c9"},
+  {id:"j22",name:"大湾自治会",  addr:"沖縄県中頭郡読谷村字大湾425",  tel:"098-956-2233",hash:"63db221d6d03f7b96697b2a1746bded1d27a42304437b6885c2e34ac8c9770c7"},
+  {id:"j23",name:"比謝矼自治会",  addr:"沖縄県中頭郡読谷村字比謝矼3",  tel:"098-957-2172",hash:"41bbd45daaff22fa77d8f048a2bda374aeef5a080c45f451099a9cf81d2e3262"},
+  {id:"j24",name:"比謝自治会",  addr:"沖縄県中頭郡読谷村字比謝26",  tel:"098-956-2234",hash:"fda61158df163c0f1549ea496539b5a83aff0ee713a7dc750f2ea23966047d6e"},
+];
+
+var MAX_MSGS=10, MAX_CHARS=140;
+var db=null, firebaseOk=false, loggedInJid=null, unsubscribeMsgs=null;
+var currentPriority="normal"; // "normal" | "high"
+
+/* ── 重要度選択 ── */
+function selectPriority(p){
+  currentPriority=p;
+  document.getElementById("pri-normal").className="priority-btn"+(p==="normal"?" selected-normal":"");
+  document.getElementById("pri-high").className  ="priority-btn"+(p==="high"?"   selected-high":"");
+}
+
+/* ── Firebase初期化 ── */
+function initFirebase(){
+  if(FIREBASE_CONFIG.apiKey==="YOUR_API_KEY"){ setFbStatus("warn","⚠ Firebase未設定"); return; }
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.firestore(); firebaseOk=true;
+    setFbStatus("ok","● Firebase接続OK");
+  }catch(e){ console.error(e); setFbStatus("err","✕ 接続エラー"); }
+}
+function setFbStatus(cls,text){
+  var el=document.getElementById("fb-status"); if(!el) return;
+  el.className="fb-status "+cls; el.innerHTML='<span class="fb-dot"></span> '+text;
+}
+
+/* ── ログイン画面構築（最後の選択を復元）── */
+function buildLoginSelect(){
+  var sel=document.getElementById("login-select");
+  var lastJid=localStorage.getItem("admin_last_jid")||"";
+  JICHIKAI.forEach(function(j,i){
+    var o=document.createElement("option");
+    o.value=j.id; o.textContent=String(i+1).padStart(2,"0")+". "+j.name;
+    if(j.id===lastJid) o.selected=true;
+    sel.appendChild(o);
+  });
+  document.getElementById("login-pw").addEventListener("keydown",function(e){
+    if(e.key==="Enter") doLogin();
+  });
+}
+
+/* ── ソルト ── */
+var HASH_SALT = "yomitan-jichikai-2024";
+
+/* ── SHA-256ハッシュ生成（Web Crypto API）── */
+async function sha256(str) {
+  var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+}
+
+/* ── ログイン（ハッシュ照合）── */
+function doLogin(){
+  var jid = document.getElementById("login-select").value;
+  var pw  = document.getElementById("login-pw").value;
+  var errEl = document.getElementById("err-box");
+  errEl.classList.remove("show");
+  if(!jid){ showErr("自治会を選択してください"); return; }
+  if(!pw)  { showErr("パスワードを入力してください"); return; }
+  var jichi = JICHIKAI.find(function(x){ return x.id===jid; });
+  if(!jichi){ showErr("自治会が見つかりません"); return; }
+  var btn = document.querySelector(".login-btn");
+  if(btn){ btn.disabled=true; btn.textContent="確認中..."; }
+  sha256(HASH_SALT + pw).then(function(hash){
+    if(hash === jichi.hash){
+      localStorage.setItem("admin_last_jid", jid);
+      loggedInJid = jid;
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("admin-screen").classList.add("show");
+      document.getElementById("admin-name").textContent = jichi.name;
+      document.getElementById("admin-addr").textContent = jichi.addr;
+      updateCharCount();
+      subscribeAdminMsgs();
+    } else {
+      showErr("パスワードが正しくありません");
+      document.getElementById("login-pw").value = "";
+      if(btn){ btn.disabled=false; btn.textContent="ログイン"; }
+    }
+  }).catch(function(e){
+    console.error(e);
+    showErr("認証処理に失敗しました。再度お試しください。");
+    if(btn){ btn.disabled=false; btn.textContent="ログイン"; }
+  });
+}
+function showErr(msg){ var e=document.getElementById("err-box"); e.textContent=msg; e.classList.add("show"); }
+
+/* ── ログアウト ── */
+function doLogout(){
+  if(!confirm("ログアウトしますか？")) return;
+  if(unsubscribeMsgs){ unsubscribeMsgs(); unsubscribeMsgs=null; }
+  loggedInJid=null;
+  document.getElementById("admin-screen").classList.remove("show");
+  document.getElementById("login-screen").style.display="";
+  document.getElementById("login-pw").value="";
+  document.getElementById("post-text").value="";
+  updateCharCount();
+}
+
+/* ── メッセージ購読 ── */
+function subscribeAdminMsgs(){
+  if(!firebaseOk){ renderAdminMsgsFallback(); return; }
+  var q=db.collection("messages").where("jichiId","==",loggedInJid).orderBy("timestamp","desc").limit(MAX_MSGS+1);
+  unsubscribeMsgs=q.onSnapshot(function(snap){
+    renderAdminMsgs(snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); }));
+    setFbStatus("ok","● リアルタイム同期中");
+  },function(err){ console.error(err); setFbStatus("err","✕ 読み込みエラー"); });
+}
+
+/* ── 投稿 ── */
+function postMsg(){
+  var text=document.getElementById("post-text").value.trim();
+  if(!text||text.length>MAX_CHARS) return;
+  var btn=document.getElementById("post-btn");
+  btn.disabled=true; btn.textContent="投稿中...";
+  if(!firebaseOk){
+    var msgs=getMsgsFallback(loggedInJid);
+    if(msgs.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.textContent="📢 投稿する"; return; }
+    msgs.unshift({id:String(Date.now()),text:text,priority:currentPriority,timestamp:new Date().toISOString()});
+    localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); renderAdminMsgsFallback(); showToast("📢 投稿しました！", false);
+    btn.disabled=false; btn.textContent="📢 投稿する"; return;
+  }
+  db.collection("messages").where("jichiId","==",loggedInJid).get().then(function(snap){
+    if(snap.size>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false); btn.disabled=false; btn.textContent="📢 投稿する"; return null; }
+    return db.collection("messages").add({jichiId:loggedInJid,text:text,priority:currentPriority,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+  }).then(function(ref){
+    if(!ref) return;
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); showToast("📢 投稿しました！", false);
+    btn.disabled=false; btn.textContent="📢 投稿する";
+  }).catch(function(e){ console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.textContent="📢 投稿する"; });
+}
+
+/* ── 管理画面描画 ── */
+var msgStore = {}; // {[id]:{text,priority}} テキストをJS変数で保持
+
+function renderAdminMsgs(msgs){
+  var el=document.getElementById("admin-msg-list");
+  if(!msgs.length){ el.innerHTML='<div class="msg-empty-admin">📭 まだ投稿はありません</div>'; return; }
+  msgStore={};
+  msgs.forEach(function(m){ msgStore[m.id]={text:m.text||"", priority:m.priority||"normal"}; });
+  el.innerHTML=msgs.map(function(m,i){
+    var age=tsAge(m.timestamp);
+    var ageCls=age==="today"?"age-today":age==="week"?"age-week":age==="month"?"age-month":"age-old";
+    var ageLabel=age==="today"?"今日":age==="week"?"今週":age==="month"?"今月":"古い";
+    var d=m.timestamp&&m.timestamp.toDate?m.timestamp.toDate():new Date(m.timestamp);
+    var dateStr=d.toLocaleString("ja-JP",{year:"numeric",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    var isHigh=(m.priority==="high");
+    var cardStyle=isHigh?"background:#fff8f0;border-left:4px solid #e8520a;border-color:#f5c4a0":"";
+    var priLabel=isHigh
+      ?'<span style="font-size:10px;font-weight:700;color:#e8520a;background:#fde8d8;padding:2px 7px;border-radius:10px;margin-right:4px">🔴 重要</span>'
+      :'<span style="font-size:10px;font-weight:700;color:var(--green-deep);background:var(--green-pale);padding:2px 7px;border-radius:10px;margin-right:4px">📋 通常</span>';
+    return'<div class="admin-msg-card" id="card-'+m.id+'" style="'+cardStyle+'">'
+      +'<div class="admin-msg-body">'
+      +'<div class="admin-msg-meta">'
+      +priLabel
+      +'<span class="admin-msg-num">#'+(i+1)+'</span>'
+      +'<span class="admin-msg-time">'+dateStr+'</span>'
+      +'<span class="admin-msg-age '+ageCls+'">'+ageLabel+'</span>'
+      +'</div>'
+      +'<div class="admin-msg-text" id="text-'+m.id+'">'+esc(m.text)+'</div>'
+      +'<div class="edit-area" id="edit-area-'+m.id+'" style="display:none"></div>'
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+      +'<button class="edit-btn" id="edit-btn-'+m.id+'" data-id="'+m.id+'" onclick="startEditById(this)" title="編集">✏️</button>'
+      +'<button class="delete-btn" data-id="'+m.id+'" onclick="deleteMsgById(this)" title="削除">🗑️</button>'
+      +'</div>'
+      +'</div>';
+  }).join("");
+}
+function getMsgsFallback(jid){ try{ return JSON.parse(localStorage.getItem("msgs_"+jid)||"[]"); }catch(e){ return []; } }
+function renderAdminMsgsFallback(){ renderAdminMsgs(getMsgsFallback(loggedInJid)); }
+
+
+
+
+/* ── 削除（元に戻す付き）── */
+var deletedMsg = null; // 直前に削除したメッセージを保持
+
+function deleteMsgById(btn){
+  var msgId = btn.getAttribute("data-id");
+  var stored = msgStore[msgId];
+  if(!stored){ showToast("❌ 削除できませんでした", false); return; }
+
+  // 削除前のデータを保存（元に戻す用）
+  deletedMsg = {
+    id:       msgId,
+    text:     stored.text,
+    priority: stored.priority
+  };
+
+  if(!firebaseOk){
+    var msgs = getMsgsFallback(loggedInJid).filter(function(m){ return m.id!==msgId; });
+    localStorage.setItem("msgs_"+loggedInJid, JSON.stringify(msgs));
+    renderAdminMsgsFallback();
+    showToast("🗑️ 削除しました", true);
+    return;
+  }
+  db.collection("messages").doc(msgId).delete()
+    .then(function(){ showToast("🗑️ 削除しました", true); })
+    .catch(function(e){
+      console.error(e);
+      deletedMsg = null;
+      showToast("❌ 削除に失敗しました", false);
+    });
+}
+
+/* ── 元に戻す ── */
+function undoDelete(){
+  if(!deletedMsg){ hideToast(); return; }
+  var msg = deletedMsg;
+  deletedMsg = null;
+  hideToast();
+
+  if(!firebaseOk){
+    var msgs = getMsgsFallback(loggedInJid);
+    msgs.unshift({id: msg.id, text: msg.text, priority: msg.priority, timestamp: new Date().toISOString()});
+    localStorage.setItem("msgs_"+loggedInJid, JSON.stringify(msgs));
+    renderAdminMsgsFallback();
+    showToast("↩️ 元に戻しました", false);
+    return;
+  }
+  // Firestoreに再投稿（新しいdocとして追加）
+  db.collection("messages").add({
+    jichiId:   loggedInJid,
+    text:      msg.text,
+    priority:  msg.priority,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    showToast("↩️ 元に戻しました", false);
+  }).catch(function(e){
+    console.error(e);
+    showToast("❌ 元に戻せませんでした", false);
+  });
+}
+
+/* ── Toast ── */
+var toastTimer = null;
+function showToast(msg, withUndo){
+  var el      = document.getElementById("toast");
+  var msgEl   = document.getElementById("toast-msg");
+  var undoBtn = document.getElementById("toast-undo-btn");
+  if(!el||!msgEl||!undoBtn) return;
+
+  msgEl.textContent = msg;
+  if(withUndo){
+    undoBtn.classList.add("show");
+  } else {
+    undoBtn.classList.remove("show");
+  }
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  // 元に戻すありは5秒、なしは2.8秒
+  toastTimer = setTimeout(function(){
+    hideToast();
+  }, withUndo ? 5000 : 2800);
+}
+function hideToast(){
+  var el = document.getElementById("toast");
+  var undoBtn = document.getElementById("toast-undo-btn");
+  if(el) el.classList.remove("show");
+  if(undoBtn) undoBtn.classList.remove("show");
+  clearTimeout(toastTimer);
+}
+
+/* ── 編集開始（data-id属性版）── */
+var editingId = null;
+
+function startEditById(btn){
+  var msgId = btn.getAttribute("data-id");
+  var stored = msgStore[msgId];
+  if(!stored){ console.error("msgStore未登録:", msgId); return; }
+  startEdit(msgId, stored.text, stored.priority);
+}
+
+function startEdit(msgId, rawText, currentPriority){
+  if(editingId && editingId !== msgId) cancelEdit(editingId);
+  editingId = msgId;
+
+  var card    = document.getElementById("card-"+msgId);
+  var textEl  = document.getElementById("text-"+msgId);
+  var areaEl  = document.getElementById("edit-area-"+msgId);
+  var editBtn = document.getElementById("edit-btn-"+msgId);
+  if(!card||!textEl||!areaEl) return;
+
+  textEl.style.display = "none";
+  card.classList.add("editing");
+  if(editBtn) editBtn.style.display = "none";
+
+  var normalSel = currentPriority !== "high" ? " sel-normal" : "";
+  var highSel   = currentPriority === "high"  ? " sel-high"   : "";
+  areaEl.innerHTML =
+    '<div class="edit-priority-selector">'
+    + '<button class="edit-pri-btn'+normalSel+'" id="epri-normal-'+msgId+'">📋 通常</button>'
+    + '<button class="edit-pri-btn'+highSel+'"   id="epri-high-'+msgId+'">🔴 重要</button>'
+    + '</div>'
+    + '<textarea class="edit-textarea" id="edit-ta-'+msgId+'" maxlength="'+MAX_CHARS+'"></textarea>'
+    + '<div class="edit-footer">'
+    + '<span class="edit-char-count" id="edit-cc-'+msgId+'">0 / '+MAX_CHARS+'</span>'
+    + '<div class="edit-actions">'
+    + '<button class="edit-cancel-btn" id="edit-cancel-'+msgId+'">キャンセル</button>'
+    + '<button class="edit-save-btn"   id="edit-save-'+msgId+'">💾 保存</button>'
+    + '</div></div>';
+
+  areaEl.style.display   = "block";
+  areaEl.dataset.priority = currentPriority;
+
+  // すべてのイベントをaddEventListenerで登録（onclickに文字列を埋め込まない）
+  var ta        = document.getElementById("edit-ta-"+msgId);
+  var normalBtn = document.getElementById("epri-normal-"+msgId);
+  var highBtn   = document.getElementById("epri-high-"+msgId);
+  var cancelBtn = document.getElementById("edit-cancel-"+msgId);
+  var saveBtn   = document.getElementById("edit-save-"+msgId);
+
+  normalBtn.addEventListener("click", function(){ setEditPri(msgId,"normal"); });
+  highBtn.addEventListener("click",   function(){ setEditPri(msgId,"high"); });
+  ta.value = rawText||"";
+  updateEditCount(msgId);
+  ta.addEventListener("input",   function(){ updateEditCount(msgId); });
+  ta.addEventListener("keydown", function(e){ if(e.key==="Escape") cancelEdit(msgId); });
+  cancelBtn.addEventListener("click", function(){ cancelEdit(msgId); });
+  saveBtn.addEventListener("click",   function(){ saveEdit(msgId); });
+
+  setTimeout(function(){
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+  }, 50);
+}
+
+function setEditPri(msgId, p){
+  var areaEl = document.getElementById("edit-area-"+msgId); if(!areaEl) return;
+  areaEl.dataset.priority = p;
+  var nb = document.getElementById("epri-normal-"+msgId);
+  var hb = document.getElementById("epri-high-"+msgId);
+  if(nb) nb.className = "edit-pri-btn"+(p==="normal"?" sel-normal":"");
+  if(hb) hb.className = "edit-pri-btn"+(p==="high"?" sel-high":"");
+}
+
+function updateEditCount(msgId){
+  var ta = document.getElementById("edit-ta-"+msgId); if(!ta) return;
+  var cc = document.getElementById("edit-cc-"+msgId); if(!cc) return;
+  var len = ta.value.length;
+  cc.textContent = len+" / "+MAX_CHARS;
+  cc.className = "edit-char-count"+(len>MAX_CHARS?" over":len>120?" warn":"");
+  var sb = document.getElementById("edit-save-"+msgId);
+  if(sb) sb.disabled = (len===0||len>MAX_CHARS);
+}
+
+function cancelEdit(msgId){
+  var card    = document.getElementById("card-"+msgId); if(!card) return;
+  var textEl  = document.getElementById("text-"+msgId);
+  var areaEl  = document.getElementById("edit-area-"+msgId);
+  var editBtn = document.getElementById("edit-btn-"+msgId);
+  if(textEl)  textEl.style.display = "";
+  if(areaEl){ areaEl.innerHTML = ""; areaEl.style.display = "none"; }
+  if(editBtn) editBtn.style.display = "";
+  card.classList.remove("editing");
+  if(editingId===msgId) editingId = null;
+}
+
+function saveEdit(msgId){
+  var ta      = document.getElementById("edit-ta-"+msgId); if(!ta) return;
+  var areaEl  = document.getElementById("edit-area-"+msgId);
+  var newText = ta.value.trim();
+  var newPri  = (areaEl&&areaEl.dataset.priority)||"normal";
+  if(!newText||newText.length>MAX_CHARS) return;
+
+  var saveBtn = document.getElementById("edit-save-"+msgId);
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent="保存中..."; }
+
+  if(!firebaseOk){
+    var msgs = getMsgsFallback(loggedInJid).map(function(m){
+      return m.id===msgId ? Object.assign({},m,{text:newText,priority:newPri}) : m;
+    });
+    localStorage.setItem("msgs_"+loggedInJid, JSON.stringify(msgs));
+    cancelEdit(msgId); editingId=null; renderAdminMsgsFallback(); showToast("✅ 更新しました", false); return;
+  }
+
+  db.collection("messages").doc(msgId).update({text:newText, priority:newPri})
+    .then(function(){ cancelEdit(msgId); editingId=null; showToast("✅ 更新しました", false); })
+    .catch(function(e){
+      console.error(e); showToast("❌ 更新に失敗しました", false);
+      if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent="💾 保存"; }
+    });
+}
+
+/* ── ユーティリティ ── */
+function tsAge(ts){
+  var t=ts&&ts.toDate?ts.toDate().getTime():new Date(ts).getTime();
+  var h=(Date.now()-t)/3600000;
+  if(h<24)  return "today";
+  if(h<168) return "week";
+  if(h<720) return "month";
+  return "old";
+}
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function updateCharCount(){
+  var len=document.getElementById("post-text").value.length;
+  var el=document.getElementById("char-count");
+  el.textContent=len+" / "+MAX_CHARS;
+  el.className="char-count"+(len>MAX_CHARS?" over":len>120?" warn":"");
+  document.getElementById("post-btn").disabled=len===0||len>MAX_CHARS;
+}
+
+
+/* ── 初期化 ── */
+initFirebase();
+buildLoginSelect();
+</script>
+</body>
+</html>
