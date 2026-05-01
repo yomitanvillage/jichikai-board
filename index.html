@@ -256,11 +256,11 @@ var JICHIKAI = [
   {id:"j07",name:"波平自治会",addr:"沖縄県中頭郡読谷村字波平61",tel:"098-958-2229",email:"",lat:26.4056167,lng:127.733921,hp:"",sns:""},
   {id:"j08",name:"上地自治会",addr:"沖縄県中頭郡読谷村字上地1",tel:"098-958-0628",email:"",lat:26.4025552,lng:127.7380729,hp:"",sns:""},
   {id:"j09",name:"都屋自治会",addr:"沖縄県中頭郡読谷村字都屋307",tel:"098-956-2241",email:"",lat:26.3918624,lng:127.7264575,hp:"",sns:""},
-  {id:"j10",name:"喜名自治会",addr:"沖縄県中頭郡読谷村字喜名2207",tel:"098-958-2236",email:"",lat:26.3990503,lng:127.7567113,hp:"https://m.facebook.com/kinakouminkan/?locale=ja_JP",sns:""},
+  {id:"j10",name:"喜名自治会",addr:"沖縄県中頭郡読谷村字喜名2207",tel:"098-958-2236",email:"",lat:26.3990503,lng:127.7567113,hp:"https://m.facebook.com/kinakouminkan/?locale=ja_JP",youtube:"",instagram:"https://www.instagram.com/kinajitikai/"},
   {id:"j11",name:"親志自治会",addr:"沖縄県中頭郡読谷村字座喜味2317",tel:"098-958-2237",email:"",lat:26.4028566,lng:127.7548829,hp:"",sns:""},
   {id:"j12",name:"座喜味自治会",addr:"沖縄県中頭郡読谷村字座喜味154",tel:"098-958-2228",email:"",lat:26.4046064,lng:127.744139,hp:"",sns:""},
   {id:"j13",name:"横田自治会",addr:"沖縄県中頭郡読谷村字座喜味2713-115",tel:"098-958-7111",email:"",lat:26.4056327,lng:127.7561202,hp:"",sns:""},
-  {id:"j14",name:"楚辺自治会",addr:"沖縄県中頭郡読谷村字楚辺1928-1",tel:"098-956-2326",email:"",lat:26.3857137,lng:127.7271317,hp:"",sns:""},
+  {id:"j14",name:"楚辺自治会",addr:"沖縄県中頭郡読谷村字楚辺1928-1",tel:"098-956-2326",email:"",lat:26.3857137,lng:127.7271317,hp:"",youtube:"https://www.youtube.com/results?search_query=%E6%A5%9A%E8%BE%BA%E3%83%81%E3%83%A3%E3%83%B3%E3%83%8D%E3%83%AB",instagram:""},
   {id:"j15",name:"大添自治会",addr:"沖縄県中頭郡読谷村字楚辺1279-31",tel:"098-956-9093",email:"",lat:26.3875181,lng:127.7376736,hp:"",sns:""},
   {id:"j16",name:"大木自治会",addr:"沖縄県中頭郡読谷村字大木294",tel:"098-956-2020",email:"",lat:26.3808349,lng:127.7463291,hp:"",sns:""},
   {id:"j17",name:"伊良皆自治会",addr:"沖縄県中頭郡読谷村字伊良皆177-3",tel:"098-956-2235",email:"",lat:26.3848176,lng:127.7538245,hp:"",sns:""},
@@ -508,10 +508,12 @@ function renderBoardView(){
 
   /* 連絡先リンク */
   var links=[];
-  if(j.tel)   links.push('<a class="detail-link-btn" href="tel:'+j.tel+'">📞 '+j.tel+'</a>');
-  if(j.email) links.push('<a class="detail-link-btn" href="mailto:'+j.email+'">✉️ メール</a>');
-  if(j.hp)    links.push('<a class="detail-link-btn" href="'+j.hp+'" target="_blank" rel="noopener">🌐 HP</a>');
-  if(j.sns)   links.push('<a class="detail-link-btn" href="'+j.sns+'" target="_blank" rel="noopener">📱 SNS</a>');
+  if(j.tel)       links.push('<a class="detail-link-btn" href="tel:'+j.tel+'">📞 '+j.tel+'</a>');
+  if(j.email)     links.push('<a class="detail-link-btn" href="mailto:'+j.email+'">✉️ メール</a>');
+  if(j.hp)        links.push('<a class="detail-link-btn" href="'+j.hp+'" target="_blank" rel="noopener">🌐 HP</a>');
+  if(j.youtube)   links.push('<a class="detail-link-btn" href="'+j.youtube+'" target="_blank" rel="noopener">▶️ YouTube</a>');
+  if(j.instagram) links.push('<a class="detail-link-btn" href="'+j.instagram+'" target="_blank" rel="noopener">📸 Instagram</a>');
+  if(j.sns)       links.push('<a class="detail-link-btn" href="'+j.sns+'" target="_blank" rel="noopener">📱 SNS</a>');
   links.push('<a class="detail-link-btn" href="https://maps.google.com/maps?q='+j.lat+','+j.lng+'" target="_blank" rel="noopener">🗺️ 地図</a>');
 
   /* お気に入りボタン状態 */
