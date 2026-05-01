@@ -412,7 +412,7 @@ function renderMsgList(jid,name){
       +'<span class="msg-time">'+fmtTs(m.timestamp)+'</span>'
       +'<span class="msg-age-badge '+ageCls+'">'+ageLabel+'</span>'
       +'</div>'
-      +'<div class="msg-text">'+esc(m.text)+'</div>'
+      +'<div class="msg-text">'+linkify(m.text)+'</div>'
       +'</div>';
   }).join("");
 }
@@ -611,7 +611,16 @@ function openMenu(){ buildMenu(); document.getElementById("side-menu").classList
 function closeMenu(){ document.getElementById("side-menu").classList.remove("open"); document.getElementById("menu-overlay").classList.remove("open"); document.body.style.overflow=""; }
 function selectFromMenu(jid){ closeMenu(); openBoard(jid); }
 
-/* ── GPS ── */
+/* ── URLをリンクに変換 ── */
+function linkify(text){
+  // まずHTMLエスケープ
+  var escaped = esc(text);
+  // http:// または https:// で始まるURLをaタグに変換
+  return escaped.replace(
+    /(https?:\/\/[^\s<>"]+)/g,
+    '<a href="$1" target="_blank" rel="noopener" style="color:var(--green-mid);text-decoration:underline;word-break:break-all;">$1</a>'
+  );
+}
 function getLocation(){
   if(!navigator.geolocation){ alert("このブラウザではGPSが使えません"); return; }
   navigator.geolocation.getCurrentPosition(
