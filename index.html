@@ -147,7 +147,26 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .age-today { background: #e8f5ee; color: #1a6b3c; }
 .age-week  { background: #e6f0fa; color: #2a6cb5; }
 .age-month { background: #fff8e8; color: #e8a020; }
-.age-old   { background: #f0f0f0; color: #aaa; }
+.age-old   { display: none; } /* 「古い」は非表示 */
+/* ── いいね ── */
+.msg-footer { display:flex; align-items:center; justify-content:flex-end; margin-top:10px; }
+.like-btn {
+  display:inline-flex; align-items:center; gap:5px;
+  background:none; border:1.5px solid var(--border);
+  border-radius:20px; padding:5px 12px;
+  font-size:13px; font-family:inherit; cursor:pointer;
+  color:var(--ink-faint); transition:all 0.15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.like-btn:hover { border-color:#e05a7a; color:#e05a7a; background:#fff0f4; }
+.like-btn.liked { border-color:#e05a7a; color:#e05a7a; background:#fff0f4; }
+.like-btn.liked .like-heart { animation:heart-pop 0.25s ease; }
+.like-count { font-weight:700; font-size:13px; }
+@keyframes heart-pop {
+  0%  { transform:scale(1); }
+  50% { transform:scale(1.4); }
+  100%{ transform:scale(1); }
+}
 /* ▼ メッセージ本文を大きめに */
 .msg-text { font-size: 15px; line-height: 1.75; color: var(--ink); white-space: pre-wrap; word-break: break-word; }
 
@@ -401,18 +420,26 @@ function renderMsgList(jid,name){
   return msgs.map(function(m){
     var age=tsAge(m.timestamp);
     var ageCls=age==="today"?"age-today":age==="week"?"age-week":age==="month"?"age-month":"age-old";
-    var ageLabel=age==="today"?"今日":age==="week"?"今週":age==="month"?"今月":"古い";
+    var ageLabel=age==="today"?"今日":age==="week"?"今週":age==="month"?"今月":"";
     var isHigh=(m.priority==="high");
     var cardCls="msg-card"+(isHigh?" priority-high":"");
     var priorityLabel=isHigh?'<span class="msg-priority-label">🔴 重要</span>':"";
-    return'<div class="'+cardCls+'">'
+    var likes=m.likes||0;
+    var liked=isLiked(m.id);
+    var likedCls=liked?" liked":"";
+    return'<div class="'+cardCls+'" id="msgcard-'+m.id+'">'
       +'<div class="msg-meta">'
       +priorityLabel
       +'<span class="msg-jichi-name">'+esc(name)+'</span>'
       +'<span class="msg-time">'+fmtTs(m.timestamp)+'</span>'
-      +'<span class="msg-age-badge '+ageCls+'">'+ageLabel+'</span>'
-      +'</div>'
+      +(ageLabel?'<span class="msg-age-badge '+ageCls+'">'+ageLabel+'</span>':"")      +'</div>'
       +'<div class="msg-text">'+linkify(m.text)+'</div>'
+      +'<div class="msg-footer">'
+      +'<button class="like-btn'+likedCls+'" id="like-'+m.id+'" onclick="toggleLike(\''+jid+'\',\''+m.id+'\')">'
+      +'<span class="like-heart">'+(liked?'❤️':'🤍')+'</span>'
+      +'<span class="like-count" id="like-count-'+m.id+'">'+likes+'</span>'
+      +'</button>'
+      +'</div>'
       +'</div>';
   }).join("");
 }
@@ -612,6 +639,51 @@ function refreshMenuBadge(jid){
 function openMenu(){ buildMenu(); document.getElementById("side-menu").classList.add("open"); document.getElementById("menu-overlay").classList.add("open"); document.body.style.overflow="hidden"; }
 function closeMenu(){ document.getElementById("side-menu").classList.remove("open"); document.getElementById("menu-overlay").classList.remove("open"); document.body.style.overflow=""; }
 function selectFromMenu(jid){ closeMenu(); openBoard(jid); }
+
+
+/* ── いいね機能 ── */
+var LIKED_KEY = "liked_msgs";
+function getLikedSet(){
+  try{ return JSON.parse(localStorage.getItem(LIKED_KEY)||"{}"); }catch(e){ return {}; }
+}
+function saveLikedSet(obj){ localStorage.setItem(LIKED_KEY, JSON.stringify(obj)); }
+function isLiked(msgId){ return !!getLikedSet()[msgId]; }
+
+function toggleLike(jid, msgId){
+  if(!firebaseOk) return;
+  var liked = isLiked(msgId);
+  var delta = liked ? -1 : 1;
+  // localStorageを即時更新
+  var set = getLikedSet();
+  if(liked) delete set[msgId]; else set[msgId] = 1;
+  saveLikedSet(set);
+  // UIを即時更新
+  var btn = document.getElementById("like-"+msgId);
+  var cnt = document.getElementById("like-count-"+msgId);
+  var nowLiked = !liked;
+  if(btn){
+    btn.className = "like-btn"+(nowLiked?" liked":"");
+    var heart = btn.querySelector(".like-heart");
+    if(heart) heart.textContent = nowLiked ? "❤️" : "🤍";
+  }
+  if(cnt){ cnt.textContent = Math.max(0,(parseInt(cnt.textContent)||0)+delta); }
+  // Firestoreを更新
+  db.collection("messages").doc(msgId).update({
+    likes: firebase.firestore.FieldValue.increment(delta)
+  }).catch(function(e){
+    console.error("いいね更新エラー:", e);
+    // 失敗時は元に戻す
+    var set2 = getLikedSet();
+    if(nowLiked) delete set2[msgId]; else set2[msgId] = 1;
+    saveLikedSet(set2);
+    if(btn){
+      btn.className = "like-btn"+(liked?" liked":"");
+      var heart2 = btn.querySelector(".like-heart");
+      if(heart2) heart2.textContent = liked ? "❤️" : "🤍";
+    }
+    if(cnt){ cnt.textContent = Math.max(0,(parseInt(cnt.textContent)||0)-delta); }
+  });
+}
 
 /* ── URLをリンクに変換 ── */
 function linkify(text){
