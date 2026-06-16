@@ -73,7 +73,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .fav-banner-label { font-size: 10px; color: rgba(255,255,255,0.7); font-weight: 700; letter-spacing: 0.08em; }
 .fav-banner-name { font-size: 16px; font-weight: 700; color: white; font-family: 'Noto Serif JP', serif; }
 .fav-banner-arrow { color: rgba(255,255,255,0.7); font-size: 18px; flex-shrink: 0; }
-.fav-banner-badge { background: rgba(255,255,255,0.25); color: white; font-size: 14px; font-weight: 700; padding: 4px 11px; border-radius: 20px; flex-shrink: 0; }
+.fav-banner-badge { background: rgba(255,255,255,0.25); color: white; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; }
 
 /* ── 自治会リスト ── */
 .jichi-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
@@ -90,7 +90,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .jichi-addr { font-size: 11px; color: var(--ink-light); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ── バッジ（件数 + 色で時期） ── */
-.jichi-badge { font-size: 14px; font-weight: 700; padding: 4px 11px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.jichi-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
 .badge-today  { background: #e8f5ee; color: #1a6b3c; }
 .badge-week   { background: #e6f0fa; color: #2a6cb5; }
 .badge-month  { background: #fff8e8; color: #e8a020; }
@@ -123,7 +123,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 /* ── お知らせボード ── */
 .msg-board-header { display: flex; align-items: center; margin-bottom: 10px; }
 .msg-board-title { font-size: 14px; font-weight: 700; color: var(--green-deep); display: flex; align-items: center; gap: 6px; }
-.msg-count-badge { font-size: 14px; background: var(--green-pale); color: var(--green-mid); border-radius: 10px; padding: 3px 10px; font-weight: 700; }
+.msg-count-badge { font-size: 11px; background: var(--green-pale); color: var(--green-mid); border-radius: 10px; padding: 2px 8px; font-weight: 700; }
 .msg-list { display: flex; flex-direction: column; gap: 8px; }
 .msg-empty { text-align: center; color: var(--ink-faint); font-size: 14px; padding: 24px 0; }
 .msg-card { background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 12px 14px; }
@@ -147,7 +147,27 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .age-today { background: #e8f5ee; color: #1a6b3c; }
 .age-week  { background: #e6f0fa; color: #2a6cb5; }
 .age-month { background: #fff8e8; color: #e8a020; }
-.age-old   { background: #f0f0f0; color: #aaa; }
+.age-old   { display: none; }  /* 「古い」は非表示 */
+
+/* ── いいねボタン ── */
+.msg-footer { display: flex; align-items: center; justify-content: flex-end; margin-top: 10px; }
+.like-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: none; border: 1.5px solid var(--border);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 13px; font-family: inherit; cursor: pointer;
+  color: var(--ink-faint); transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.like-btn:hover  { border-color: #e05a7a; color: #e05a7a; background: #fff0f4; }
+.like-btn.liked  { border-color: #e05a7a; color: #e05a7a; background: #fff0f4; }
+.like-btn.liked .like-heart { animation: heart-pop 0.25s ease; }
+.like-count { font-weight: 700; font-size: 13px; }
+@keyframes heart-pop {
+  0%  { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100%{ transform: scale(1); }
+}
 /* ▼ メッセージ本文を大きめに */
 .msg-text { font-size: 15px; line-height: 1.75; color: var(--ink); white-space: pre-wrap; word-break: break-word; }
 
@@ -182,23 +202,15 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .menu-header h2 { font-size: 15px; color: white; font-family: 'Noto Serif JP', serif; }
 .menu-close { background: rgba(255,255,255,0.15); border: none; border-radius: 6px; color: white; font-size: 16px; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .menu-body { flex: 1; overflow-y: auto; padding: 6px 0; }
-.menu-section-title { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; color: var(--ink-faint); padding: 10px 16px 4px; text-transform: uppercase; }
-.menu-jichi-item { display: flex; align-items: center; gap: 8px; padding: 12px 16px; cursor: pointer; font-size: 16px; border-bottom: 1px solid var(--border); transition: background 0.1s; }
+.menu-section-title { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-faint); padding: 10px 16px 4px; text-transform: uppercase; }
+.menu-jichi-item { display: flex; align-items: center; gap: 8px; padding: 10px 16px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); transition: background 0.1s; }
 .menu-jichi-item:hover { background: var(--green-faint); }
 .menu-jichi-item.active { background: var(--green-pale); font-weight: 700; color: var(--green-deep); }
 .menu-jichi-icon { font-size: 13px; flex-shrink: 0; width: 20px; text-align: center; }
-.menu-jichi-num { font-size: 13px; color: var(--ink-faint); font-family: 'DM Mono', monospace; min-width: 26px; flex-shrink: 0; }
+.menu-jichi-num { font-size: 10px; color: var(--ink-faint); font-family: 'DM Mono', monospace; min-width: 22px; flex-shrink: 0; }
 .menu-jichi-name-text { flex: 1; }
-.menu-msg-badge { font-size: 13px; padding: 3px 9px; border-radius: 10px; font-weight: 700; flex-shrink: 0; }
+.menu-msg-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-weight: 700; flex-shrink: 0; }
 </style>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-GENYF89C83"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-GENYF89C83');
-</script>
 </head>
 <body>
 
@@ -247,30 +259,30 @@ var FIREBASE_CONFIG = {
 
 /* ── 自治会マスターデータ ── */
 var JICHIKAI = [
-  {id:"j01",name:"長浜自治会",addr:"沖縄県中頭郡読谷村字長浜14",tel:"098-958-4246",email:"",lat:26.4218262,lng:127.7384241,hp:"",sns:""},
-  {id:"j02",name:"瀬名波自治会",addr:"沖縄県中頭郡読谷村字瀬名波138",tel:"098-958-2594",email:"",lat:26.4207398,lng:127.7312578,hp:"",sns:""},
-  {id:"j03",name:"宇座自治会",addr:"沖縄県中頭郡読谷村字長浜1840-2",tel:"098-958-2231",email:"",lat:26.4125618,lng:127.7328,hp:"",sns:""},
-  {id:"j04",name:"儀間自治会",addr:"沖縄県中頭郡読谷村字長浜1409",tel:"098-958-3002",email:"",lat:26.4161338,lng:127.7291517,hp:"",sns:""},
-  {id:"j05",name:"渡慶次自治会",addr:"沖縄県中頭郡読谷村字渡慶次180",tel:"098-958-4922",email:"",lat:26.4206609,lng:127.7265009,hp:"http://tokeshi.ezlog.jp/",sns:""},
-  {id:"j06",name:"高志保自治会",addr:"沖縄県中頭郡読谷村字高志保260",tel:"098-958-4455",email:"",lat:26.4093286,lng:127.7334781,hp:"",sns:""},
-  {id:"j07",name:"波平自治会",addr:"沖縄県中頭郡読谷村字波平61",tel:"098-958-2229",email:"",lat:26.4056167,lng:127.733921,hp:"",sns:""},
-  {id:"j08",name:"上地自治会",addr:"沖縄県中頭郡読谷村字上地1",tel:"098-958-0628",email:"",lat:26.4025552,lng:127.7380729,hp:"",sns:""},
-  {id:"j09",name:"都屋自治会",addr:"沖縄県中頭郡読谷村字都屋307",tel:"098-956-2241",email:"",lat:26.3918624,lng:127.7264575,hp:"",sns:""},
-  {id:"j10",name:"喜名自治会",addr:"沖縄県中頭郡読谷村字喜名2207",tel:"098-958-2236",email:"",lat:26.3990503,lng:127.7567113,hp:"https://m.facebook.com/kinakouminkan/?locale=ja_JP",youtube:"",instagram:"https://www.instagram.com/kinajitikai/"},
-  {id:"j11",name:"親志自治会",addr:"沖縄県中頭郡読谷村字座喜味2317",tel:"098-958-2237",email:"",lat:26.4028566,lng:127.7548829,hp:"",sns:""},
-  {id:"j12",name:"座喜味自治会",addr:"沖縄県中頭郡読谷村字座喜味154",tel:"098-958-2228",email:"",lat:26.4046064,lng:127.744139,hp:"",sns:""},
-  {id:"j13",name:"横田自治会",addr:"沖縄県中頭郡読谷村字座喜味2713-115",tel:"098-958-7111",email:"",lat:26.4056327,lng:127.7561202,hp:"",sns:""},
-  {id:"j14",name:"楚辺自治会",addr:"沖縄県中頭郡読谷村字楚辺1928-1",tel:"098-956-2326",email:"",lat:26.3857137,lng:127.7271317,hp:"",youtube:"https://www.youtube.com/results?search_query=%E6%A5%9A%E8%BE%BA%E3%83%81%E3%83%A3%E3%83%B3%E3%83%8D%E3%83%AB",instagram:""},
-  {id:"j15",name:"大添自治会",addr:"沖縄県中頭郡読谷村字楚辺1279-31",tel:"098-956-9093",email:"",lat:26.3875181,lng:127.7376736,hp:"",sns:""},
-  {id:"j16",name:"大木自治会",addr:"沖縄県中頭郡読谷村字大木294",tel:"098-956-2020",email:"",lat:26.3808349,lng:127.7463291,hp:"",sns:""},
-  {id:"j17",name:"伊良皆自治会",addr:"沖縄県中頭郡読谷村字伊良皆177-3",tel:"098-956-2235",email:"",lat:26.3848176,lng:127.7538245,hp:"",sns:""},
-  {id:"j18",name:"牧原自治会",addr:"沖縄県中頭郡読谷村字比謝315-4",tel:"098-956-2328",email:"",lat:26.3802659,lng:127.7514085,hp:"",sns:""},
-  {id:"j19",name:"長田自治会",addr:"沖縄県中頭郡読谷村字大木313-1",tel:"098-957-3752",email:"",lat:26.3816344,lng:127.7486171,hp:"",sns:""},
-  {id:"j20",name:"渡具知自治会",addr:"沖縄県中頭郡読谷村字渡具知246-2",tel:"098-956-2240",email:"",lat:26.3651527,lng:127.7398094,hp:"",sns:""},
-  {id:"j21",name:"古堅自治会",addr:"沖縄県中頭郡読谷村字古堅75-3",tel:"098-956-2238",email:"",lat:26.3694527,lng:127.7504828,hp:"",sns:""},
-  {id:"j22",name:"大湾自治会",addr:"沖縄県中頭郡読谷村字大湾425",tel:"098-956-2233",email:"",lat:26.372093,lng:127.754191,hp:"",sns:""},
-  {id:"j23",name:"比謝矼自治会",addr:"沖縄県中頭郡読谷村字比謝矼3",tel:"098-957-2172",email:"",lat:26.3718906,lng:127.7548071,hp:"",sns:""},
-  {id:"j24",name:"比謝自治会",addr:"沖縄県中頭郡読谷村字比謝26",tel:"098-956-2234",email:"",lat:26.3747406,lng:127.7543108,hp:"",sns:""},
+  {id:"j01",name:"喜名自治会",    addr:"沖縄県中頭郡読谷村字喜名2207",          tel:"098-958-2236",email:"",lat:26.3990503,lng:127.7567113,hp:"https://m.facebook.com/kinakouminkan/?locale=ja_JP",sns:""},
+  {id:"j02",name:"親志自治会",    addr:"沖縄県中頭郡読谷村字座喜味2317",         tel:"098-958-2237",email:"",lat:26.4028566,lng:127.7548829,hp:"",sns:""},
+  {id:"j03",name:"座喜味自治会",  addr:"沖縄県中頭郡読谷村字座喜味154",          tel:"098-958-2228",email:"",lat:26.4046064,lng:127.7441390,hp:"",sns:""},
+  {id:"j04",name:"伊良皆自治会",  addr:"沖縄県中頭郡読谷村字伊良皆177-3",        tel:"098-956-2235",email:"",lat:26.3848176,lng:127.7538245,hp:"",sns:""},
+  {id:"j05",name:"波平自治会",    addr:"沖縄県中頭郡読谷村字波平61",             tel:"098-958-2229",email:"",lat:26.4056167,lng:127.7339210,hp:"",sns:""},
+  {id:"j06",name:"上地自治会",    addr:"沖縄県中頭郡読谷村字上地1",              tel:"098-958-0628",email:"",lat:26.4025552,lng:127.7380729,hp:"",sns:""},
+  {id:"j07",name:"都屋自治会",    addr:"沖縄県中頭郡読谷村字都屋307",            tel:"098-956-2241",email:"",lat:26.3918624,lng:127.7264575,hp:"",sns:""},
+  {id:"j08",name:"高志保自治会",  addr:"沖縄県中頭郡読谷村字高志保260",          tel:"098-958-4455",email:"",lat:26.4093286,lng:127.7334781,hp:"",sns:""},
+  {id:"j09",name:"渡慶次自治会",  addr:"沖縄県中頭郡読谷村字渡慶次180",          tel:"098-958-4922",email:"",lat:26.4206609,lng:127.7265009,hp:"http://tokeshi.ezlog.jp/",sns:""},
+  {id:"j10",name:"儀間自治会",    addr:"沖縄県中頭郡読谷村字長浜1409",           tel:"098-958-3002",email:"",lat:26.4161338,lng:127.7291517,hp:"",sns:""},
+  {id:"j11",name:"宇座自治会",    addr:"沖縄県中頭郡読谷村字長浜1840-2",         tel:"098-958-2231",email:"",lat:26.4125618,lng:127.7328000,hp:"",sns:""},
+  {id:"j12",name:"瀬名波自治会",  addr:"沖縄県中頭郡読谷村字瀬名波138",          tel:"098-958-2594",email:"",lat:26.4207398,lng:127.7312578,hp:"",sns:""},
+  {id:"j13",name:"長浜自治会",    addr:"沖縄県中頭郡読谷村字長浜14",             tel:"098-958-4246",email:"",lat:26.4218262,lng:127.7384241,hp:"",sns:""},
+  {id:"j14",name:"楚辺自治会",    addr:"沖縄県中頭郡読谷村字楚辺1928-1",         tel:"098-956-2326",email:"",lat:26.3857137,lng:127.7271317,hp:"",sns:""},
+  {id:"j15",name:"古堅自治会",    addr:"沖縄県中頭郡読谷村字古堅75-3",           tel:"098-956-2238",email:"",lat:26.3694527,lng:127.7504828,hp:"",sns:""},
+  {id:"j16",name:"渡具知自治会",  addr:"沖縄県中頭郡読谷村字渡具知246-2",        tel:"098-956-2240",email:"",lat:26.3651527,lng:127.7398094,hp:"",sns:""},
+  {id:"j17",name:"大木自治会",    addr:"沖縄県中頭郡読谷村字大木294",            tel:"098-956-2020",email:"",lat:26.3808349,lng:127.7463291,hp:"",sns:""},
+  {id:"j18",name:"比謝自治会",    addr:"沖縄県中頭郡読谷村字比謝26",             tel:"098-956-2234",email:"",lat:26.3747406,lng:127.7543108,hp:"",sns:""},
+  {id:"j19",name:"大湾自治会",    addr:"沖縄県中頭郡読谷村字大湾425",            tel:"098-956-2233",email:"",lat:26.3720930,lng:127.7541910,hp:"",sns:""},
+  {id:"j20",name:"比謝矼自治会",  addr:"沖縄県中頭郡読谷村字比謝矼3",           tel:"098-957-2172",email:"",lat:26.3718906,lng:127.7548071,hp:"",sns:""},
+  {id:"j21",name:"長田自治会",    addr:"沖縄県中頭郡読谷村字大木313-9",          tel:"098-956-6550",email:"",lat:26.3816344,lng:127.7486171,hp:"",sns:""},
+  {id:"j22",name:"牧原自治会",    addr:"沖縄県中頭郡読谷村字比謝315-4",          tel:"098-956-2328",email:"",lat:26.3802659,lng:127.7514085,hp:"",sns:""},
+  {id:"j23",name:"大添自治会",    addr:"沖縄県中頭郡読谷村字楚辺1279-31",        tel:"098-956-9093",email:"",lat:26.3875181,lng:127.7376736,hp:"",sns:""},
+  {id:"j24",name:"横田自治会",    addr:"沖縄県中頭郡読谷村字座喜味2713-115",     tel:"098-958-7111",email:"",lat:26.4056327,lng:127.7561202,hp:"",sns:""}
 ];
 
 /* ══════════════════════════════════════════
@@ -333,11 +345,8 @@ function subscribeMsgs(jid){
       var bc=document.getElementById("msgcount-"+jid);
       if(bc) bc.textContent=getMsgs(jid).length+"件";
     }
-    // リスト表示中のカードバッジを即時更新
+    // リスト表示中のバッジ更新
     refreshListBadge(jid);
-    // お気に入りバナーのバッジを即時更新
-    refreshFavBannerBadge(jid);
-    // サイドメニューのバッジを即時更新
     refreshMenuBadge(jid);
   });
 }
@@ -401,18 +410,28 @@ function renderMsgList(jid,name){
   return msgs.map(function(m){
     var age=tsAge(m.timestamp);
     var ageCls=age==="today"?"age-today":age==="week"?"age-week":age==="month"?"age-month":"age-old";
-    var ageLabel=age==="today"?"今日":age==="week"?"今週":age==="month"?"今月":"古い";
+    var ageLabel=age==="today"?"今日":age==="week"?"今週":age==="month"?"今月":"";
     var isHigh=(m.priority==="high");
     var cardCls="msg-card"+(isHigh?" priority-high":"");
     var priorityLabel=isHigh?'<span class="msg-priority-label">🔴 重要</span>':"";
-    return'<div class="'+cardCls+'">'
+    // いいね状態
+    var likes=m.likes||0;
+    var liked=isLiked(m.id);
+    var likedCls=liked?" liked":"";
+    return'<div class="'+cardCls+'" id="msgcard-'+m.id+'">'
       +'<div class="msg-meta">'
       +priorityLabel
       +'<span class="msg-jichi-name">'+esc(name)+'</span>'
       +'<span class="msg-time">'+fmtTs(m.timestamp)+'</span>'
-      +'<span class="msg-age-badge '+ageCls+'">'+ageLabel+'</span>'
+      +(ageLabel?'<span class="msg-age-badge '+ageCls+'">'+ageLabel+'</span>':"")
       +'</div>'
       +'<div class="msg-text">'+linkify(m.text)+'</div>'
+      +'<div class="msg-footer">'
+      +'<button class="like-btn'+likedCls+'" id="like-'+m.id+'" onclick="toggleLike(\''+jid+'\',\''+m.id+'\')">'
+      +'<span class="like-heart">'+(liked?'❤️':'🤍')+'</span>'
+      +'<span class="like-count" id="like-count-'+m.id+'">'+likes+'</span>'
+      +'</button>'
+      +'</div>'
       +'</div>';
   }).join("");
 }
@@ -458,7 +477,7 @@ function renderListView(){
       html+='<div class="fav-banner" onclick="openBoard(\''+favJ.id+'\')">'
         +'<span class="fav-banner-icon">⭐</span>'
         +'<div class="fav-banner-info">'
-        +'<div class="fav-banner-label">お気に入りの自治会</div>'
+        +'<div class="fav-banner-label">お気に入り（'+favList.length+'/'+MAX_FAV+'件）</div>'
         +'<div class="fav-banner-name">'+esc(favJ.name)+'</div>'
         +'</div>'
         +'<span class="fav-banner-badge">'+badge.label+'</span>'
@@ -508,12 +527,10 @@ function renderBoardView(){
 
   /* 連絡先リンク */
   var links=[];
-  if(j.tel)       links.push('<a class="detail-link-btn" href="tel:'+j.tel+'">📞 '+j.tel+'</a>');
-  if(j.email)     links.push('<a class="detail-link-btn" href="mailto:'+j.email+'">✉️ メール</a>');
-  if(j.hp)        links.push('<a class="detail-link-btn" href="'+j.hp+'" target="_blank" rel="noopener">🌐 HP</a>');
-  if(j.youtube)   links.push('<a class="detail-link-btn" href="'+j.youtube+'" target="_blank" rel="noopener">▶️ YouTube</a>');
-  if(j.instagram) links.push('<a class="detail-link-btn" href="'+j.instagram+'" target="_blank" rel="noopener">📸 Instagram</a>');
-  if(j.sns)       links.push('<a class="detail-link-btn" href="'+j.sns+'" target="_blank" rel="noopener">📱 SNS</a>');
+  if(j.tel)   links.push('<a class="detail-link-btn" href="tel:'+j.tel+'">📞 '+j.tel+'</a>');
+  if(j.email) links.push('<a class="detail-link-btn" href="mailto:'+j.email+'">✉️ メール</a>');
+  if(j.hp)    links.push('<a class="detail-link-btn" href="'+j.hp+'" target="_blank" rel="noopener">🌐 HP</a>');
+  if(j.sns)   links.push('<a class="detail-link-btn" href="'+j.sns+'" target="_blank" rel="noopener">📱 SNS</a>');
   links.push('<a class="detail-link-btn" href="https://maps.google.com/maps?q='+j.lat+','+j.lng+'" target="_blank" rel="noopener">🗺️ 地図</a>');
 
   /* お気に入りボタン状態 */
@@ -578,7 +595,7 @@ function buildMenu(){
   var favList=getFavList();
   var html="";
   if(favList.length){
-    html+='<div class="menu-section-title">⭐ お気に入り</div>';
+    html+='<div class="menu-section-title">⭐ お気に入り（'+favList.length+'/'+MAX_FAV+'件）</div>';
     favList.forEach(function(fid){
       var fj=JICHIKAI.find(function(x){return x.id===fid;}); if(!fj) return;
       var c=getMsgs(fj.id).length;
@@ -613,16 +630,73 @@ function openMenu(){ buildMenu(); document.getElementById("side-menu").classList
 function closeMenu(){ document.getElementById("side-menu").classList.remove("open"); document.getElementById("menu-overlay").classList.remove("open"); document.body.style.overflow=""; }
 function selectFromMenu(jid){ closeMenu(); openBoard(jid); }
 
+
+/* ── いいね機能 ── */
+var LIKED_KEY = "liked_msgs"; // localStorage キー
+
+function getLikedSet(){
+  try{ return JSON.parse(localStorage.getItem(LIKED_KEY)||"{}"); }catch(e){ return {}; }
+}
+function saveLikedSet(obj){ localStorage.setItem(LIKED_KEY, JSON.stringify(obj)); }
+function isLiked(msgId){ return !!getLikedSet()[msgId]; }
+
+function toggleLike(jid, msgId){
+  if(!firebaseOk) return; // Firebase未接続時は無効
+  var liked = isLiked(msgId);
+  var delta = liked ? -1 : 1;
+
+  // localStorage を先に更新（楽観的更新）
+  var set = getLikedSet();
+  if(liked) delete set[msgId];
+  else set[msgId] = 1;
+  saveLikedSet(set);
+
+  // ボタンUIを即時更新
+  var btn = document.getElementById("like-"+msgId);
+  var cnt = document.getElementById("like-count-"+msgId);
+  var nowLiked = !liked;
+  if(btn){
+    btn.className = "like-btn"+(nowLiked?" liked":"");
+    var heart = btn.querySelector(".like-heart");
+    if(heart) heart.textContent = nowLiked ? "❤️" : "🤍";
+  }
+  if(cnt){
+    var current = parseInt(cnt.textContent)||0;
+    cnt.textContent = Math.max(0, current + delta);
+  }
+
+  // Firestoreのlikesフィールドをインクリメント
+  db.collection("messages").doc(msgId).update({
+    likes: firebase.firestore.FieldValue.increment(delta)
+  }).catch(function(e){
+    console.error("いいね更新エラー:", e);
+    // 失敗時はlocalStorageを元に戻す
+    var set2 = getLikedSet();
+    if(nowLiked) delete set2[msgId];
+    else set2[msgId] = 1;
+    saveLikedSet(set2);
+    if(btn){
+      btn.className = "like-btn"+(liked?" liked":"");
+      var heart2 = btn.querySelector(".like-heart");
+      if(heart2) heart2.textContent = liked ? "❤️" : "🤍";
+    }
+    if(cnt){
+      var current2 = parseInt(cnt.textContent)||0;
+      cnt.textContent = Math.max(0, current2 - delta);
+    }
+  });
+}
+
 /* ── URLをリンクに変換 ── */
 function linkify(text){
-  // まずHTMLエスケープ
   var escaped = esc(text);
-  // http:// または https:// で始まるURLをaタグに変換
   return escaped.replace(
     /(https?:\/\/[^\s<>"]+)/g,
     '<a href="$1" target="_blank" rel="noopener" style="color:var(--green-mid);text-decoration:underline;word-break:break-all;">$1</a>'
   );
 }
+
+/* ── GPS ── */
 function getLocation(){
   if(!navigator.geolocation){ alert("このブラウザではGPSが使えません"); return; }
   navigator.geolocation.getCurrentPosition(
@@ -634,8 +708,6 @@ function getLocation(){
 
 /* ── 起動時の初期表示 ── */
 function startup(){
-  // 全自治会を購読してリアルタイムバッジ更新
-  JICHIKAI.forEach(function(j){ subscribeMsgs(j.id); });
   var favList=getFavList();
   if(favList.length===1&&JICHIKAI.find(function(x){return x.id===favList[0];})){
     /* お気に入りが1件だけならすぐそのボードを表示 */
