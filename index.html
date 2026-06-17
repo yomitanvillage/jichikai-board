@@ -569,6 +569,15 @@ function openBoard(jid){
   subscribeMsgs(jid);
   renderBoardView();
   window.scrollTo({top:0,behavior:"smooth"});
+
+  // Googleアナリティクスに自治会別の閲覧イベントを送信
+  if(typeof gtag === "function"){
+    var j = JICHIKAI.find(function(x){ return x.id===jid; });
+    gtag('event', 'view_jichikai', {
+      jichikai_id: jid,
+      jichikai_name: j ? j.name : jid
+    });
+  }
 }
 function backToList(){
   currentView="list"; boardJid=null;
@@ -712,6 +721,14 @@ function startup(){
   if(favList.length===1&&JICHIKAI.find(function(x){return x.id===favList[0];})){
     /* お気に入りが1件だけならすぐそのボードを表示 */
     currentView="board"; boardJid=favList[0];
+    // Googleアナリティクスに閲覧イベントを送信（起動時の自動表示分）
+    if(typeof gtag === "function"){
+      var jStartup = JICHIKAI.find(function(x){ return x.id===favList[0]; });
+      gtag('event', 'view_jichikai', {
+        jichikai_id: favList[0],
+        jichikai_name: jStartup ? jStartup.name : favList[0]
+      });
+    }
   }
   renderMain();
   getLocation();
