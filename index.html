@@ -125,6 +125,35 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .msg-board-title { font-size: 14px; font-weight: 700; color: var(--green-deep); display: flex; align-items: center; gap: 6px; }
 .msg-count-badge { font-size: 14px; background: var(--green-pale); color: var(--green-mid); border-radius: 10px; padding: 3px 10px; font-weight: 700; }
 .msg-list { display: flex; flex-direction: column; gap: 8px; }
+
+/* ── ボードタブ（お知らせ／おくやみ） ── */
+.board-tabs { display: flex; gap: 6px; margin-bottom: 14px; border-bottom: 2px solid var(--border); }
+.board-tab {
+  flex: 1; padding: 10px 8px; background: none; border: none;
+  border-bottom: 3px solid transparent; cursor: pointer;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  color: var(--ink-faint); display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: color 0.15s, border-color 0.15s; margin-bottom: -2px;
+}
+.board-tab.active.tab-notice     { color: var(--green-deep); border-bottom-color: var(--green-deep); }
+.board-tab.active.tab-condolence { color: #4a4a48; border-bottom-color: #6b6b66; }
+.tab-count-badge { font-size: 12px; font-weight: 700; border-radius: 10px; padding: 2px 8px; }
+.tab-count-badge.notice    { background: var(--green-pale); color: var(--green-mid); }
+.tab-count-badge.condolence{ background: #e8e8e4; color: #5a5a56; }
+
+/* ── おくやみボード ── */
+.condolence-board-title { font-size: 14px; font-weight: 700; color: #4a4a48; display: flex; align-items: center; gap: 6px; }
+.condolence-count-badge { font-size: 14px; background: #e8e8e4; color: #5a5a56; border-radius: 10px; padding: 3px 10px; font-weight: 700; }
+.condolence-card {
+  background: #f7f7f5; border-radius: var(--radius-md);
+  border: 1px solid #d8d8d2; border-left: 4px solid #8a8a84;
+  padding: 12px 14px;
+}
+.condolence-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.condolence-jichi-name { font-size: 12px; font-weight: 700; color: #5a5a56; }
+.condolence-time { font-size: 11px; color: #9a9a94; font-family: 'DM Mono', monospace; }
+.condolence-text { font-size: 15px; line-height: 1.75; color: #333331; white-space: pre-wrap; word-break: break-word; }
+.condolence-intro { font-size: 12px; color: var(--ink-faint); margin-bottom: 12px; line-height: 1.6; background: #f7f7f5; border-radius: var(--radius-sm); padding: 10px 12px; }
 .msg-empty { text-align: center; color: var(--ink-faint); font-size: 14px; padding: 24px 0; }
 .msg-card { background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); padding: 12px 14px; }
 /* 重要度：重要 */
@@ -298,6 +327,7 @@ var JICHIKAI = [
 var userLat=null, userLng=null;
 var currentView="list";   // "list" | "board"
 var boardJid=null;        // 現在ボード表示中のjid
+var currentBoardTab="notice"; // "notice" | "condolence" — ボード内タブ状態
 var msgCache={}, msgListeners={};
 var db=null, firebaseOk=false;
 
@@ -345,13 +375,15 @@ function subscribeMsgs(jid){
   msgListeners[jid]=q.onSnapshot(function(snap){
     msgCache[jid]=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
     // ボード表示中なら即時更新
-    if(currentView==="board"&&boardJid===jid){
+    if(currentView==="board"&&boardJid===jid&&currentBoardTab==="notice"){
       var j=JICHIKAI.find(function(x){return x.id===jid;});
       var el=document.getElementById("msglist-"+jid);
       if(el&&j) el.innerHTML=renderMsgList(jid,j.name);
       var bc=document.getElementById("msgcount-"+jid);
       if(bc) bc.textContent=getMsgs(jid).length+"件";
     }
+    // タブの件数バッジを即時更新
+    refreshTabBadge(jid,"notice");
     // リスト表示中のカードバッジを即時更新
     refreshListBadge(jid);
     // お気に入りバナーのバッジを即時更新
@@ -359,6 +391,33 @@ function subscribeMsgs(jid){
     // サイドメニューのバッジを即時更新
     refreshMenuBadge(jid);
   });
+}
+
+/* ── おくやみボード：Firestoreリアルタイム購読 ── */
+var condolenceCache={}, condolenceListeners={};
+function subscribeCondolences(jid){
+  if(!firebaseOk||condolenceListeners[jid]) return;
+  var q=db.collection("condolences")
+          .where("jichiId","==",jid)
+          .orderBy("timestamp","desc")
+          .limit(10);
+  condolenceListeners[jid]=q.onSnapshot(function(snap){
+    condolenceCache[jid]=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    // ボード表示中（おくやみタブ）なら即時更新
+    if(currentView==="board"&&boardJid===jid&&currentBoardTab==="condolence"){
+      var j=JICHIKAI.find(function(x){return x.id===jid;});
+      var el=document.getElementById("condolencelist-"+jid);
+      if(el&&j) el.innerHTML=renderCondolenceList(jid,j.name);
+      var bc=document.getElementById("condolencecount-"+jid);
+      if(bc) bc.textContent=getCondolences(jid).length+"件";
+    }
+    // タブの件数バッジを即時更新
+    refreshTabBadge(jid,"condolence");
+  });
+}
+function getCondolences(jid){
+  if(firebaseOk) return condolenceCache[jid]||[];
+  try{ return JSON.parse(localStorage.getItem("condolences_"+jid)||"[]"); }catch(e){ return []; }
 }
 function unsubMsgs(jid){ if(msgListeners[jid]){ msgListeners[jid](); delete msgListeners[jid]; } }
 
@@ -440,6 +499,23 @@ function renderMsgList(jid,name){
       +'<span class="like-count" id="like-count-'+m.id+'">'+likes+'</span>'
       +'</button>'
       +'</div>'
+      +'</div>';
+  }).join("");
+}
+
+/* ── おくやみボード：HTML生成 ── */
+function renderCondolenceList(jid,name){
+  var items=getCondolences(jid);
+  if(!items.length) return'<div class="msg-empty">まだおくやみ情報はありません</div>';
+  return items.map(function(m){
+    var d=tsToDate(m.timestamp);
+    var dateStr=d.toLocaleDateString("ja-JP",{year:"numeric",month:"numeric",day:"numeric"});
+    return'<div class="condolence-card">'
+      +'<div class="condolence-meta">'
+      +'<span class="condolence-jichi-name">'+esc(name)+'</span>'
+      +'<span class="condolence-time">'+dateStr+'</span>'
+      +'</div>'
+      +'<div class="condolence-text">'+linkify(m.text)+'</div>'
       +'</div>';
   }).join("");
 }
@@ -526,12 +602,13 @@ function renderBoardView(){
   var j=JICHIKAI.find(function(x){return x.id===jid;});
   if(!j){ currentView="list"; renderListView(); return; }
   subscribeMsgs(jid);
+  subscribeCondolences(jid);
 
   var favList=getFavList();
   var isFavNow=isFav(jid);
   var canAdd=favList.length<MAX_FAV;
-  var msgs=getMsgs(jid);
-  var cnt=msgs.length;
+  var msgCnt=getMsgs(jid).length;
+  var condCnt=getCondolences(jid).length;
 
   /* 連絡先リンク */
   var links=[];
@@ -547,6 +624,8 @@ function renderBoardView(){
   var favBtnCls="fav-toggle-btn"+(isFavNow?" is-fav":"")+((!isFavNow&&!canAdd)?" disabled":"");
   var favBtnLabel=isFavNow?"⭐ 登録中":(!canAdd?"★ 上限3件":"☆ お気に入り");
 
+  var noticeActive=currentBoardTab==="notice";
+
   var html=''
     +'<div class="board-view-header">'
     +'<button class="back-btn" onclick="backToList()">‹ 一覧に戻る</button>'
@@ -555,18 +634,67 @@ function renderBoardView(){
     +'<div class="board-view-name">'+esc(j.name)+'</div>'
     +'<div style="font-size:11px;color:var(--ink-faint);margin-bottom:14px">'+esc(j.addr)+'</div>'
     +'<div class="detail-links" style="margin-bottom:14px">'+links.join("")+'</div>'
-    +'<div class="msg-board-header">'
-    +'<div class="msg-board-title">📢 お知らせボード <span class="msg-count-badge" id="msgcount-'+jid+'">'+cnt+'件</span></div>'
+
+    /* タブ */
+    +'<div class="board-tabs">'
+    +'<button class="board-tab tab-notice'+(noticeActive?" active":"")+'\" onclick="switchBoardTab(\'notice\')">📢 お知らせ <span class="tab-count-badge notice" id="tabbadge-notice-'+jid+'">'+msgCnt+'件</span></button>'
+    +'<button class="board-tab tab-condolence'+(!noticeActive?" active":"")+'\" onclick="switchBoardTab(\'condolence\')">🕯️ おくやみ <span class="tab-count-badge condolence" id="tabbadge-condolence-'+jid+'">'+condCnt+'件</span></button>'
     +'</div>'
-    +'<div class="msg-list" id="msglist-'+jid+'">'+renderMsgList(jid,j.name)+'</div>';
+
+    /* お知らせボード（パネル） */
+    +'<div id="panel-notice-'+jid+'\" style="'+(noticeActive?"":"display:none")+'">'
+    +'<div class="msg-board-header">'
+    +'<div class="msg-board-title">📢 お知らせボード <span class="msg-count-badge" id="msgcount-'+jid+'">'+msgCnt+'件</span></div>'
+    +'</div>'
+    +'<div class="msg-list" id="msglist-'+jid+'">'+renderMsgList(jid,j.name)+'</div>'
+    +'</div>'
+
+    /* おくやみボード（パネル） */
+    +'<div id="panel-condolence-'+jid+'\" style="'+(noticeActive?"display:none":"")+'">'
+    +'<div class="condolence-intro">🕯️ 訃報・お悔やみに関するお知らせです。</div>'
+    +'<div class="msg-board-header">'
+    +'<div class="condolence-board-title">🕯️ おくやみボード <span class="condolence-count-badge" id="condolencecount-'+jid+'">'+condCnt+'件</span></div>'
+    +'</div>'
+    +'<div class="msg-list" id="condolencelist-'+jid+'">'+renderCondolenceList(jid,j.name)+'</div>'
+    +'</div>';
 
   document.getElementById("main-content").innerHTML=html;
 }
 
+/* ── ボード内タブ切替 ── */
+function switchBoardTab(tab){
+  currentBoardTab=tab;
+  var jid=boardJid;
+  var noticeEl=document.getElementById("panel-notice-"+jid);
+  var condEl=document.getElementById("panel-condolence-"+jid);
+  if(noticeEl) noticeEl.style.display=(tab==="notice")?"":"none";
+  if(condEl)   condEl.style.display=(tab==="condolence")?"":"none";
+  // タブボタンのactiveクラス切替
+  var tabs=document.querySelectorAll(".board-tab");
+  tabs.forEach(function(btn){
+    if(btn.classList.contains("tab-notice"))     btn.classList.toggle("active", tab==="notice");
+    if(btn.classList.contains("tab-condolence")) btn.classList.toggle("active", tab==="condolence");
+  });
+}
+
+/* ── タブ件数バッジの即時更新 ── */
+function refreshTabBadge(jid,type){
+  if(boardJid!==jid) return;
+  if(type==="notice"){
+    var el=document.getElementById("tabbadge-notice-"+jid);
+    if(el) el.textContent=getMsgs(jid).length+"件";
+  }else{
+    var el2=document.getElementById("tabbadge-condolence-"+jid);
+    if(el2) el2.textContent=getCondolences(jid).length+"件";
+  }
+}
+
+
 /* ── ボード遷移 ── */
 function openBoard(jid){
-  currentView="board"; boardJid=jid;
+  currentView="board"; boardJid=jid; currentBoardTab="notice"; // 常にお知らせタブをデフォルト表示
   subscribeMsgs(jid);
+  subscribeCondolences(jid);
   renderBoardView();
   window.scrollTo({top:0,behavior:"smooth"});
 
@@ -716,11 +844,11 @@ function getLocation(){
 /* ── 起動時の初期表示 ── */
 function startup(){
   // 全自治会を購読してリアルタイムバッジ更新
-  JICHIKAI.forEach(function(j){ subscribeMsgs(j.id); });
+  JICHIKAI.forEach(function(j){ subscribeMsgs(j.id); subscribeCondolences(j.id); });
   var favList=getFavList();
   if(favList.length===1&&JICHIKAI.find(function(x){return x.id===favList[0];})){
     /* お気に入りが1件だけならすぐそのボードを表示 */
-    currentView="board"; boardJid=favList[0];
+    currentView="board"; boardJid=favList[0]; currentBoardTab="notice";
     // Googleアナリティクスに閲覧イベントを送信（起動時の自動表示分）
     if(typeof gtag === "function"){
       var jStartup = JICHIKAI.find(function(x){ return x.id===favList[0]; });
