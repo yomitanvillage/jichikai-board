@@ -195,6 +195,29 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .toast-undo-btn:hover { background: rgba(255,255,255,0.35); }
 .toast-undo-btn.show { display: inline-block; }
 
+/* ── ボードタブ（お知らせ／おくやみ） ── */
+.board-tabs { display: flex; gap: 6px; margin-bottom: 16px; border-bottom: 2px solid var(--border); }
+.board-tab {
+  flex: 1; padding: 10px 8px; background: none; border: none;
+  border-bottom: 3px solid transparent; cursor: pointer;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  color: var(--ink-faint); display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: color 0.15s, border-color 0.15s; margin-bottom: -2px;
+}
+.board-tab.active.tab-notice     { color: var(--green-deep); border-bottom-color: var(--green-deep); }
+.board-tab.active.tab-condolence { color: #4a4a48; border-bottom-color: #6b6b66; }
+.tab-count-badge { font-size: 12px; font-weight: 700; border-radius: 10px; padding: 2px 8px; }
+.tab-count-badge.notice     { background: var(--green-pale); color: var(--green-mid); }
+.tab-count-badge.condolence { background: #e8e8e4; color: #5a5a56; }
+
+/* ── おくやみ投稿（落ち着いた色調） ── */
+.condolence-post-box { border-color: #c8c8c2; }
+.condolence-post-title { color: #4a4a48; }
+.condolence-admin-intro { font-size: 12px; color: var(--ink-light); margin-bottom: 12px; line-height: 1.6; }
+.condolence-post-btn { background: #5a5a56; }
+.condolence-post-btn:hover { background: #4a4a48; }
+.condolence-post-btn:disabled { background: var(--ink-faint); }
+
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-GENYF89C83"></script>
@@ -254,28 +277,60 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       </div>
     </div>
 
-    <div class="post-box">
-      <div class="post-box-title">✏️ 新しいお知らせを投稿</div>
-      <!-- 重要度選択 -->
-      <div class="priority-selector">
-        <button class="priority-btn selected-normal" id="pri-normal" onclick="selectPriority('normal')">📋 通常</button>
-        <button class="priority-btn" id="pri-high"   onclick="selectPriority('high')">🔴 重要</button>
+    <!-- 管理者画面：ボードタブ -->
+    <div class="board-tabs">
+      <button class="board-tab tab-notice active" id="admintab-notice" onclick="switchAdminTab('notice')">📢 お知らせ投稿 <span class="tab-count-badge notice" id="admintabbadge-notice">0件</span></button>
+      <button class="board-tab tab-condolence" id="admintab-condolence" onclick="switchAdminTab('condolence')">🕯️ おくやみ投稿 <span class="tab-count-badge condolence" id="admintabbadge-condolence">0件</span></button>
+    </div>
+
+    <!-- お知らせ投稿パネル -->
+    <div id="adminpanel-notice">
+      <div class="post-box">
+        <div class="post-box-title">✏️ 新しいお知らせを投稿</div>
+        <!-- 重要度選択 -->
+        <div class="priority-selector">
+          <button class="priority-btn selected-normal" id="pri-normal" onclick="selectPriority('normal')">📋 通常</button>
+          <button class="priority-btn" id="pri-high"   onclick="selectPriority('high')">🔴 重要</button>
+        </div>
+        <textarea class="post-textarea" id="post-text"
+          placeholder="お知らせ内容を入力してください（最大140文字）&#10;&#10;例：○月○日に地区清掃があります。午前9時に公民館前に集合してください。"
+          maxlength="140" oninput="updateCharCount()"></textarea>
+        <div class="post-footer">
+          <span class="char-count" id="char-count">0 / 140</span>
+          <button class="post-btn" id="post-btn" onclick="postMsg()" disabled>📢 投稿する</button>
+        </div>
       </div>
-      <textarea class="post-textarea" id="post-text"
-        placeholder="お知らせ内容を入力してください（最大140文字）&#10;&#10;例：○月○日に地区清掃があります。午前9時に公民館前に集合してください。"
-        maxlength="140" oninput="updateCharCount()"></textarea>
-      <div class="post-footer">
-        <span class="char-count" id="char-count">0 / 280</span>
-        <button class="post-btn" id="post-btn" onclick="postMsg()" disabled>📢 投稿する</button>
+
+      <div class="msg-manage-header">
+        <div class="msg-manage-title">📝 投稿済みお知らせ</div>
+        <span class="msg-limit-note">最大10件まで</span>
+      </div>
+      <div class="admin-msg-list" id="admin-msg-list">
+        <div class="msg-empty-admin">読み込み中...</div>
       </div>
     </div>
 
-    <div class="msg-manage-header">
-      <div class="msg-manage-title">📝 投稿済みお知らせ</div>
-      <span class="msg-limit-note">最大10件まで</span>
-    </div>
-    <div class="admin-msg-list" id="admin-msg-list">
-      <div class="msg-empty-admin">読み込み中...</div>
+    <!-- おくやみ投稿パネル -->
+    <div id="adminpanel-condolence" style="display:none">
+      <div class="post-box condolence-post-box">
+        <div class="post-box-title condolence-post-title">🕯️ おくやみ情報を投稿</div>
+        <div class="condolence-admin-intro">訃報・お悔やみに関する情報を投稿します。通常のお知らせとは別のボードに表示されます。</div>
+        <textarea class="post-textarea" id="condolence-text"
+          placeholder="おくやみ情報を入力してください（最大140文字）&#10;&#10;例：〇〇様（〇〇班）が逝去されました。心よりお悔やみ申し上げます。"
+          maxlength="140" oninput="updateCondolenceCharCount()"></textarea>
+        <div class="post-footer">
+          <span class="char-count" id="condolence-char-count">0 / 140</span>
+          <button class="post-btn condolence-post-btn" id="condolence-post-btn" onclick="postCondolence()" disabled>🕯️ 投稿する</button>
+        </div>
+      </div>
+
+      <div class="msg-manage-header">
+        <div class="msg-manage-title">📝 投稿済みおくやみ情報</div>
+        <span class="msg-limit-note">最大10件まで</span>
+      </div>
+      <div class="admin-msg-list" id="admin-condolence-list">
+        <div class="msg-empty-admin">読み込み中...</div>
+      </div>
     </div>
   </div>
 </main>
@@ -396,7 +451,9 @@ function doLogin(){
       document.getElementById("admin-name").textContent = jichi.name;
       document.getElementById("admin-addr").textContent = jichi.addr;
       updateCharCount();
+      updateCondolenceCharCount();
       subscribeAdminMsgs();
+      subscribeCondolenceAdmin();
     } else {
       showErr("パスワードが正しくありません");
       document.getElementById("login-pw").value = "";
@@ -414,12 +471,16 @@ function showErr(msg){ var e=document.getElementById("err-box"); e.textContent=m
 function doLogout(){
   if(!confirm("ログアウトしますか？")) return;
   if(unsubscribeMsgs){ unsubscribeMsgs(); unsubscribeMsgs=null; }
+  if(unsubscribeCondolences){ unsubscribeCondolences(); unsubscribeCondolences=null; }
   loggedInJid=null;
   document.getElementById("admin-screen").classList.remove("show");
   document.getElementById("login-screen").style.display="";
   document.getElementById("login-pw").value="";
   document.getElementById("post-text").value="";
+  document.getElementById("condolence-text").value="";
   updateCharCount();
+  updateCondolenceCharCount();
+  switchAdminTab("notice"); // 次回ログイン時は常にお知らせタブから
 }
 
 /* ── メッセージ購読 ── */
@@ -427,7 +488,10 @@ function subscribeAdminMsgs(){
   if(!firebaseOk){ renderAdminMsgsFallback(); return; }
   var q=db.collection("messages").where("jichiId","==",loggedInJid).orderBy("timestamp","desc").limit(MAX_MSGS+1);
   unsubscribeMsgs=q.onSnapshot(function(snap){
-    renderAdminMsgs(snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); }));
+    var msgs=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    renderAdminMsgs(msgs);
+    var bd=document.getElementById("admintabbadge-notice");
+    if(bd) bd.textContent=msgs.length+"件";
     setFbStatus("ok","● リアルタイム同期中");
   },function(err){ console.error(err); setFbStatus("err","✕ 読み込みエラー"); });
 }
@@ -454,6 +518,211 @@ function postMsg(){
     document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); showToast("📢 投稿しました！", false);
     btn.disabled=false; btn.textContent="📢 投稿する";
   }).catch(function(e){ console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.textContent="📢 投稿する"; });
+}
+
+/* ══════════════════════════════════════════
+   おくやみボード（管理者側）
+══════════════════════════════════════════ */
+var unsubscribeCondolences=null;
+
+/* ── おくやみ購読 ── */
+function subscribeCondolenceAdmin(){
+  if(!firebaseOk){ renderAdminCondolencesFallback(); return; }
+  var q=db.collection("condolences").where("jichiId","==",loggedInJid).orderBy("timestamp","desc").limit(MAX_MSGS+1);
+  unsubscribeCondolences=q.onSnapshot(function(snap){
+    var items=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    renderAdminCondolences(items);
+    var bd=document.getElementById("admintabbadge-condolence");
+    if(bd) bd.textContent=items.length+"件";
+  },function(err){ console.error(err); });
+}
+
+/* ── おくやみ投稿 ── */
+function postCondolence(){
+  var text=document.getElementById("condolence-text").value.trim();
+  if(!text||text.length>MAX_CHARS) return;
+  var btn=document.getElementById("condolence-post-btn");
+  btn.disabled=true; btn.textContent="投稿中...";
+  if(!firebaseOk){
+    var items=getCondolencesFallback(loggedInJid);
+    if(items.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.textContent="🕯️ 投稿する"; return; }
+    items.unshift({id:String(Date.now()),text:text,timestamp:new Date().toISOString()});
+    localStorage.setItem("condolences_"+loggedInJid,JSON.stringify(items));
+    document.getElementById("condolence-text").value=""; updateCondolenceCharCount(); renderAdminCondolencesFallback(); showToast("🕯️ 投稿しました", false);
+    btn.disabled=false; btn.textContent="🕯️ 投稿する"; return;
+  }
+  db.collection("condolences").where("jichiId","==",loggedInJid).get().then(function(snap){
+    if(snap.size>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false); btn.disabled=false; btn.textContent="🕯️ 投稿する"; return null; }
+    return db.collection("condolences").add({jichiId:loggedInJid,text:text,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+  }).then(function(ref){
+    if(!ref) return;
+    document.getElementById("condolence-text").value=""; updateCondolenceCharCount(); showToast("🕯️ 投稿しました", false);
+    btn.disabled=false; btn.textContent="🕯️ 投稿する";
+  }).catch(function(e){ console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.textContent="🕯️ 投稿する"; });
+}
+
+/* ── おくやみ：文字数カウント ── */
+function updateCondolenceCharCount(){
+  var len=document.getElementById("condolence-text").value.length;
+  var el=document.getElementById("condolence-char-count");
+  el.textContent=len+" / "+MAX_CHARS;
+  el.className="char-count"+(len>MAX_CHARS?" over":len>120?" warn":"");
+  document.getElementById("condolence-post-btn").disabled=len===0||len>MAX_CHARS;
+}
+
+/* ── おくやみ：管理画面描画 ── */
+var condolenceStore = {};
+
+function renderAdminCondolences(items){
+  var el=document.getElementById("admin-condolence-list");
+  if(!items.length){ el.innerHTML='<div class="msg-empty-admin">まだおくやみ情報の投稿はありません</div>'; return; }
+  condolenceStore={};
+  items.forEach(function(m){ condolenceStore[m.id]={text:m.text||""}; });
+  el.innerHTML=items.map(function(m,i){
+    var d=m.timestamp&&m.timestamp.toDate?m.timestamp.toDate():new Date(m.timestamp);
+    var dateStr=d.toLocaleString("ja-JP",{year:"numeric",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    return'<div class="admin-msg-card" id="condcard-'+m.id+'" style="background:#f7f7f5;border-left:4px solid #8a8a84;border-color:#d8d8d2">'
+      +'<div class="admin-msg-body">'
+      +'<div class="admin-msg-meta">'
+      +'<span class="admin-msg-num">#'+(i+1)+'</span>'
+      +'<span class="admin-msg-time">'+dateStr+'</span>'
+      +'</div>'
+      +'<div class="admin-msg-text" id="condtext-'+m.id+'">'+esc(m.text)+'</div>'
+      +'<div class="edit-area" id="condedit-area-'+m.id+'" style="display:none"></div>'
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+      +'<button class="edit-btn" id="condedit-btn-'+m.id+'" data-id="'+m.id+'" onclick="startCondEditById(this)" title="編集">✏️</button>'
+      +'<button class="delete-btn" data-id="'+m.id+'" onclick="deleteCondolenceById(this)" title="削除">🗑️</button>'
+      +'</div>'
+      +'</div>';
+  }).join("");
+}
+function getCondolencesFallback(jid){ try{ return JSON.parse(localStorage.getItem("condolences_"+jid)||"[]"); }catch(e){ return []; } }
+function renderAdminCondolencesFallback(){ renderAdminCondolences(getCondolencesFallback(loggedInJid)); }
+
+/* ── おくやみ：削除（元に戻す付き）── */
+var deletedCondolence=null;
+function deleteCondolenceById(btn){
+  var id=btn.getAttribute("data-id");
+  var stored=condolenceStore[id];
+  if(!stored){ showToast("❌ 削除できませんでした", false); return; }
+  deletedCondolence={id:id, text:stored.text};
+
+  if(!firebaseOk){
+    var items=getCondolencesFallback(loggedInJid).filter(function(m){ return m.id!==id; });
+    localStorage.setItem("condolences_"+loggedInJid, JSON.stringify(items));
+    renderAdminCondolencesFallback();
+    showToast("🗑️ 削除しました", true);
+    return;
+  }
+  db.collection("condolences").doc(id).delete()
+    .then(function(){ showToast("🗑️ 削除しました", true); })
+    .catch(function(e){ console.error(e); deletedCondolence=null; showToast("❌ 削除に失敗しました", false); });
+}
+
+/* ── おくやみ：編集 ── */
+var editingCondId=null;
+
+function startCondEditById(btn){
+  var id=btn.getAttribute("data-id");
+  var stored=condolenceStore[id];
+  if(!stored){ console.error("condolenceStore未登録:",id); return; }
+  startCondEdit(id, stored.text);
+}
+
+function startCondEdit(id, rawText){
+  if(editingCondId && editingCondId!==id) cancelCondEdit(editingCondId);
+  editingCondId=id;
+
+  var card=document.getElementById("condcard-"+id);
+  var textEl=document.getElementById("condtext-"+id);
+  var areaEl=document.getElementById("condedit-area-"+id);
+  var editBtn=document.getElementById("condedit-btn-"+id);
+  if(!card||!textEl||!areaEl) return;
+
+  textEl.style.display="none";
+  card.classList.add("editing");
+  if(editBtn) editBtn.style.display="none";
+
+  areaEl.innerHTML =
+    '<textarea class="edit-textarea" id="condedit-ta-'+id+'" maxlength="'+MAX_CHARS+'"></textarea>'
+    + '<div class="edit-footer">'
+    + '<span class="edit-char-count" id="condedit-cc-'+id+'">0 / '+MAX_CHARS+'</span>'
+    + '<div class="edit-actions">'
+    + '<button class="edit-cancel-btn" id="condedit-cancel-'+id+'">キャンセル</button>'
+    + '<button class="edit-save-btn"   id="condedit-save-'+id+'">💾 保存</button>'
+    + '</div></div>';
+  areaEl.style.display="block";
+
+  var ta=document.getElementById("condedit-ta-"+id);
+  var cancelBtn=document.getElementById("condedit-cancel-"+id);
+  var saveBtn=document.getElementById("condedit-save-"+id);
+
+  ta.value=rawText||"";
+  updateCondEditCount(id);
+  ta.addEventListener("input", function(){ updateCondEditCount(id); });
+  ta.addEventListener("keydown", function(e){ if(e.key==="Escape") cancelCondEdit(id); });
+  cancelBtn.addEventListener("click", function(){ cancelCondEdit(id); });
+  saveBtn.addEventListener("click", function(){ saveCondEdit(id); });
+
+  setTimeout(function(){ ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length); },50);
+}
+
+function updateCondEditCount(id){
+  var ta=document.getElementById("condedit-ta-"+id); if(!ta) return;
+  var cc=document.getElementById("condedit-cc-"+id); if(!cc) return;
+  var len=ta.value.length;
+  cc.textContent=len+" / "+MAX_CHARS;
+  cc.className="edit-char-count"+(len>MAX_CHARS?" over":len>120?" warn":"");
+  var sb=document.getElementById("condedit-save-"+id);
+  if(sb) sb.disabled=(len===0||len>MAX_CHARS);
+}
+
+function cancelCondEdit(id){
+  var card=document.getElementById("condcard-"+id); if(!card) return;
+  var textEl=document.getElementById("condtext-"+id);
+  var areaEl=document.getElementById("condedit-area-"+id);
+  var editBtn=document.getElementById("condedit-btn-"+id);
+  if(textEl) textEl.style.display="";
+  if(areaEl){ areaEl.innerHTML=""; areaEl.style.display="none"; }
+  if(editBtn) editBtn.style.display="";
+  card.classList.remove("editing");
+  if(editingCondId===id) editingCondId=null;
+}
+
+function saveCondEdit(id){
+  var ta=document.getElementById("condedit-ta-"+id); if(!ta) return;
+  var newText=ta.value.trim();
+  if(!newText||newText.length>MAX_CHARS) return;
+
+  var saveBtn=document.getElementById("condedit-save-"+id);
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent="保存中..."; }
+
+  if(!firebaseOk){
+    var items=getCondolencesFallback(loggedInJid).map(function(m){
+      return m.id===id ? Object.assign({},m,{text:newText}) : m;
+    });
+    localStorage.setItem("condolences_"+loggedInJid, JSON.stringify(items));
+    cancelCondEdit(id); editingCondId=null; renderAdminCondolencesFallback(); showToast("✅ 更新しました", false); return;
+  }
+  db.collection("condolences").doc(id).update({text:newText})
+    .then(function(){ cancelCondEdit(id); editingCondId=null; showToast("✅ 更新しました", false); })
+    .catch(function(e){
+      console.error(e); showToast("❌ 更新に失敗しました", false);
+      if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent="💾 保存"; }
+    });
+}
+
+/* ── 管理者画面タブ切替 ── */
+function switchAdminTab(tab){
+  var noticePanel=document.getElementById("adminpanel-notice");
+  var condPanel=document.getElementById("adminpanel-condolence");
+  var noticeTab=document.getElementById("admintab-notice");
+  var condTab=document.getElementById("admintab-condolence");
+  if(noticePanel) noticePanel.style.display=(tab==="notice")?"":"none";
+  if(condPanel)   condPanel.style.display=(tab==="condolence")?"":"none";
+  if(noticeTab) noticeTab.classList.toggle("active", tab==="notice");
+  if(condTab)   condTab.classList.toggle("active", tab==="condolence");
 }
 
 /* ── 管理画面描画 ── */
