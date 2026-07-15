@@ -217,7 +217,60 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   line-height: 1.3; margin-bottom: 4px;
 }
 
-/* ── スピナー ── */
+/* ── 新着情報セクション ── */
+.new-arrivals-section {
+  border-radius: var(--radius-md);
+  border: 1.5px solid #e8c030;
+  margin-bottom: 16px;
+  overflow: hidden;
+  background: #fffcf0;
+}
+.new-arrivals-header {
+  background: #f5d840;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.new-arrivals-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #5a3e00;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.na-total-badge {
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(90,62,0,0.15);
+  color: #5a3e00;
+  border-radius: 10px;
+  padding: 2px 9px;
+}
+.new-arrival-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0e090;
+  transition: background 0.1s;
+}
+.new-arrival-item:last-child { border-bottom: none; }
+.new-arrival-item:hover { background: #fff8d0; }
+.na-age-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.na-today { background: #e8f5ee; color: #1a6b3c; }
+.na-week  { background: #e6f0fa; color: #2a6cb5; }
+.new-arrival-name { flex: 1; font-size: 14px; font-weight: 700; color: var(--ink); }
+.new-arrival-time { font-size: 11px; color: var(--ink-faint); font-family: 'DM Mono', monospace; flex-shrink: 0; }
+.new-arrival-arrow { color: #c8a000; font-size: 18px; flex-shrink: 0; }
 .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--green-mid); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -390,6 +443,8 @@ function subscribeMsgs(jid){
     refreshFavBannerBadge(jid);
     // サイドメニューのバッジを即時更新
     refreshMenuBadge(jid);
+    // 新着情報セクションを即時更新
+    refreshNewArrivals();
   });
 }
 
@@ -548,6 +603,53 @@ function renderMain(){
   else renderListView();
 }
 
+/* ── 新着情報 ── */
+function getNewArrivals(){
+  var results=[];
+  JICHIKAI.forEach(function(j){
+    var msgs=getMsgs(j.id);
+    if(!msgs.length) return;
+    var latest=msgs[0]; // timestamp降順なので先頭が最新
+    var age=tsAge(latest.timestamp);
+    if(age==="today"||age==="week"){
+      results.push({jid:j.id, name:j.name, age:age, timestamp:latest.timestamp});
+    }
+  });
+  // 投稿時刻が新しい順にソート
+  results.sort(function(a,b){
+    return tsToDate(b.timestamp).getTime()-tsToDate(a.timestamp).getTime();
+  });
+  return results.slice(0,10);
+}
+
+function renderNewArrivalsSection(){
+  var items=getNewArrivals();
+  if(!items.length) return'';
+  var rows=items.map(function(item){
+    var ageCls=item.age==="today"?"na-today":"na-week";
+    var ageLabel=item.age==="today"?"今日":"今週";
+    return'<div class="new-arrival-item" onclick="openBoard(\''+item.jid+'\')">'
+      +'<span class="na-age-badge '+ageCls+'">'+ageLabel+'</span>'
+      +'<span class="new-arrival-name">'+esc(item.name)+'</span>'
+      +'<span class="new-arrival-time">'+fmtTs(item.timestamp)+'</span>'
+      +'<span class="new-arrival-arrow">›</span>'
+      +'</div>';
+  }).join('');
+  return'<div class="new-arrivals-section">'
+    +'<div class="new-arrivals-header">'
+    +'<div class="new-arrivals-title">🔔 新着情報</div>'
+    +'<span class="na-total-badge">'+items.length+'件</span>'
+    +'</div>'
+    +rows
+    +'</div>';
+}
+
+function refreshNewArrivals(){
+  var el=document.getElementById("new-arrivals-container");
+  if(!el) return;
+  el.innerHTML=renderNewArrivalsSection();
+}
+
 /* ── リスト表示 ── */
 function renderListView(){
   var favList=getFavList();
@@ -592,6 +694,9 @@ function renderListView(){
       +'<small style="color:var(--ink-faint)">自治会一覧は ☰ メニューからご覧いただけます</small>'
       +'</div>';
   }
+
+  /* 新着情報セクション */
+  html+='<div id="new-arrivals-container">'+renderNewArrivalsSection()+'</div>';
 
   document.getElementById("main-content").innerHTML=html;
 }
