@@ -248,6 +248,30 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   border-radius: 10px;
   padding: 2px 9px;
 }
+.na-refresh-btn {
+  background: rgba(90,62,0,0.12);
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #5a3e00;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.na-refresh-btn:hover { background: rgba(90,62,0,0.22); }
+.na-refresh-btn.spinning .na-refresh-icon { display: inline-block; animation: spin 0.6s linear infinite; }
+.na-refresh-icon { display: inline-block; }
+.na-empty {
+  padding: 16px 14px;
+  font-size: 13px;
+  color: #9a8040;
+  text-align: center;
+}
 .new-arrival-item {
   display: flex;
   align-items: center;
@@ -624,21 +648,28 @@ function getNewArrivals(){
 
 function renderNewArrivalsSection(){
   var items=getNewArrivals();
-  if(!items.length) return'';
-  var rows=items.map(function(item){
-    var ageCls=item.age==="today"?"na-today":"na-week";
-    var ageLabel=item.age==="today"?"今日":"今週";
-    return'<div class="new-arrival-item" onclick="openBoard(\''+item.jid+'\')">'
-      +'<span class="na-age-badge '+ageCls+'">'+ageLabel+'</span>'
-      +'<span class="new-arrival-name">'+esc(item.name)+'</span>'
-      +'<span class="new-arrival-time">'+fmtTs(item.timestamp)+'</span>'
-      +'<span class="new-arrival-arrow">›</span>'
-      +'</div>';
-  }).join('');
+  var rows=items.length
+    ? items.map(function(item){
+        var ageCls=item.age==="today"?"na-today":"na-week";
+        var ageLabel=item.age==="today"?"今日":"今週";
+        return'<div class="new-arrival-item" onclick="openBoard(\''+item.jid+'\')">'
+          +'<span class="na-age-badge '+ageCls+'">'+ageLabel+'</span>'
+          +'<span class="new-arrival-name">'+esc(item.name)+'</span>'
+          +'<span class="new-arrival-time">'+fmtTs(item.timestamp)+'</span>'
+          +'<span class="new-arrival-arrow">›</span>'
+          +'</div>';
+      }).join('')
+    : '<div class="na-empty">今週の新着はまだありません</div>';
+
   return'<div class="new-arrivals-section">'
     +'<div class="new-arrivals-header">'
     +'<div class="new-arrivals-title">🔔 新着情報</div>'
-    +'<span class="na-total-badge">'+items.length+'件</span>'
+    +'<div style="display:flex;align-items:center;gap:8px">'
+    +(items.length?'<span class="na-total-badge">'+items.length+'件</span>':'')
+    +'<button class="na-refresh-btn" id="na-refresh-btn" onclick="triggerRefreshNewArrivals()" title="新着情報を再取得">'
+    +'<span class="na-refresh-icon">↻</span> 再取得'
+    +'</button>'
+    +'</div>'
     +'</div>'
     +rows
     +'</div>';
@@ -648,6 +679,16 @@ function refreshNewArrivals(){
   var el=document.getElementById("new-arrivals-container");
   if(!el) return;
   el.innerHTML=renderNewArrivalsSection();
+}
+
+function triggerRefreshNewArrivals(){
+  // ボタンをスピン状態に
+  var btn=document.getElementById("na-refresh-btn");
+  if(btn) btn.classList.add("spinning");
+  // 少し待ってから再描画（Firebase購読は常時生きているのでキャッシュを再レンダリング）
+  setTimeout(function(){
+    refreshNewArrivals();
+  }, 600);
 }
 
 /* ── リスト表示 ── */
