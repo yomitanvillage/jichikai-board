@@ -646,8 +646,13 @@ function getNewArrivals(){
   return results.slice(0,10);
 }
 
+var newArrivalsRefreshed = false; // 再取得ボタンが押されたかどうか
+
 function renderNewArrivalsSection(){
   var items=getNewArrivals();
+  var emptyMsg = newArrivalsRefreshed
+    ? '今週の新着はまだありません'
+    : '再取得ボタンを押して更新してください';
   var rows=items.length
     ? items.map(function(item){
         var ageCls=item.age==="today"?"na-today":"na-week";
@@ -659,7 +664,7 @@ function renderNewArrivalsSection(){
           +'<span class="new-arrival-arrow">›</span>'
           +'</div>';
       }).join('')
-    : '<div class="na-empty">今週の新着はまだありません</div>';
+    : '<div class="na-empty">'+emptyMsg+'</div>';
 
   return'<div class="new-arrivals-section">'
     +'<div class="new-arrivals-header">'
@@ -682,11 +687,10 @@ function refreshNewArrivals(){
 }
 
 function triggerRefreshNewArrivals(){
-  // ボタンをスピン状態に
   var btn=document.getElementById("na-refresh-btn");
   if(btn) btn.classList.add("spinning");
-  // 少し待ってから再描画（Firebase購読は常時生きているのでキャッシュを再レンダリング）
   setTimeout(function(){
+    newArrivalsRefreshed = true;
     refreshNewArrivals();
   }, 600);
 }
