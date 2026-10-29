@@ -711,7 +711,7 @@ function renderListView(){
         +'<div class="fav-banner-label">お気に入りの自治会</div>'
         +'<div class="fav-banner-name">'+esc(favJ.name)+'</div>'
         +'</div>'
-        +'<span class="fav-banner-badge">'+badge.label+'</span>'
+        +'<span class="fav-banner-badge" id="fav-badge-'+favJ.id+'">'+badge.label+'</span>'
         +'<span class="fav-banner-arrow">›</span>'
         +'</div>';
       subscribeMsgs(favJ.id);
@@ -847,6 +847,7 @@ function openBoard(jid){
   subscribeCondolences(jid);
   renderBoardView();
   window.scrollTo({top:0,behavior:"smooth"});
+  recordJichiVisit(jid);
 
   // Googleアナリティクスに自治会別の閲覧イベントを送信
   if(typeof gtag === "function"){
@@ -885,6 +886,11 @@ function refreshListBadge(jid){
   var el=document.getElementById("badge-"+jid); if(!el) return;
   var badge=buildBadge(jid);
   el.className="jichi-badge "+badge.cls; el.textContent=badge.label;
+}
+function refreshFavBannerBadge(jid){
+  var el=document.getElementById("fav-badge-"+jid); if(!el) return;
+  var badge=buildBadge(jid);
+  el.textContent=badge.label;
 }
 
 /* ── サイドメニュー ── */
@@ -991,10 +997,42 @@ function getLocation(){
   );
 }
 
+/* ── 訪問者カウンター ── */
+function visitorMonthKey(){
+  var d = new Date();
+  return "m_" + d.getFullYear() + "_" + (d.getMonth()+1);
+}
+function recordSiteVisit(){
+  if(!firebaseOk) return;
+  try{
+    if(sessionStorage.getItem("sv_counted")) return;
+    sessionStorage.setItem("sv_counted","1");
+  }catch(e){}
+  var mk = visitorMonthKey();
+  var upd = { total: firebase.firestore.FieldValue.increment(1) };
+  upd[mk] = firebase.firestore.FieldValue.increment(1);
+  db.collection("siteStats").doc("global").set(upd,{merge:true})
+    .catch(function(e){ console.warn("siteStats更新失敗:",e); });
+}
+function recordJichiVisit(jid){
+  if(!firebaseOk) return;
+  try{
+    var key = "jv_"+jid;
+    if(sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key,"1");
+  }catch(e){}
+  var mk = visitorMonthKey();
+  var upd = { total: firebase.firestore.FieldValue.increment(1) };
+  upd[mk] = firebase.firestore.FieldValue.increment(1);
+  db.collection("jichiStats").doc(jid).set(upd,{merge:true})
+    .catch(function(e){ console.warn("jichiStats更新失敗:",e); });
+}
+
 /* ── 起動時の初期表示 ── */
 function startup(){
   // 全自治会を購読してリアルタイムバッジ更新
   JICHIKAI.forEach(function(j){ subscribeMsgs(j.id); subscribeCondolences(j.id); });
+  recordSiteVisit();
   var favList=getFavList();
   if(favList.length===1&&JICHIKAI.find(function(x){return x.id===favList[0];})){
     /* お気に入りが1件だけならすぐそのボードを表示 */
