@@ -238,6 +238,20 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
 /* ── 画像添付 ── */
 .img-attach-area { margin: 0 0 12px; }
+/* ── 下書き ── */
+.draft-section-header { display: flex; align-items: center; justify-content: space-between; margin: 20px 0 8px; }
+.draft-section-title { font-size: 13px; font-weight: 700; color: var(--ink-mid); display: flex; align-items: center; gap: 6px; }
+.draft-count-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #fff8e8; color: #c07800; border: 1px solid #f0d070; }
+.admin-draft-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.draft-card { background: #fffbf0; border: 1.5px solid #f0d070; border-radius: var(--radius-md); padding: 12px 14px; display: flex; gap: 10px; }
+.draft-empty { text-align: center; color: var(--ink-faint); font-size: 13px; padding: 10px 0; }
+.draft-label { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: #fff8e8; color: #c07800; border: 1px solid #f0d070; margin-right: 4px; }
+.publish-draft-btn { background: var(--navy); color: white; border: none; border-radius: var(--radius-sm); padding: 7px 12px; font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; }
+.publish-draft-btn:hover { background: var(--navy-mid); }
+.save-draft-btn { background: var(--surface); border: 1.5px solid #c09000; color: #8a6800; border-radius: var(--radius-md); padding: 10px 14px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+.save-draft-btn:hover { background: #fff8e8; border-color: #a07000; }
+.save-draft-btn:disabled { background: var(--bg); border-color: var(--border); color: var(--ink-faint); cursor: not-allowed; }
+.post-footer-actions { display: flex; gap: 8px; align-items: center; }
 .img-attach-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1.5px dashed var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--ink-mid); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.15s; }
 .img-attach-btn:hover { border-color: var(--green-mid); color: var(--green-deep); }
 .img-preview-wrap { position: relative; display: inline-block; margin-top: 8px; }
@@ -345,12 +359,26 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
         </div>
         <div class="post-footer">
           <span class="char-count" id="char-count">0 / 140</span>
-          <button class="post-btn" id="post-btn" onclick="postMsg()" disabled>📢 投稿する</button>
+          <div class="post-footer-actions">
+            <button class="save-draft-btn" id="draft-btn" onclick="saveDraft()" disabled><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>下書き保存</button>
+            <button class="post-btn" id="post-btn" onclick="postMsg()" disabled><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>投稿する</button>
+          </div>
         </div>
       </div>
 
-      <div class="msg-manage-header">
-        <div class="msg-manage-title">📝 投稿済みお知らせ</div>
+      <!-- 下書き一覧 -->
+      <div class="draft-section-header">
+        <div class="draft-section-title">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+          下書き <span class="draft-count-badge" id="draft-count-badge">0件</span>
+        </div>
+      </div>
+      <div class="admin-draft-list" id="admin-draft-list">
+        <div class="draft-empty">下書きはありません</div>
+      </div>
+
+      <div class="msg-manage-header" style="margin-top:20px">
+        <div class="msg-manage-title">投稿済みお知らせ</div>
         <span class="msg-limit-note">最大10件まで</span>
       </div>
       <div class="admin-msg-list" id="admin-msg-list">
@@ -431,6 +459,7 @@ var JICHIKAI = [
 
 var MAX_MSGS=10, MAX_CHARS=140;
 var db=null, firebaseOk=false, loggedInJid=null, unsubscribeMsgs=null;
+var publishedCount=0; // 公開済み件数（下書きは含まない）
 var currentPriority="normal"; // "normal" | "high"
 var currentCategory="notice"; // "notice" | "event" | "urgent"
 var pendingImageFile=null;    // 投稿フォームで選択中の画像ファイル
@@ -546,12 +575,16 @@ function doLogout(){
 /* ── メッセージ購読 ── */
 function subscribeAdminMsgs(){
   if(!firebaseOk){ renderAdminMsgsFallback(); return; }
-  var q=db.collection("messages").where("jichiId","==",loggedInJid).orderBy("timestamp","desc").limit(MAX_MSGS+1);
+  var q=db.collection("messages").where("jichiId","==",loggedInJid).orderBy("timestamp","desc");
   unsubscribeMsgs=q.onSnapshot(function(snap){
-    var msgs=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
-    renderAdminMsgs(msgs);
+    var all=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    var published=all.filter(function(m){ return !m.status||m.status==="published"; });
+    var drafts   =all.filter(function(m){ return m.status==="draft"; });
+    publishedCount=published.length;
+    renderAdminMsgs(published);
+    renderDrafts(drafts);
     var bd=document.getElementById("admintabbadge-notice");
-    if(bd) bd.textContent=msgs.length+"件";
+    if(bd) bd.textContent=published.length+"件";
     setFbStatus("ok","● リアルタイム同期中");
   },function(err){ console.error(err); setFbStatus("err","✕ 読み込みエラー"); });
 }
@@ -611,6 +644,9 @@ function uploadImage(file, jichiId){
 }
 
 /* ── 投稿 ── */
+var POST_BTN_HTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>投稿する';
+var DRAFT_BTN_HTML='<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>下書き保存';
+
 function postMsg(){
   var text=document.getElementById("post-text").value.trim();
   if(!text||text.length>MAX_CHARS) return;
@@ -619,30 +655,56 @@ function postMsg(){
   var imageFile=pendingImageFile;
 
   if(!firebaseOk){
-    var msgs=getMsgsFallback(loggedInJid);
-    if(msgs.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.textContent="📢 投稿する"; return; }
-    msgs.unshift({id:String(Date.now()),text:text,priority:currentPriority,category:currentCategory,timestamp:new Date().toISOString()});
-    localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
-    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); renderAdminMsgsFallback(); showToast("📢 投稿しました！", false);
-    btn.disabled=false; btn.textContent="📢 投稿する"; return;
+    var allMsgs=getMsgsFallback(loggedInJid);
+    var pubMsgs=allMsgs.filter(function(m){ return !m.status||m.status==="published"; });
+    if(pubMsgs.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.innerHTML=POST_BTN_HTML; return; }
+    allMsgs.unshift({id:String(Date.now()),text:text,priority:currentPriority,category:currentCategory,status:"published",timestamp:new Date().toISOString()});
+    localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(allMsgs));
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); renderAdminMsgsFallback(); showToast("投稿しました", false);
+    btn.disabled=false; btn.innerHTML=POST_BTN_HTML; return;
   }
 
-  // まず件数チェック → 画像アップロード → Firestore追加
-  db.collection("messages").where("jichiId","==",loggedInJid).get().then(function(snap){
-    if(snap.size>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false); btn.disabled=false; btn.textContent="📢 投稿する"; return Promise.reject("full"); }
-    if(imageFile) btn.textContent="画像アップロード中...";
-    return uploadImage(imageFile, loggedInJid);
-  }).then(function(imageUrl){
-    var data={jichiId:loggedInJid,text:text,priority:currentPriority,category:currentCategory,timestamp:firebase.firestore.FieldValue.serverTimestamp()};
+  if(publishedCount>=MAX_MSGS){
+    showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false);
+    btn.disabled=false; btn.innerHTML=POST_BTN_HTML; return;
+  }
+  if(imageFile) btn.textContent="画像アップロード中...";
+  uploadImage(imageFile, loggedInJid).then(function(imageUrl){
+    var data={jichiId:loggedInJid,text:text,priority:currentPriority,category:currentCategory,status:"published",timestamp:firebase.firestore.FieldValue.serverTimestamp()};
     if(imageUrl) data.imageUrl=imageUrl;
     return db.collection("messages").add(data);
-  }).then(function(ref){
-    if(!ref) return;
-    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); showToast("📢 投稿しました！", false);
-    btn.disabled=false; btn.textContent="📢 投稿する";
+  }).then(function(){
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); showToast("投稿しました", false);
+    btn.disabled=false; btn.innerHTML=POST_BTN_HTML;
   }).catch(function(e){
-    if(e==="full") return;
-    console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.textContent="📢 投稿する";
+    console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.innerHTML=POST_BTN_HTML;
+  });
+}
+
+/* ── 下書き保存 ── */
+function saveDraft(){
+  var text=document.getElementById("post-text").value.trim();
+  if(!text||text.length>MAX_CHARS) return;
+  var btn=document.getElementById("draft-btn");
+  btn.disabled=true; btn.textContent="保存中...";
+  var imageFile=pendingImageFile;
+
+  if(!firebaseOk){
+    var msgs=getMsgsFallback(loggedInJid);
+    msgs.unshift({id:String(Date.now()),text:text,priority:currentPriority,category:currentCategory,status:"draft",timestamp:new Date().toISOString()});
+    localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); renderAdminMsgsFallback(); showToast("下書きを保存しました", false);
+    btn.disabled=false; btn.innerHTML=DRAFT_BTN_HTML; return;
+  }
+  uploadImage(imageFile, loggedInJid).then(function(imageUrl){
+    var data={jichiId:loggedInJid,text:text,priority:currentPriority,category:currentCategory,status:"draft",timestamp:firebase.firestore.FieldValue.serverTimestamp()};
+    if(imageUrl) data.imageUrl=imageUrl;
+    return db.collection("messages").add(data);
+  }).then(function(){
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); showToast("下書きを保存しました", false);
+    btn.disabled=false; btn.innerHTML=DRAFT_BTN_HTML;
+  }).catch(function(e){
+    console.error(e); showToast("❌ 保存に失敗しました", false); btn.disabled=false; btn.innerHTML=DRAFT_BTN_HTML;
   });
 }
 
@@ -896,7 +958,80 @@ function renderAdminMsgs(msgs){
   }).join("");
 }
 function getMsgsFallback(jid){ try{ return JSON.parse(localStorage.getItem("msgs_"+jid)||"[]"); }catch(e){ return []; } }
-function renderAdminMsgsFallback(){ renderAdminMsgs(getMsgsFallback(loggedInJid)); }
+function renderAdminMsgsFallback(){
+  var all=getMsgsFallback(loggedInJid);
+  var published=all.filter(function(m){ return !m.status||m.status==="published"; });
+  var drafts   =all.filter(function(m){ return m.status==="draft"; });
+  publishedCount=published.length;
+  renderAdminMsgs(published);
+  renderDrafts(drafts);
+}
+
+/* ── 下書き描画 ── */
+var draftStore={};
+
+function renderDrafts(drafts){
+  var badge=document.getElementById("draft-count-badge");
+  if(badge) badge.textContent=drafts.length+"件";
+  var el=document.getElementById("admin-draft-list");
+  if(!el) return;
+  if(!drafts.length){ el.innerHTML='<div class="draft-empty">下書きはありません</div>'; return; }
+  draftStore={};
+  drafts.forEach(function(d){ draftStore[d.id]={text:d.text||"",priority:d.priority||"normal",category:d.category||"notice",imageUrl:d.imageUrl||""}; });
+  el.innerHTML=drafts.map(function(d){
+    var catLabel={notice:"お知らせ",event:"イベント",urgent:"緊急",info:"情報"}[d.category||"notice"]||"お知らせ";
+    var priLabel={normal:"通常",high:"重要"}[d.priority||"normal"]||"通常";
+    var isHigh=d.priority==="high";
+    var txt=d.text||"";
+    var preview=txt.length>60?txt.slice(0,60)+"…":txt;
+    return '<div class="draft-card" data-id="'+d.id+'">'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">'
+      +'<span class="draft-label">下書き</span>'
+      +'<span style="font-size:11px;color:var(--ink-mid);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1px 7px">'+esc(catLabel)+'</span>'
+      +(isHigh?'<span style="font-size:11px;font-weight:700;color:#e8520a">重要</span>':'')
+      +'</div>'
+      +'<div style="font-size:13px;color:var(--ink);line-height:1.55;word-break:break-all">'+esc(preview)+'</div>'
+      +(d.imageUrl?'<div style="margin-top:6px"><img src="'+esc(d.imageUrl)+'" style="max-height:60px;border-radius:6px;border:1px solid var(--border)"></div>':'')
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+      +'<button class="publish-draft-btn" onclick="publishDraft(\''+d.id+'\')">'
+      +'<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>'
+      +'公開</button>'
+      +'<button onclick="deleteDraft(\''+d.id+'\')" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:11px;color:var(--ink-mid);cursor:pointer;font-family:inherit">削除</button>'
+      +'</div>'
+      +'</div>';
+  }).join("");
+}
+
+function publishDraft(draftId){
+  if(publishedCount>=MAX_MSGS){
+    if(!confirm("公開済み投稿が"+MAX_MSGS+"件に達しています。\n古い投稿を削除してから公開することをお勧めします。\n\nそれでも公開しますか？")) return;
+  }
+  if(!firebaseOk){
+    var msgs=getMsgsFallback(loggedInJid);
+    var idx=-1; msgs.forEach(function(m,i){ if(m.id===draftId) idx=i; });
+    if(idx<0){ showToast("❌ 下書きが見つかりません", false); return; }
+    msgs[idx].status="published";
+    localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
+    renderAdminMsgsFallback(); showToast("公開しました", false); return;
+  }
+  db.collection("messages").doc(draftId).update({status:"published"}).then(function(){
+    showToast("公開しました", false);
+  }).catch(function(e){ console.error(e); showToast("❌ 公開に失敗しました", false); });
+}
+
+function deleteDraft(draftId){
+  if(!confirm("この下書きを削除しますか？")) return;
+  if(!firebaseOk){
+    var msgs=getMsgsFallback(loggedInJid).filter(function(m){ return m.id!==draftId; });
+    localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
+    renderAdminMsgsFallback(); showToast("下書きを削除しました", false); return;
+  }
+  db.collection("messages").doc(draftId).delete().then(function(){
+    showToast("下書きを削除しました", false);
+  }).catch(function(e){ console.error(e); showToast("❌ 削除に失敗しました", false); });
+}
 
 
 
@@ -1258,7 +1393,10 @@ function updateCharCount(){
   var el=document.getElementById("char-count");
   el.textContent=len+" / "+MAX_CHARS;
   el.className="char-count"+(len>MAX_CHARS?" over":len>120?" warn":"");
-  document.getElementById("post-btn").disabled=len===0||len>MAX_CHARS;
+  var disabled=len===0||len>MAX_CHARS;
+  document.getElementById("post-btn").disabled=disabled;
+  var db2=document.getElementById("draft-btn");
+  if(db2) db2.disabled=disabled;
 }
 
 
