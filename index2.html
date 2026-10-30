@@ -57,6 +57,17 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .loc-text strong { color: var(--green-deep); font-size: 12px; }
 .loc-btn { background: var(--green-deep); color: white; border: none; border-radius: var(--radius-sm); padding: 5px 11px; font-size: 12px; font-family: inherit; cursor: pointer; white-space: nowrap; font-weight: 500; }
 
+/* ── 訪問者カウンターバー ── */
+.visitor-bar { display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--surface); border-radius: var(--radius-md); border: 1.5px solid var(--border); padding: 8px 14px; margin-bottom: 14px; }
+.visitor-icon { color: var(--green-mid); display: flex; align-items: center; flex-shrink: 0; }
+.visitor-stats { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-light); }
+.visitor-stat { display: flex; align-items: baseline; gap: 2px; }
+.visitor-label { font-size: 11px; color: var(--ink-light); }
+.visitor-num { font-size: 16px; font-weight: 700; color: var(--green-deep); font-family: 'DM Mono', monospace; line-height: 1; }
+.visitor-unit { font-size: 11px; color: var(--ink-mid); }
+.visitor-sep { font-size: 13px; color: var(--border); font-weight: 300; }
+.visitor-suffix { font-size: 11px; color: var(--ink-faint); }
+
 /* ── セクションラベル ── */
 .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-light); text-transform: uppercase; margin-bottom: 8px; }
 
@@ -815,6 +826,9 @@ function renderListView(){
     +'<button class="loc-btn" onclick="getLocation()">'+(userLat?'再取得':'現在地を取得')+'</button>'
     +'</div>';
 
+  /* 訪問者カウンターバー */
+  html+='<div id="visitor-bar-container"></div>';
+
   /* 新着情報セクション */
   html+='<div id="new-arrivals-container">'+renderNewArrivalsSection()+'</div>';
 
@@ -1102,6 +1116,10 @@ function visitorMonthKey(){
   var d = new Date();
   return "m_" + d.getFullYear() + "_" + (d.getMonth()+1);
 }
+function visitorDayKey(){
+  var d = new Date();
+  return "d_" + d.getFullYear() + "_" + (d.getMonth()+1) + "_" + d.getDate();
+}
 function recordSiteVisit(){
   if(!firebaseOk) return;
   try{
@@ -1109,10 +1127,44 @@ function recordSiteVisit(){
     sessionStorage.setItem("sv_counted","1");
   }catch(e){}
   var mk = visitorMonthKey();
+  var dk = visitorDayKey();
   var upd = { total: firebase.firestore.FieldValue.increment(1) };
   upd[mk] = firebase.firestore.FieldValue.increment(1);
+  upd[dk] = firebase.firestore.FieldValue.increment(1);
   db.collection("siteStats").doc("global").set(upd,{merge:true})
     .catch(function(e){ console.warn("siteStats更新失敗:",e); });
+}
+
+/* ICN_PEOPLE SVG */
+var ICN_PEOPLE='<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" style="flex-shrink:0"><path d="M9 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM17 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 0 0-1.5-4.33A5 5 0 0 1 19 16v1h-6.07zM6 11a5 5 0 0 1 5 5v1H1v-1a5 5 0 0 1 5-5z"/></svg>';
+
+function renderVisitorBar(todayN, totalN){
+  var el = document.getElementById("visitor-bar-container");
+  if(!el) return;
+  if(todayN === null){
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML = '<div class="visitor-bar">'
+    +'<span class="visitor-icon">'+ICN_PEOPLE+'</span>'
+    +'<div class="visitor-stats">'
+    +'<div class="visitor-stat"><span class="visitor-label">今日</span> <span class="visitor-num">'+todayN+'</span><span class="visitor-unit">人</span></div>'
+    +'<span class="visitor-sep">／</span>'
+    +'<div class="visitor-stat"><span class="visitor-label">累計</span> <span class="visitor-num">'+totalN+'</span><span class="visitor-unit">人</span></div>'
+    +'<span class="visitor-suffix">が訪問</span>'
+    +'</div>'
+    +'</div>';
+}
+function loadVisitorStats(){
+  if(!firebaseOk) return;
+  var dk = visitorDayKey();
+  db.collection("siteStats").doc("global").onSnapshot(function(doc){
+    if(!doc.exists){ renderVisitorBar(0, 0); return; }
+    var data = doc.data();
+    var todayN = data[dk] || 0;
+    var totalN = data.total || 0;
+    renderVisitorBar(todayN, totalN);
+  }, function(e){ console.warn("siteStats取得失敗:",e); });
 }
 function recordJichiVisit(jid){
   if(!firebaseOk) return;
@@ -1133,6 +1185,7 @@ function startup(){
   // 全自治会を購読してリアルタイムバッジ更新
   JICHIKAI.forEach(function(j){ subscribeMsgs(j.id); subscribeCondolences(j.id); });
   recordSiteVisit();
+  loadVisitorStats();
   var favList=getFavList();
   if(favList.length===1&&JICHIKAI.find(function(x){return x.id===favList[0];})){
     /* お気に入りが1件だけならすぐそのボードを表示 */
