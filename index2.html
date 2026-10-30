@@ -629,11 +629,11 @@ function buildStickyCard(j,distM,showDist){
   var distHtml="";
   if(showDist&&distM!==null){
     var d=fmtDist(distM);
-    distHtml='<span style="font-size:9.5px;color:var(--ink-faint);font-family:'DM Mono',monospace;display:inline-flex;align-items:center;gap:2px;">'+ICN_MAP+' '+d.n+d.u+'</span> ';
+    distHtml='<span style="font-size:9.5px;color:var(--ink-faint);font-family:monospace;display:inline-flex;align-items:center;gap:2px;">'+ICN_MAP+' '+d.n+d.u+'</span> ';
   }
   var preview="";
   if(cnt){var pt=msgs[0].text.replace(/\n/g," ").trim();preview=pt.length>30?pt.slice(0,30)+"…":pt;}
-  return'<div class="sticky-card fresh-'+age+(fav?" fav-card":"")+'" id="sc-'+j.id+'" onclick="openBoard(''+j.id+'')">'
+  return'<div class="sticky-card fresh-'+age+(fav?" fav-card":"")+'" id="sc-'+j.id+'" onclick="openBoard(\''+j.id+'\')">'
     +'<div class="sticky-top-bar"></div>'
     +'<div class="sticky-body">'
     +'<div class="sticky-days '+dl.cls+'">'+dl.label+'</div>'
