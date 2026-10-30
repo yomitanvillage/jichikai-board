@@ -815,6 +815,9 @@ function renderListView(){
     +'<button class="loc-btn" onclick="getLocation()">'+(userLat?'再取得':'現在地を取得')+'</button>'
     +'</div>';
 
+  /* 新着情報セクション */
+  html+='<div id="new-arrivals-container">'+renderNewArrivalsSection()+'</div>';
+
   /* 全自治会グリッド（GPS取得済みなら距離順、未取得なら番号順）*/
   var jList=JICHIKAI.map(function(j){
     return Object.assign({},j,{dist:userLat?calcDist(userLat,userLng,j.lat,j.lng):null});
@@ -824,9 +827,6 @@ function renderListView(){
   html+='<div class="sticky-grid" id="sticky-grid">';
   jList.forEach(function(j){ html+=buildStickyCard(j,j.dist,userLat!==null); subscribeMsgs(j.id); });
   html+='</div>';
-
-  /* 新着情報セクション */
-  html+='<div id="new-arrivals-container">'+renderNewArrivalsSection()+'</div>';
 
   document.getElementById("main-content").innerHTML=html;
 }
