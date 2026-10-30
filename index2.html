@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>読谷村 自治会ボード</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
@@ -36,14 +36,14 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { font-size: 16px; }
-body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; overscroll-behavior: none; }
+body { font-family: "M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans",system-ui,sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; overscroll-behavior: none; }
 
 /* ── ヘッダー ── */
 .header { background: var(--green-deep); padding: 0 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .header-inner { max-width: 480px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 52px; }
 .logo { display: flex; align-items: center; gap: 10px; }
 .logo-icon { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.logo-text h1 { font-size: 15px; font-weight: 700; color: white; line-height: 1.2; font-family: 'Noto Serif JP', serif; }
+.logo-text h1 { font-size: 15px; font-weight: 800; color: white; line-height: 1.2; }
 .logo-text p  { font-size: 10px; color: rgba(255,255,255,0.55); }
 .menu-btn { background: rgba(255,255,255,0.15); border: none; border-radius: 8px; height: 38px; padding: 0 12px; cursor: pointer; color: white; font-size: 18px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 
@@ -82,7 +82,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .fav-banner-icon { font-size: 22px; flex-shrink: 0; }
 .fav-banner-info { flex: 1; min-width: 0; }
 .fav-banner-label { font-size: 10px; color: rgba(255,255,255,0.7); font-weight: 700; letter-spacing: 0.08em; }
-.fav-banner-name { font-size: 16px; font-weight: 700; color: white; font-family: 'Noto Serif JP', serif; }
+.fav-banner-name { font-size: 16px; font-weight: 800; color: white; }
 .fav-banner-arrow { color: rgba(255,255,255,0.7); font-size: 18px; flex-shrink: 0; }
 .fav-banner-badge { background: rgba(255,255,255,0.25); color: white; font-size: 14px; font-weight: 700; padding: 4px 11px; border-radius: 20px; flex-shrink: 0; }
 
@@ -243,7 +243,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .back-btn:hover { border-color: var(--green-mid); color: var(--green-deep); background: var(--green-faint); }
 .board-view-name {
   font-size: 24px; font-weight: 700; color: var(--ink);
-  font-family: 'Noto Serif JP', serif;
+  font-weight: 800;
   line-height: 1.3; margin-bottom: 4px;
 }
 
@@ -334,7 +334,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .side-menu { position: fixed; top: 0; left: -320px; bottom: 0; width: 300px; background: var(--surface); z-index: 201; transition: left 0.25s ease; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
 .side-menu.open { left: 0; }
 .menu-header { background: var(--green-deep); padding: 16px; display: flex; align-items: center; justify-content: space-between; }
-.menu-header h2 { font-size: 15px; color: white; font-family: 'Noto Serif JP', serif; }
+.menu-header h2 { font-size: 15px; color: white; font-weight: 800; }
 .menu-close { background: rgba(255,255,255,0.15); border: none; border-radius: 6px; color: white; font-size: 16px; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .menu-body { flex: 1; overflow-y: auto; padding: 6px 0; }
 .menu-section-title { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; color: var(--ink-faint); padding: 10px 16px 4px; text-transform: uppercase; }
