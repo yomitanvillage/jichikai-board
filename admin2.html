@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a3a6b">
+<title>読谷村 自治会ボード｜管理者</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+:root {
+  --navy:       #1a3a6b;
+  --navy-mid:   #2a5298;
+  --navy-pale:  #e8eef8;
+  --green-deep: #1a6b3c;
+  --green-mid:  #2d8f54;
+  --green-pale: #e8f5ee;
+  --amber:      #e8a020;
+  --amber-pale: #fff8e8;
+  --red-soft:   #dc3545;
+  --red-pale:   #fff0f0;
+  --ink:        #1a1a1a;
+  --ink-mid:    #444;
+  --ink-light:  #777;
+  --ink-faint:  #aaa;
+  --surface:    #ffffff;
+  --bg:         #f0f4f8;
+  --border:     #ccd5e0;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; }
+body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+.header { background: var(--navy); padding: 0 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
+.header-inner { max-width: 520px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 52px; }
+.logo { display: flex; align-items: center; gap: 10px; }
+.logo-icon { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 17px; }
+.logo-text h1 { font-size: 14px; font-weight: 700; color: white; font-family: 'Noto Serif JP', serif; }
+.logo-text p  { font-size: 10px; color: rgba(255,255,255,0.5); }
+.admin-badge { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.08em; }
+
+.main { max-width: 520px; margin: 0 auto; padding: 24px 16px 60px; }
+
+/* ── ログイン ── */
+.login-card { background: var(--surface); border-radius: var(--radius-lg); border: 1.5px solid var(--border); padding: 28px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.login-title { font-size: 18px; font-weight: 700; color: var(--navy); font-family: 'Noto Serif JP', serif; text-align: center; margin-bottom: 6px; }
+.login-sub { font-size: 12px; color: var(--ink-light); text-align: center; margin-bottom: 24px; }
+.form-group { margin-bottom: 16px; }
+.form-label { display: block; font-size: 11px; font-weight: 700; color: var(--ink-mid); letter-spacing: 0.05em; margin-bottom: 6px; }
+.form-select, .form-input {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--radius-md); background: var(--surface); font-size: 14px;
+  font-family: inherit; color: var(--ink); outline: none; transition: border-color 0.12s;
+  appearance: none; -webkit-appearance: none;
+}
+.form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23777' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+}
+.form-select:focus, .form-input:focus { border-color: var(--navy-mid); }
+.login-btn { width: 100%; padding: 13px; background: var(--navy); color: white; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.15s; }
+.login-btn:hover { background: var(--navy-mid); }
+.error-box { background: var(--red-pale); border: 1px solid #fcc; border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--red-soft); margin-bottom: 14px; display: none; }
+.error-box.show { display: block; }
+
+/* ── 管理画面 ── */
+.admin-screen { display: none; }
+.admin-screen.show { display: block; }
+.admin-header-bar { background: var(--surface); border-radius: var(--radius-md); border: 1.5px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.admin-jichi-name { font-size: 16px; font-weight: 700; color: var(--navy); font-family: 'Noto Serif JP', serif; }
+.admin-jichi-sub { font-size: 11px; color: var(--ink-light); margin-top: 2px; }
+.logout-btn { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 6px 12px; font-size: 12px; font-family: inherit; cursor: pointer; color: var(--ink-mid); transition: all 0.12s; }
+.logout-btn:hover { border-color: var(--red-soft); color: var(--red-soft); }
+
+/* ── 投稿ボックス ── */
+.post-box { background: var(--surface); border-radius: var(--radius-lg); border: 1.5px solid var(--border); padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.post-box-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+/* ▼ 入力エリアを広く */
+.post-textarea {
+  width: 100%; min-height: 160px; padding: 14px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-md);
+  font-size: 15px; font-family: inherit; line-height: 1.75;
+  resize: vertical; outline: none; transition: border-color 0.12s; color: var(--ink);
+}
+.post-textarea:focus { border-color: var(--navy-mid); }
+.post-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.char-count { font-size: 12px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.char-count.warn { color: var(--amber); }
+.char-count.over { color: var(--red-soft); }
+.post-btn { background: var(--green-deep); color: white; border: none; border-radius: var(--radius-md); padding: 10px 22px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.15s; }
+.post-btn:hover { background: var(--green-mid); }
+.post-btn:disabled { background: var(--ink-faint); cursor: not-allowed; }
+
+/* ── 重要度選択 ── */
+.priority-selector {
+  display: flex; gap: 8px; margin-bottom: 12px;
+}
+.priority-btn {
+  flex: 1; padding: 9px 8px; border-radius: var(--radius-md);
+  border: 1.5px solid var(--border); background: var(--surface);
+  font-size: 13px; font-weight: 700; font-family: inherit;
+  cursor: pointer; transition: all 0.15s; color: var(--ink-mid);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.priority-btn.selected-normal { border-color: var(--green-mid); background: var(--green-pale); color: var(--green-deep); }
+.priority-btn.selected-high   { border-color: #e8520a; background: #fff0e8; color: #e8520a; }
+
+/* ── メッセージ管理 ── */
+.msg-manage-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.msg-manage-title { font-size: 13px; font-weight: 700; color: var(--ink-mid); }
+.msg-limit-note { font-size: 11px; color: var(--ink-faint); }
+.admin-msg-list { display: flex; flex-direction: column; gap: 8px; }
+.admin-msg-card { background: var(--surface); border-radius: var(--radius-md); border: 1.5px solid var(--border); padding: 12px 14px; display: flex; gap: 10px; }
+.admin-msg-body { flex: 1; min-width: 0; }
+.admin-msg-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.admin-msg-num { font-size: 10px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.admin-msg-time { font-size: 11px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.admin-msg-age { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+/* 投稿時期バッジ色（閲覧側と統一）*/
+.age-today { background: #e8f5ee; color: #1a6b3c; }
+.age-week  { background: #e6f0fa; color: #2a6cb5; }
+.age-month { background: #fff8e8; color: #e8a020; }
+.age-old   { background: #f0f0f0; color: #aaa; }
+/* ▼ 投稿済みメッセージ本文も大きめに */
+.admin-msg-text { font-size: 15px; line-height: 1.75; color: var(--ink); white-space: pre-wrap; word-break: break-word; }
+.delete-btn { background: none; border: 1.5px solid var(--border); border-radius: var(--radius-sm); width: 32px; height: 32px; cursor: pointer; color: var(--ink-faint); font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.12s; }
+.delete-btn:hover { border-color: var(--red-soft); color: var(--red-soft); background: var(--red-pale); }
+.edit-btn { background: none; border: 1.5px solid var(--border); border-radius: var(--radius-sm); width: 32px; height: 32px; cursor: pointer; color: var(--ink-faint); font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.12s; }
+.edit-btn:hover { border-color: var(--navy-mid); color: var(--navy-mid); background: var(--navy-pale); }
+
+/* ── インライン編集エリア ── */
+.edit-area { margin-top: 10px; }
+.edit-textarea {
+  width: 100%; padding: 10px 12px; border: 1.5px solid var(--navy-mid);
+  border-radius: var(--radius-md); font-size: 15px; font-family: inherit;
+  line-height: 1.7; resize: vertical; outline: none; color: var(--ink);
+  min-height: 80px; background: var(--navy-faint);
+}
+.edit-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.edit-char-count { font-size: 11px; color: var(--ink-faint); font-family: 'DM Mono', monospace; }
+.edit-char-count.warn { color: var(--amber); }
+.edit-char-count.over { color: var(--red-soft); }
+.edit-actions { display: flex; gap: 6px; }
+.edit-save-btn {
+  background: var(--navy); color: white; border: none; border-radius: var(--radius-sm);
+  padding: 7px 16px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+  transition: background 0.15s;
+}
+.edit-save-btn:hover { background: var(--navy-mid); }
+.edit-save-btn:disabled { background: var(--ink-faint); cursor: not-allowed; }
+.edit-cancel-btn {
+  background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: 7px 14px; font-size: 13px; font-family: inherit; cursor: pointer;
+  color: var(--ink-mid); transition: all 0.12s;
+}
+.edit-cancel-btn:hover { border-color: var(--ink-mid); }
+
+/* 編集中カードのハイライト */
+.admin-msg-card.editing { border-color: var(--navy-mid) !important; border-width: 2px; }
+
+/* ── 重要度切替（編集モード内）── */
+.edit-priority-selector { display: flex; gap: 6px; margin-bottom: 8px; }
+.edit-pri-btn {
+  padding: 5px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: var(--surface); font-size: 12px; font-weight: 700;
+  font-family: inherit; cursor: pointer; transition: all 0.15s; color: var(--ink-faint);
+}
+.edit-pri-btn.sel-normal { border-color: var(--green-mid); background: var(--green-pale); color: var(--green-deep); }
+.edit-pri-btn.sel-high   { border-color: #e8520a; background: #fff0e8; color: #e8520a; }
+.msg-empty-admin { text-align: center; color: var(--ink-faint); font-size: 13px; padding: 24px 0; }
+
+/* ── Firebase状態 ── */
+.fb-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+.fb-status.ok   { background: var(--green-pale); color: var(--green-deep); }
+.fb-status.warn { background: var(--amber-pale); color: var(--amber); }
+.fb-status.err  { background: var(--red-pale); color: var(--red-soft); }
+.fb-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+/* ── Toast ── */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: white; border-radius: 24px; padding: 10px 20px; font-size: 13px; font-weight: 500; z-index: 999; transition: transform 0.3s ease; pointer-events: none; white-space: nowrap; display: flex; align-items: center; gap: 12px; }
+.toast.show { transform: translateX(-50%) translateY(0); pointer-events: auto; }
+.toast-msg { flex: 1; }
+.toast-undo-btn {
+  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+  color: white; border-radius: 14px; padding: 4px 12px;
+  font-size: 12px; font-weight: 700; font-family: inherit;
+  cursor: pointer; white-space: nowrap; transition: background 0.15s;
+  display: none;
+}
+.toast-undo-btn:hover { background: rgba(255,255,255,0.35); }
+.toast-undo-btn.show { display: inline-block; }
+
+/* ── ボードタブ（お知らせ／おくやみ） ── */
+.board-tabs { display: flex; gap: 6px; margin-bottom: 16px; border-bottom: 2px solid var(--border); }
+.board-tab {
+  flex: 1; padding: 10px 8px; background: none; border: none;
+  border-bottom: 3px solid transparent; cursor: pointer;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  color: var(--ink-faint); display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: color 0.15s, border-color 0.15s; margin-bottom: -2px;
+}
+.board-tab.active.tab-notice     { color: var(--green-deep); border-bottom-color: var(--green-deep); }
+.board-tab.active.tab-condolence { color: #4a4a48; border-bottom-color: #6b6b66; }
+.tab-count-badge { font-size: 12px; font-weight: 700; border-radius: 10px; padding: 2px 8px; }
+.tab-count-badge.notice     { background: var(--green-pale); color: var(--green-mid); }
+.tab-count-badge.condolence { background: #e8e8e4; color: #5a5a56; }
+
+/* ── おくやみ投稿（落ち着いた色調） ── */
+.condolence-post-box { border-color: #c8c8c2; }
+.condolence-post-title { color: #4a4a48; }
+.condolence-admin-intro { font-size: 12px; color: var(--ink-light); margin-bottom: 12px; line-height: 1.6; }
+.condolence-post-btn { background: #5a5a56; }
+.condolence-post-btn:hover { background: #4a4a48; }
+.condolence-post-btn:disabled { background: var(--ink-faint); }
+
+/* ── カテゴリ選択 ── */
+.category-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+.category-btn {
+  flex: 1; padding: 8px 6px; border-radius: var(--radius-md);
+  border: 1.5px solid var(--border); background: var(--surface);
+  font-size: 12px; font-weight: 700; font-family: inherit;
+  cursor: pointer; transition: all 0.15s; color: var(--ink-mid);
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+.category-btn.sel-notice { border-color: #3b5bdb; background: #eef2ff; color: #3b5bdb; }
+.category-btn.sel-event  { border-color: #2f9e44; background: #ebfbee; color: #2f9e44; }
+.category-btn.sel-urgent { border-color: #c92a2a; background: #fff5f5; color: #c92a2a; }
+/* カテゴリタグ（投稿済みリスト用） */
+.admin-cat-tag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 700; border: 1px solid; margin-right: 4px; }
+.admin-cat-notice { background: #eef2ff; color: #3b5bdb; border-color: #c5d0fa; }
+.admin-cat-event  { background: #ebfbee; color: #2f9e44; border-color: #b2f2bb; }
+.admin-cat-urgent { background: #fff5f5; color: #c92a2a; border-color: #ffc9c9; }
+
+/* ── 画像添付 ── */
+.img-attach-area { margin: 0 0 12px; }
+.img-attach-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1.5px dashed var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--ink-mid); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.15s; }
+.img-attach-btn:hover { border-color: var(--green-mid); color: var(--green-deep); }
+.img-preview-wrap { position: relative; display: inline-block; margin-top: 8px; }
+.img-preview { max-width: 100%; max-height: 200px; border-radius: var(--radius-md); border: 1px solid var(--border); display: block; }
+.img-clear-btn { position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; border-radius: 50%; background: #c92a2a; color: #fff; border: 2px solid var(--surface); font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; line-height: 1; }
+.admin-thumb { max-width: 120px; max-height: 90px; border-radius: 6px; border: 1px solid var(--border); margin-top: 8px; display: block; object-fit: cover; cursor: pointer; }
+.edit-img-area { margin-bottom: 10px; }
+.edit-img-thumb { max-width: 100px; max-height: 75px; border-radius: 6px; border: 1px solid var(--border); display: block; margin-bottom: 6px; object-fit: cover; }
+.edit-img-actions { display: flex; gap: 6px; }
+.edit-img-btn { font-size: 11px; font-weight: 700; font-family: inherit; padding: 4px 10px; border-radius: 14px; border: 1.5px solid var(--border); background: var(--surface); color: var(--ink-mid); cursor: pointer; transition: all 0.15s; }
+.edit-img-btn:hover { border-color: var(--green-mid); color: var(--green-deep); }
+.edit-img-btn.remove { border-color: #ffc9c9; color: #c92a2a; background: #fff5f5; }
+
+</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GENYF89C83"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GENYF89C83');
+</script>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🏛️</div>
+      <div class="logo-text">
+        <h1>読谷村 自治会ボード</h1>
+        <p>Community Board Admin</p>
+      </div>
+    </div>
+    <div class="admin-badge">🔒 管理者</div>
+  </div>
+</header>
+
+<main class="main">
+  <!-- ログイン画面 -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-title">🏘️ 管理者ログイン</div>
+      <div class="login-sub">自治会を選択してパスワードを入力してください</div>
+      <div class="error-box" id="err-box"></div>
+      <div class="form-group">
+        <label class="form-label">自治会を選択</label>
+        <select class="form-select" id="login-select">
+          <option value="">— 自治会を選んでください —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">パスワード</label>
+        <input class="form-input" type="password" id="login-pw" placeholder="パスワードを入力" autocomplete="current-password">
+      </div>
+      <button class="login-btn" onclick="doLogin()">ログイン</button>
+    </div>
+  </div>
+
+  <!-- 管理者画面 -->
+  <div class="admin-screen" id="admin-screen">
+    <div class="admin-header-bar">
+      <div>
+        <div class="admin-jichi-name" id="admin-name"></div>
+        <div class="admin-jichi-sub" id="admin-addr"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <span class="fb-status warn" id="fb-status"><span class="fb-dot"></span> 接続中...</span>
+        <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+      </div>
+    </div>
+
+    <!-- 管理者画面：ボードタブ -->
+    <div class="board-tabs">
+      <button class="board-tab tab-notice active" id="admintab-notice" onclick="switchAdminTab('notice')">📢 お知らせ投稿 <span class="tab-count-badge notice" id="admintabbadge-notice">0件</span></button>
+      <button class="board-tab tab-condolence" id="admintab-condolence" onclick="switchAdminTab('condolence')">🕯️ おくやみ投稿 <span class="tab-count-badge condolence" id="admintabbadge-condolence">0件</span></button>
+    </div>
+
+    <!-- お知らせ投稿パネル -->
+    <div id="adminpanel-notice">
+      <div class="post-box">
+        <div class="post-box-title">✏️ 新しいお知らせを投稿</div>
+        <!-- カテゴリ選択 -->
+        <div class="category-selector">
+          <button class="category-btn sel-notice" id="cat-notice" onclick="selectCategory('notice')">📢 お知らせ</button>
+          <button class="category-btn" id="cat-event"  onclick="selectCategory('event')">🎉 イベント</button>
+          <button class="category-btn" id="cat-urgent" onclick="selectCategory('urgent')">🚨 緊急</button>
+        </div>
+        <!-- 重要度選択 -->
+        <div class="priority-selector">
+          <button class="priority-btn selected-normal" id="pri-normal" onclick="selectPriority('normal')">📋 通常</button>
+          <button class="priority-btn" id="pri-high"   onclick="selectPriority('high')">🔴 重要</button>
+        </div>
+        <textarea class="post-textarea" id="post-text"
+          placeholder="お知らせ内容を入力してください（最大140文字）&#10;&#10;例：○月○日に地区清掃があります。午前9時に公民館前に集合してください。"
+          maxlength="140" oninput="updateCharCount()"></textarea>
+        <!-- 画像添付 -->
+        <div class="img-attach-area" id="img-attach-area">
+          <button type="button" class="img-attach-btn" onclick="pickImage()">📷 写真を添付</button>
+          <div id="img-preview-wrap" class="img-preview-wrap" style="display:none">
+            <img id="img-preview" class="img-preview" src="" alt="プレビュー">
+            <button type="button" class="img-clear-btn" onclick="clearImage()" title="画像を削除">✕</button>
+          </div>
+          <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImagePick(this)">
+        </div>
+        <div class="post-footer">
+          <span class="char-count" id="char-count">0 / 140</span>
+          <button class="post-btn" id="post-btn" onclick="postMsg()" disabled>📢 投稿する</button>
+        </div>
+      </div>
+
+      <div class="msg-manage-header">
+        <div class="msg-manage-title">📝 投稿済みお知らせ</div>
+        <span class="msg-limit-note">最大10件まで</span>
+      </div>
+      <div class="admin-msg-list" id="admin-msg-list">
+        <div class="msg-empty-admin">読み込み中...</div>
+      </div>
+    </div>
+
+    <!-- おくやみ投稿パネル -->
+    <div id="adminpanel-condolence" style="display:none">
+      <div class="post-box condolence-post-box">
+        <div class="post-box-title condolence-post-title">🕯️ おくやみ情報を投稿</div>
+        <div class="condolence-admin-intro">訃報・お悔やみに関する情報を投稿します。通常のお知らせとは別のボードに表示されます。</div>
+        <textarea class="post-textarea" id="condolence-text"
+          placeholder="おくやみ情報を入力してください（最大140文字）&#10;&#10;例：〇〇様（〇〇班）が逝去されました。心よりお悔やみ申し上げます。"
+          maxlength="140" oninput="updateCondolenceCharCount()"></textarea>
+        <div class="post-footer">
+          <span class="char-count" id="condolence-char-count">0 / 140</span>
+          <button class="post-btn condolence-post-btn" id="condolence-post-btn" onclick="postCondolence()" disabled>🕯️ 投稿する</button>
+        </div>
+      </div>
+
+      <div class="msg-manage-header">
+        <div class="msg-manage-title">📝 投稿済みおくやみ情報</div>
+        <span class="msg-limit-note">最大10件まで</span>
+      </div>
+      <div class="admin-msg-list" id="admin-condolence-list">
+        <div class="msg-empty-admin">読み込み中...</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast">
+  <span class="toast-msg" id="toast-msg"></span>
+  <button class="toast-undo-btn" id="toast-undo-btn" onclick="undoDelete()">元に戻す</button>
+</div>
+
+<script>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ▼▼▼ Firebase設定 — ここを書き換えてください ▼▼▼
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBuqb9l1sNOC8rV5bnbsB0IGQY02mm7NOk",
+  authDomain: "yomitan-jichikai-board.firebaseapp.com",
+  projectId: "yomitan-jichikai-board",
+  storageBucket: "yomitan-jichikai-board.firebasestorage.app",
+  messagingSenderId: "374597777571",
+  appId: "1:374597777571:web:a2937dfb13b8f11b226716"
+};
+/* ▲▲▲ Firebase設定ここまで ▲▲▲ */
+
+var JICHIKAI = [
+  {id:"j01",name:"長浜自治会",  addr:"沖縄県中頭郡読谷村字長浜14",  tel:"098-958-4246",hash:"4f94010cb9e39a3b77ef5e3d85ad5dcd63d4317bdb0739179ded9183ce2798ab"},
+  {id:"j02",name:"瀬名波自治会",  addr:"沖縄県中頭郡読谷村字瀬名波138",  tel:"098-958-2594",hash:"1dd51a3204af0330b6bd13e80e04d56b5bec729c79bc38599b5f0240327c4917"},
+  {id:"j03",name:"宇座自治会",  addr:"沖縄県中頭郡読谷村字長浜1840-2",  tel:"098-958-2231",hash:"14664877830858fbc554d24a9e383c9403550ffa63dd3f85e5798889f966737e"},
+  {id:"j04",name:"儀間自治会",  addr:"沖縄県中頭郡読谷村字長浜1409",  tel:"098-958-3002",hash:"2925e3886ca94ddcc0f05eff19bd0a1fa790ddf0e1786bacd8f8ee4cd5634025"},
+  {id:"j05",name:"渡慶次自治会",  addr:"沖縄県中頭郡読谷村字渡慶次180",  tel:"098-958-4922",hash:"495caeed67aa1a14c6e4ff14bad7f8bb00c784b931bb2a00595b07147a788bb6"},
+  {id:"j06",name:"高志保自治会",  addr:"沖縄県中頭郡読谷村字高志保260",  tel:"098-958-4455",hash:"4948f97add0d096ec163cffd1c8905e97c2597d531c6a95fac9781be5b55d883"},
+  {id:"j07",name:"波平自治会",  addr:"沖縄県中頭郡読谷村字波平61",  tel:"098-958-2229",hash:"c507660c1f38009a19c345b2cbde6fc904e2304b3534f7b8b7e351fea1322135"},
+  {id:"j08",name:"上地自治会",  addr:"沖縄県中頭郡読谷村字上地1",  tel:"098-958-0628",hash:"cfbd262b5a49a61536c18f65db47de9f14c3ebe1f0155a75816984640caa1b0b"},
+  {id:"j09",name:"都屋自治会",  addr:"沖縄県中頭郡読谷村字都屋307",  tel:"098-956-2241",hash:"e3b71288d9ae018d0ee25dbfeec84bf7be9ef9d6ddf269bd968fe3ed3ea5307d"},
+  {id:"j10",name:"喜名自治会",  addr:"沖縄県中頭郡読谷村字喜名2207",  tel:"098-958-2236",hash:"690af74c60bba8123e1ad0d2915035cc0929f28a232789e727eca163c83647d8"},
+  {id:"j11",name:"親志自治会",  addr:"沖縄県中頭郡読谷村字座喜味2317",  tel:"098-958-2237",hash:"5fc1e6097657b83508680302ab830a5f7c16c93f457a19c2a69e47aeecb7b7b0"},
+  {id:"j12",name:"座喜味自治会",  addr:"沖縄県中頭郡読谷村字座喜味154",  tel:"098-958-2228",hash:"99b8d32427643c62bd416700fc654f16df9de06ac70d4da367c59ea40c21560a"},
+  {id:"j13",name:"横田自治会",  addr:"沖縄県中頭郡読谷村字座喜味2713-115",  tel:"098-958-7111",hash:"61a1057f2d9c66b5419a69afa9635df66af4fb6d9ee8bce4180925dcc456d6ac"},
+  {id:"j14",name:"楚辺自治会",  addr:"沖縄県中頭郡読谷村字楚辺1928-1",  tel:"098-956-2326",hash:"8810a50fa9ed965021883b64a0b8b06c23bbd93a3ddd9d98d013052fe0c6b854"},
+  {id:"j15",name:"大添自治会",  addr:"沖縄県中頭郡読谷村字楚辺1279-31",  tel:"098-956-9093",hash:"e07185467d86b21ee4aa798410d396eaeecb74506464fb116db9b7b37537e459"},
+  {id:"j16",name:"大木自治会",  addr:"沖縄県中頭郡読谷村字大木294",  tel:"098-956-2020",hash:"3e0829b65d6e89d23b912409b629deeef6436de552305bd46f69367370f88815"},
+  {id:"j17",name:"伊良皆自治会",  addr:"沖縄県中頭郡読谷村字伊良皆177-3",  tel:"098-956-2235",hash:"aa94955c39aef0da9cb0f0a1575d2520fe87221121598a2d0c1823211d123f96"},
+  {id:"j18",name:"牧原自治会",  addr:"沖縄県中頭郡読谷村字比謝315-4",  tel:"098-956-2328",hash:"3c3e6bebcca08890600fe98c904e3a9216cb32e21cd477ac0377678adc9ea472"},
+  {id:"j19",name:"長田自治会",  addr:"沖縄県中頭郡読谷村字大木313-1",  tel:"098-957-3752",hash:"dd774b8cfe5322b3f89c7f56101daf052f0c7627faa319394e4c554a940578e0"},
+  {id:"j20",name:"渡具知自治会",  addr:"沖縄県中頭郡読谷村字渡具知246-2",  tel:"098-956-2240",hash:"f461df4a20c86807e2e7e3597df91d6c6c59730626ac8e2d5083b28619d88dd5"},
+  {id:"j21",name:"古堅自治会",  addr:"沖縄県中頭郡読谷村字古堅75-3",  tel:"098-956-2238",hash:"35fa5fe77f6712b2f1fe08d95ebf4288f39f980b194047d20b1cd267fafad1c9"},
+  {id:"j22",name:"大湾自治会",  addr:"沖縄県中頭郡読谷村字大湾425",  tel:"098-956-2233",hash:"63db221d6d03f7b96697b2a1746bded1d27a42304437b6885c2e34ac8c9770c7"},
+  {id:"j23",name:"比謝矼自治会",  addr:"沖縄県中頭郡読谷村字比謝矼3",  tel:"098-957-2172",hash:"41bbd45daaff22fa77d8f048a2bda374aeef5a080c45f451099a9cf81d2e3262"},
+  {id:"j24",name:"比謝自治会",  addr:"沖縄県中頭郡読谷村字比謝26",  tel:"098-956-2234",hash:"fda61158df163c0f1549ea496539b5a83aff0ee713a7dc750f2ea23966047d6e"},
+];
+
+var MAX_MSGS=10, MAX_CHARS=140;
+var db=null, firebaseOk=false, loggedInJid=null, unsubscribeMsgs=null;
+var currentPriority="normal"; // "normal" | "high"
+var currentCategory="notice"; // "notice" | "event" | "urgent"
+var pendingImageFile=null;    // 投稿フォームで選択中の画像ファイル
+
+/* ── 重要度選択 ── */
+function selectPriority(p){
+  currentPriority=p;
+  document.getElementById("pri-normal").className="priority-btn"+(p==="normal"?" selected-normal":"");
+  document.getElementById("pri-high").className  ="priority-btn"+(p==="high"?"   selected-high":"");
+}
+
+/* ── カテゴリ選択 ── */
+function selectCategory(c){
+  currentCategory=c;
+  ["notice","event","urgent"].forEach(function(k){
+    var btn=document.getElementById("cat-"+k);
+    if(!btn) return;
+    btn.className="category-btn"+(c===k?" sel-"+k:"");
+  });
+}
+
+/* ── Firebase初期化 ── */
+function initFirebase(){
+  if(FIREBASE_CONFIG.apiKey==="YOUR_API_KEY"){ setFbStatus("warn","⚠ Firebase未設定"); return; }
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.firestore(); firebaseOk=true;
+    setFbStatus("ok","● Firebase接続OK");
+  }catch(e){ console.error(e); setFbStatus("err","✕ 接続エラー"); }
+}
+function setFbStatus(cls,text){
+  var el=document.getElementById("fb-status"); if(!el) return;
+  el.className="fb-status "+cls; el.innerHTML='<span class="fb-dot"></span> '+text;
+}
+
+/* ── ログイン画面構築（最後の選択を復元）── */
+function buildLoginSelect(){
+  var sel=document.getElementById("login-select");
+  var lastJid=localStorage.getItem("admin_last_jid")||"";
+  JICHIKAI.forEach(function(j,i){
+    var o=document.createElement("option");
+    o.value=j.id; o.textContent=String(i+1).padStart(2,"0")+". "+j.name;
+    if(j.id===lastJid) o.selected=true;
+    sel.appendChild(o);
+  });
+  document.getElementById("login-pw").addEventListener("keydown",function(e){
+    if(e.key==="Enter") doLogin();
+  });
+}
+
+/* ── ソルト ── */
+var HASH_SALT = "yomitan-jichikai-2024";
+
+/* ── SHA-256ハッシュ生成（Web Crypto API）── */
+async function sha256(str) {
+  var buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+}
+
+/* ── ログイン（ハッシュ照合）── */
+function doLogin(){
+  var jid = document.getElementById("login-select").value;
+  var pw  = document.getElementById("login-pw").value;
+  var errEl = document.getElementById("err-box");
+  errEl.classList.remove("show");
+  if(!jid){ showErr("自治会を選択してください"); return; }
+  if(!pw)  { showErr("パスワードを入力してください"); return; }
+  var jichi = JICHIKAI.find(function(x){ return x.id===jid; });
+  if(!jichi){ showErr("自治会が見つかりません"); return; }
+  var btn = document.querySelector(".login-btn");
+  if(btn){ btn.disabled=true; btn.textContent="確認中..."; }
+  sha256(HASH_SALT + pw).then(function(hash){
+    if(hash === jichi.hash){
+      localStorage.setItem("admin_last_jid", jid);
+      loggedInJid = jid;
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("admin-screen").classList.add("show");
+      document.getElementById("admin-name").textContent = jichi.name;
+      document.getElementById("admin-addr").textContent = jichi.addr;
+      updateCharCount();
+      updateCondolenceCharCount();
+      subscribeAdminMsgs();
+      subscribeCondolenceAdmin();
+    } else {
+      showErr("パスワードが正しくありません");
+      document.getElementById("login-pw").value = "";
+      if(btn){ btn.disabled=false; btn.textContent="ログイン"; }
+    }
+  }).catch(function(e){
+    console.error(e);
+    showErr("認証処理に失敗しました。再度お試しください。");
+    if(btn){ btn.disabled=false; btn.textContent="ログイン"; }
+  });
+}
+function showErr(msg){ var e=document.getElementById("err-box"); e.textContent=msg; e.classList.add("show"); }
+
+/* ── ログアウト ── */
+function doLogout(){
+  if(!confirm("ログアウトしますか？")) return;
+  if(unsubscribeMsgs){ unsubscribeMsgs(); unsubscribeMsgs=null; }
+  if(unsubscribeCondolences){ unsubscribeCondolences(); unsubscribeCondolences=null; }
+  loggedInJid=null;
+  document.getElementById("admin-screen").classList.remove("show");
+  document.getElementById("login-screen").style.display="";
+  document.getElementById("login-pw").value="";
+  document.getElementById("post-text").value="";
+  document.getElementById("condolence-text").value="";
+  updateCharCount();
+  updateCondolenceCharCount();
+  switchAdminTab("notice"); // 次回ログイン時は常にお知らせタブから
+}
+
+/* ── メッセージ購読 ── */
+function subscribeAdminMsgs(){
+  if(!firebaseOk){ renderAdminMsgsFallback(); return; }
+  var q=db.collection("messages").where("jichiId","==",loggedInJid).orderBy("timestamp","desc").limit(MAX_MSGS+1);
+  unsubscribeMsgs=q.onSnapshot(function(snap){
+    var msgs=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    renderAdminMsgs(msgs);
+    var bd=document.getElementById("admintabbadge-notice");
+    if(bd) bd.textContent=msgs.length+"件";
+    setFbStatus("ok","● リアルタイム同期中");
+  },function(err){ console.error(err); setFbStatus("err","✕ 読み込みエラー"); });
+}
+
+/* ── 画像添付（投稿フォーム）── */
+function pickImage(){
+  document.getElementById("img-file-input").click();
+}
+function handleImagePick(input){
+  var file=input.files&&input.files[0];
+  if(!file) return;
+  if(!file.type.startsWith("image/")){ showToast("⚠️ 画像ファイルを選択してください", false); return; }
+  if(file.size>5*1024*1024){ showToast("⚠️ 5MB以下の画像を選択してください", false); return; }
+  pendingImageFile=file;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var wrap=document.getElementById("img-preview-wrap");
+    var prev=document.getElementById("img-preview");
+    if(wrap&&prev){ prev.src=e.target.result; wrap.style.display="inline-block"; }
+  };
+  reader.readAsDataURL(file);
+  // 同じファイルを再選択できるようリセット
+  input.value="";
+}
+function clearImage(){
+  pendingImageFile=null;
+  var wrap=document.getElementById("img-preview-wrap");
+  var prev=document.getElementById("img-preview");
+  if(wrap) wrap.style.display="none";
+  if(prev) prev.src="";
+}
+function uploadImage(file, jichiId){
+  return new Promise(function(resolve, reject){
+    if(!file){ resolve(null); return; }
+    try{
+      var reader=new FileReader();
+      reader.onerror=function(){ reject(new Error("読み込み失敗")); };
+      reader.onload=function(e){
+        var img=new Image();
+        img.onerror=function(){ reject(new Error("画像変換失敗")); };
+        img.onload=function(){
+          try{
+            var MAX_W=800;
+            var w=img.width, h=img.height;
+            if(w>MAX_W){ h=Math.round(h*MAX_W/w); w=MAX_W; }
+            var canvas=document.createElement("canvas");
+            canvas.width=w; canvas.height=h;
+            canvas.getContext("2d").drawImage(img,0,0,w,h);
+            resolve(canvas.toDataURL("image/jpeg",0.72));
+          }catch(e2){ reject(e2); }
+        };
+        img.src=e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }catch(e){ reject(e); }
+  });
+}
+
+/* ── 投稿 ── */
+function postMsg(){
+  var text=document.getElementById("post-text").value.trim();
+  if(!text||text.length>MAX_CHARS) return;
+  var btn=document.getElementById("post-btn");
+  btn.disabled=true; btn.textContent="投稿中...";
+  var imageFile=pendingImageFile;
+
+  if(!firebaseOk){
+    var msgs=getMsgsFallback(loggedInJid);
+    if(msgs.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.textContent="📢 投稿する"; return; }
+    msgs.unshift({id:String(Date.now()),text:text,priority:currentPriority,category:currentCategory,timestamp:new Date().toISOString()});
+    localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); renderAdminMsgsFallback(); showToast("📢 投稿しました！", false);
+    btn.disabled=false; btn.textContent="📢 投稿する"; return;
+  }
+
+  // まず件数チェック → 画像アップロード → Firestore追加
+  db.collection("messages").where("jichiId","==",loggedInJid).get().then(function(snap){
+    if(snap.size>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false); btn.disabled=false; btn.textContent="📢 投稿する"; return Promise.reject("full"); }
+    if(imageFile) btn.textContent="画像アップロード中...";
+    return uploadImage(imageFile, loggedInJid);
+  }).then(function(imageUrl){
+    var data={jichiId:loggedInJid,text:text,priority:currentPriority,category:currentCategory,timestamp:firebase.firestore.FieldValue.serverTimestamp()};
+    if(imageUrl) data.imageUrl=imageUrl;
+    return db.collection("messages").add(data);
+  }).then(function(ref){
+    if(!ref) return;
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); showToast("📢 投稿しました！", false);
+    btn.disabled=false; btn.textContent="📢 投稿する";
+  }).catch(function(e){
+    if(e==="full") return;
+    console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.textContent="📢 投稿する";
+  });
+}
+
+/* ══════════════════════════════════════════
+   おくやみボード（管理者側）
+══════════════════════════════════════════ */
+var unsubscribeCondolences=null;
+
+/* ── おくやみ購読 ── */
+function subscribeCondolenceAdmin(){
+  if(!firebaseOk){ renderAdminCondolencesFallback(); return; }
+  var q=db.collection("condolences").where("jichiId","==",loggedInJid).orderBy("timestamp","desc").limit(MAX_MSGS+1);
+  unsubscribeCondolences=q.onSnapshot(function(snap){
+    var items=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    renderAdminCondolences(items);
+    var bd=document.getElementById("admintabbadge-condolence");
+    if(bd) bd.textContent=items.length+"件";
+  },function(err){ console.error(err); });
+}
+
+/* ── おくやみ投稿 ── */
+function postCondolence(){
+  var text=document.getElementById("condolence-text").value.trim();
+  if(!text||text.length>MAX_CHARS) return;
+  var btn=document.getElementById("condolence-post-btn");
+  btn.disabled=true; btn.textContent="投稿中...";
+  if(!firebaseOk){
+    var items=getCondolencesFallback(loggedInJid);
+    if(items.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.textContent="🕯️ 投稿する"; return; }
+    items.unshift({id:String(Date.now()),text:text,timestamp:new Date().toISOString()});
+    localStorage.setItem("condolences_"+loggedInJid,JSON.stringify(items));
+    document.getElementById("condolence-text").value=""; updateCondolenceCharCount(); renderAdminCondolencesFallback(); showToast("🕯️ 投稿しました", false);
+    btn.disabled=false; btn.textContent="🕯️ 投稿する"; return;
+  }
+  db.collection("condolences").where("jichiId","==",loggedInJid).get().then(function(snap){
+    if(snap.size>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false); btn.disabled=false; btn.textContent="🕯️ 投稿する"; return null; }
+    return db.collection("condolences").add({jichiId:loggedInJid,text:text,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
+  }).then(function(ref){
+    if(!ref) return;
+    document.getElementById("condolence-text").value=""; updateCondolenceCharCount(); showToast("🕯️ 投稿しました", false);
+    btn.disabled=false; btn.textContent="🕯️ 投稿する";
+  }).catch(function(e){ console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.textContent="🕯️ 投稿する"; });
+}
+
+/* ── おくやみ：文字数カウント ── */
+function updateCondolenceCharCount(){
+  var len=document.getElementById("condolence-text").value.length;
+  var el=document.getElementById("condolence-char-count");
+  el.textContent=len+" / "+MAX_CHARS;
+  el.className="char-count"+(len>MAX_CHARS?" over":len>120?" warn":"");
+  document.getElementById("condolence-post-btn").disabled=len===0||len>MAX_CHARS;
+}
+
+/* ── おくやみ：管理画面描画 ── */
+var condolenceStore = {};
+
+function renderAdminCondolences(items){
+  var el=document.getElementById("admin-condolence-list");
+  if(!items.length){ el.innerHTML='<div class="msg-empty-admin">まだおくやみ情報の投稿はありません</div>'; return; }
+  condolenceStore={};
+  items.forEach(function(m){ condolenceStore[m.id]={text:m.text||""}; });
+  el.innerHTML=items.map(function(m,i){
+    var d=m.timestamp&&m.timestamp.toDate?m.timestamp.toDate():new Date(m.timestamp);
+    var dateStr=d.toLocaleString("ja-JP",{year:"numeric",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    return'<div class="admin-msg-card" id="condcard-'+m.id+'" style="background:#f7f7f5;border-left:4px solid #8a8a84;border-color:#d8d8d2">'
+      +'<div class="admin-msg-body">'
+      +'<div class="admin-msg-meta">'
+      +'<span class="admin-msg-num">#'+(i+1)+'</span>'
+      +'<span class="admin-msg-time">'+dateStr+'</span>'
+      +'</div>'
+      +'<div class="admin-msg-text" id="condtext-'+m.id+'">'+esc(m.text)+'</div>'
+      +'<div class="edit-area" id="condedit-area-'+m.id+'" style="display:none"></div>'
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+      +'<button class="edit-btn" id="condedit-btn-'+m.id+'" data-id="'+m.id+'" onclick="startCondEditById(this)" title="編集">✏️</button>'
+      +'<button class="delete-btn" data-id="'+m.id+'" onclick="deleteCondolenceById(this)" title="削除">🗑️</button>'
+      +'</div>'
+      +'</div>';
+  }).join("");
+}
+function getCondolencesFallback(jid){ try{ return JSON.parse(localStorage.getItem("condolences_"+jid)||"[]"); }catch(e){ return []; } }
+function renderAdminCondolencesFallback(){ renderAdminCondolences(getCondolencesFallback(loggedInJid)); }
+
+/* ── おくやみ：削除（元に戻す付き）── */
+var deletedCondolence=null;
+function deleteCondolenceById(btn){
+  var id=btn.getAttribute("data-id");
+  var stored=condolenceStore[id];
+  if(!stored){ showToast("❌ 削除できませんでした", false); return; }
+  deletedCondolence={id:id, text:stored.text};
+
+  if(!firebaseOk){
+    var items=getCondolencesFallback(loggedInJid).filter(function(m){ return m.id!==id; });
+    localStorage.setItem("condolences_"+loggedInJid, JSON.stringify(items));
+    renderAdminCondolencesFallback();
+    showToast("🗑️ 削除しました", true);
+    return;
+  }
+  db.collection("condolences").doc(id).delete()
+    .then(function(){ showToast("🗑️ 削除しました", true); })
+    .catch(function(e){ console.error(e); deletedCondolence=null; showToast("❌ 削除に失敗しました", false); });
+}
+
+/* ── おくやみ：編集 ── */
+var editingCondId=null;
+
+function startCondEditById(btn){
+  var id=btn.getAttribute("data-id");
+  var stored=condolenceStore[id];
+  if(!stored){ console.error("condolenceStore未登録:",id); return; }
+  startCondEdit(id, stored.text);
+}
+
+function startCondEdit(id, rawText){
+  if(editingCondId && editingCondId!==id) cancelCondEdit(editingCondId);
+  editingCondId=id;
+
+  var card=document.getElementById("condcard-"+id);
+  var textEl=document.getElementById("condtext-"+id);
+  var areaEl=document.getElementById("condedit-area-"+id);
+  var editBtn=document.getElementById("condedit-btn-"+id);
+  if(!card||!textEl||!areaEl) return;
+
+  textEl.style.display="none";
+  card.classList.add("editing");
+  if(editBtn) editBtn.style.display="none";
+
+  areaEl.innerHTML =
+    '<textarea class="edit-textarea" id="condedit-ta-'+id+'" maxlength="'+MAX_CHARS+'"></textarea>'
+    + '<div class="edit-footer">'
+    + '<span class="edit-char-count" id="condedit-cc-'+id+'">0 / '+MAX_CHARS+'</span>'
+    + '<div class="edit-actions">'
+    + '<button class="edit-cancel-btn" id="condedit-cancel-'+id+'">キャンセル</button>'
+    + '<button class="edit-save-btn"   id="condedit-save-'+id+'">💾 保存</button>'
+    + '</div></div>';
+  areaEl.style.display="block";
+
+  var ta=document.getElementById("condedit-ta-"+id);
+  var cancelBtn=document.getElementById("condedit-cancel-"+id);
+  var saveBtn=document.getElementById("condedit-save-"+id);
+
+  ta.value=rawText||"";
+  updateCondEditCount(id);
+  ta.addEventListener("input", function(){ updateCondEditCount(id); });
+  ta.addEventListener("keydown", function(e){ if(e.key==="Escape") cancelCondEdit(id); });
+  cancelBtn.addEventListener("click", function(){ cancelCondEdit(id); });
+  saveBtn.addEventListener("click", function(){ saveCondEdit(id); });
+
+  setTimeout(function(){ ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length); },50);
+}
+
+function updateCondEditCount(id){
+  var ta=document.getElementById("condedit-ta-"+id); if(!ta) return;
+  var cc=document.getElementById("condedit-cc-"+id); if(!cc) return;
+  var len=ta.value.length;
+  cc.textContent=len+" / "+MAX_CHARS;
+  cc.className="edit-char-count"+(len>MAX_CHARS?" over":len>120?" warn":"");
+  var sb=document.getElementById("condedit-save-"+id);
+  if(sb) sb.disabled=(len===0||len>MAX_CHARS);
+}
+
+function cancelCondEdit(id){
+  var card=document.getElementById("condcard-"+id); if(!card) return;
+  var textEl=document.getElementById("condtext-"+id);
+  var areaEl=document.getElementById("condedit-area-"+id);
+  var editBtn=document.getElementById("condedit-btn-"+id);
+  if(textEl) textEl.style.display="";
+  if(areaEl){ areaEl.innerHTML=""; areaEl.style.display="none"; }
+  if(editBtn) editBtn.style.display="";
+  card.classList.remove("editing");
+  if(editingCondId===id) editingCondId=null;
+}
+
+function saveCondEdit(id){
+  var ta=document.getElementById("condedit-ta-"+id); if(!ta) return;
+  var newText=ta.value.trim();
+  if(!newText||newText.length>MAX_CHARS) return;
+
+  var saveBtn=document.getElementById("condedit-save-"+id);
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent="保存中..."; }
+
+  if(!firebaseOk){
+    var items=getCondolencesFallback(loggedInJid).map(function(m){
+      return m.id===id ? Object.assign({},m,{text:newText}) : m;
+    });
+    localStorage.setItem("condolences_"+loggedInJid, JSON.stringify(items));
+    cancelCondEdit(id); editingCondId=null; renderAdminCondolencesFallback(); showToast("✅ 更新しました", false); return;
+  }
+  db.collection("condolences").doc(id).update({text:newText})
+    .then(function(){ cancelCondEdit(id); editingCondId=null; showToast("✅ 更新しました", false); })
+    .catch(function(e){
+      console.error(e); showToast("❌ 更新に失敗しました", false);
+      if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent="💾 保存"; }
+    });
+}
+
+/* ── 管理者画面タブ切替 ── */
+function switchAdminTab(tab){
+  var noticePanel=document.getElementById("adminpanel-notice");
+  var condPanel=document.getElementById("adminpanel-condolence");
+  var noticeTab=document.getElementById("admintab-notice");
+  var condTab=document.getElementById("admintab-condolence");
+  if(noticePanel) noticePanel.style.display=(tab==="notice")?"":"none";
+  if(condPanel)   condPanel.style.display=(tab==="condolence")?"":"none";
+  if(noticeTab) noticeTab.classList.toggle("active", tab==="notice");
+  if(condTab)   condTab.classList.toggle("active", tab==="condolence");
+}
+
+/* ── 管理画面描画 ── */
+var msgStore = {}; // {[id]:{text,priority,category}} テキストをJS変数で保持
+
+function renderAdminMsgs(msgs){
+  var el=document.getElementById("admin-msg-list");
+  if(!msgs.length){ el.innerHTML='<div class="msg-empty-admin">📭 まだ投稿はありません</div>'; return; }
+  msgStore={};
+  msgs.forEach(function(m){ msgStore[m.id]={text:m.text||"", priority:m.priority||"normal", category:m.category||"notice", imageUrl:m.imageUrl||""}; });
+  el.innerHTML=msgs.map(function(m,i){
+    var age=tsAge(m.timestamp);
+    var ageCls=age==="today"?"age-today":age==="week"?"age-week":age==="month"?"age-month":"age-old";
+    var ageLabel=age==="today"?"今日":age==="week"?"今週":age==="month"?"今月":"古い";
+    var d=m.timestamp&&m.timestamp.toDate?m.timestamp.toDate():new Date(m.timestamp);
+    var dateStr=d.toLocaleString("ja-JP",{year:"numeric",month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    var isHigh=(m.priority==="high");
+    var cardStyle=isHigh?"background:#fff8f0;border-left:4px solid #e8520a;border-color:#f5c4a0":"";
+    var priLabel=isHigh
+      ?'<span style="font-size:10px;font-weight:700;color:#e8520a;background:#fde8d8;padding:2px 7px;border-radius:10px;margin-right:4px">🔴 重要</span>'
+      :'<span style="font-size:10px;font-weight:700;color:var(--green-deep);background:var(--green-pale);padding:2px 7px;border-radius:10px;margin-right:4px">📋 通常</span>';
+    var cat=m.category||"notice";
+    var catLabel=cat==="event"?"🎉 イベント":cat==="urgent"?"🚨 緊急":"📢 お知らせ";
+    var catCls="admin-cat-tag "+(cat==="event"?"admin-cat-event":cat==="urgent"?"admin-cat-urgent":"admin-cat-notice");
+    var catTag='<span class="'+catCls+'">'+catLabel+'</span>';
+    var thumbHtml=m.imageUrl?'<img class="admin-thumb" src="'+esc(m.imageUrl)+'" alt="添付画像" onclick="window.open(\''+esc(m.imageUrl)+'\',\'_blank\')" title="画像を開く">':"";
+    return'<div class="admin-msg-card" id="card-'+m.id+'" style="'+cardStyle+'">'
+      +'<div class="admin-msg-body">'
+      +'<div class="admin-msg-meta">'
+      +priLabel
+      +catTag
+      +'<span class="admin-msg-num">#'+(i+1)+'</span>'
+      +'<span class="admin-msg-time">'+dateStr+'</span>'
+      +'<span class="admin-msg-age '+ageCls+'">'+ageLabel+'</span>'
+      +'</div>'
+      +'<div class="admin-msg-text" id="text-'+m.id+'">'+esc(m.text)+'</div>'
+      +thumbHtml
+      +'<div class="edit-area" id="edit-area-'+m.id+'" style="display:none"></div>'
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+      +'<button class="edit-btn" id="edit-btn-'+m.id+'" data-id="'+m.id+'" onclick="startEditById(this)" title="編集">✏️</button>'
+      +'<button class="delete-btn" data-id="'+m.id+'" onclick="deleteMsgById(this)" title="削除">🗑️</button>'
+      +'</div>'
+      +'</div>';
+  }).join("");
+}
+function getMsgsFallback(jid){ try{ return JSON.parse(localStorage.getItem("msgs_"+jid)||"[]"); }catch(e){ return []; } }
+function renderAdminMsgsFallback(){ renderAdminMsgs(getMsgsFallback(loggedInJid)); }
+
+
+
+
+/* ── 削除（元に戻す付き）── */
+var deletedMsg = null; // 直前に削除したメッセージを保持
+
+function deleteMsgById(btn){
+  var msgId = btn.getAttribute("data-id");
+  var stored = msgStore[msgId];
+  if(!stored){ showToast("❌ 削除できませんでした", false); return; }
+
+  // 削除前のデータを保存（元に戻す用）
+  deletedMsg = {
+    id:       msgId,
+    text:     stored.text,
+    priority: stored.priority,
+    category: stored.category||"notice",
+    imageUrl: stored.imageUrl||""
+  };
+
+  if(!firebaseOk){
+    var msgs = getMsgsFallback(loggedInJid).filter(function(m){ return m.id!==msgId; });
+    localStorage.setItem("msgs_"+loggedInJid, JSON.stringify(msgs));
+    renderAdminMsgsFallback();
+    showToast("🗑️ 削除しました", true);
+    return;
+  }
+  db.collection("messages").doc(msgId).delete()
+    .then(function(){ showToast("🗑️ 削除しました", true); })
+    .catch(function(e){
+      console.error(e);
+      deletedMsg = null;
+      showToast("❌ 削除に失敗しました", false);
+    });
+}
+
+/* ── 元に戻す ── */
+function undoDelete(){
+  if(!deletedMsg){ hideToast(); return; }
+  var msg = deletedMsg;
+  deletedMsg = null;
+  hideToast();
+
+  if(!firebaseOk){
+    var msgs = getMsgsFallback(loggedInJid);
+    msgs.unshift({id: msg.id, text: msg.text, priority: msg.priority, category: msg.category||"notice", imageUrl: msg.imageUrl||"", timestamp: new Date().toISOString()});
+    localStorage.setItem("msgs_"+loggedInJid, JSON.stringify(msgs));
+    renderAdminMsgsFallback();
+    showToast("↩️ 元に戻しました", false);
+    return;
+  }
+  // Firestoreに再投稿（新しいdocとして追加）
+  var restoreData = {
+    jichiId:   loggedInJid,
+    text:      msg.text,
+    priority:  msg.priority,
+    category:  msg.category||"notice",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  if(msg.imageUrl) restoreData.imageUrl = msg.imageUrl;
+  db.collection("messages").add(restoreData).then(function(){
+    showToast("↩️ 元に戻しました", false);
+  }).catch(function(e){
+    console.error(e);
+    showToast("❌ 元に戻せませんでした", false);
+  });
+}
+
+/* ── Toast ── */
+var toastTimer = null;
+function showToast(msg, withUndo){
+  var el      = document.getElementById("toast");
+  var msgEl   = document.getElementById("toast-msg");
+  var undoBtn = document.getElementById("toast-undo-btn");
+  if(!el||!msgEl||!undoBtn) return;
+
+  msgEl.textContent = msg;
+  if(withUndo){
+    undoBtn.classList.add("show");
+  } else {
+    undoBtn.classList.remove("show");
+  }
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  // 元に戻すありは5秒、なしは2.8秒
+  toastTimer = setTimeout(function(){
+    hideToast();
+  }, withUndo ? 5000 : 2800);
+}
+function hideToast(){
+  var el = document.getElementById("toast");
+  var undoBtn = document.getElementById("toast-undo-btn");
+  if(el) el.classList.remove("show");
+  if(undoBtn) undoBtn.classList.remove("show");
+  clearTimeout(toastTimer);
+}
+
+/* ── 編集開始（data-id属性版）── */
+var editingId = null;
+
+function startEditById(btn){
+  var msgId = btn.getAttribute("data-id");
+  var stored = msgStore[msgId];
+  if(!stored){ console.error("msgStore未登録:", msgId); return; }
+  startEdit(msgId, stored.text, stored.priority, stored.category||"notice", stored.imageUrl||"");
+}
+
+function startEdit(msgId, rawText, currentPriority, currentCat, currentImageUrl){
+  if(!currentCat) currentCat="notice";
+  if(!currentImageUrl) currentImageUrl="";
+  if(editingId && editingId !== msgId) cancelEdit(editingId);
+  editingId = msgId;
+
+  var card    = document.getElementById("card-"+msgId);
+  var textEl  = document.getElementById("text-"+msgId);
+  var areaEl  = document.getElementById("edit-area-"+msgId);
+  var editBtn = document.getElementById("edit-btn-"+msgId);
+  if(!card||!textEl||!areaEl) return;
+
+  textEl.style.display = "none";
+  card.classList.add("editing");
+  if(editBtn) editBtn.style.display = "none";
+
+  var normalSel = currentPriority !== "high" ? " sel-normal" : "";
+  var highSel   = currentPriority === "high"  ? " sel-high"   : "";
+  var cNotSel   = currentCat==="notice" ? " sel-notice" : "";
+  var cEvtSel   = currentCat==="event"  ? " sel-event"  : "";
+  var cUrgSel   = currentCat==="urgent" ? " sel-urgent" : "";
+
+  // 編集中の画像UI
+  var editImgHtml = '<div class="edit-img-area" id="eimg-area-'+msgId+'">';
+  if(currentImageUrl){
+    editImgHtml += '<img class="edit-img-thumb" id="eimg-thumb-'+msgId+'" src="'+esc(currentImageUrl)+'" alt="現在の画像">';
+    editImgHtml += '<div class="edit-img-actions">'
+      + '<button type="button" class="edit-img-btn" id="eimg-change-'+msgId+'">🔄 画像を変更</button>'
+      + '<button type="button" class="edit-img-btn remove" id="eimg-remove-'+msgId+'">🗑️ 画像を削除</button>'
+      + '</div>';
+  } else {
+    editImgHtml += '<button type="button" class="edit-img-btn" id="eimg-add-'+msgId+'">📷 写真を添付</button>';
+  }
+  editImgHtml += '<input type="file" id="eimg-file-'+msgId+'" accept="image/*" style="display:none">';
+  editImgHtml += '</div>';
+
+  areaEl.innerHTML =
+    '<div class="category-selector" style="margin-bottom:8px">'
+    + '<button class="category-btn'+cNotSel+'" id="ecat-notice-'+msgId+'">📢 お知らせ</button>'
+    + '<button class="category-btn'+cEvtSel+'" id="ecat-event-'+msgId+'">🎉 イベント</button>'
+    + '<button class="category-btn'+cUrgSel+'" id="ecat-urgent-'+msgId+'">🚨 緊急</button>'
+    + '</div>'
+    + '<div class="edit-priority-selector">'
+    + '<button class="edit-pri-btn'+normalSel+'" id="epri-normal-'+msgId+'">📋 通常</button>'
+    + '<button class="edit-pri-btn'+highSel+'"   id="epri-high-'+msgId+'">🔴 重要</button>'
+    + '</div>'
+    + '<textarea class="edit-textarea" id="edit-ta-'+msgId+'" maxlength="'+MAX_CHARS+'"></textarea>'
+    + editImgHtml
+    + '<div class="edit-footer">'
+    + '<span class="edit-char-count" id="edit-cc-'+msgId+'">0 / '+MAX_CHARS+'</span>'
+    + '<div class="edit-actions">'
+    + '<button class="edit-cancel-btn" id="edit-cancel-'+msgId+'">キャンセル</button>'
+    + '<button class="edit-save-btn"   id="edit-save-'+msgId+'">💾 保存</button>'
+    + '</div></div>';
+
+  areaEl.style.display    = "block";
+  areaEl.dataset.priority = currentPriority;
+  areaEl.dataset.category = currentCat;
+  areaEl.dataset.imageUrl = currentImageUrl;  // 現在のURL（""=削除済 or なし）
+  areaEl.dataset.newImageFile = "";           // 新しいファイル選択フラグ
+
+  // すべてのイベントをaddEventListenerで登録（onclickに文字列を埋め込まない）
+  var ta        = document.getElementById("edit-ta-"+msgId);
+  var normalBtn = document.getElementById("epri-normal-"+msgId);
+  var highBtn   = document.getElementById("epri-high-"+msgId);
+  var cNotBtn   = document.getElementById("ecat-notice-"+msgId);
+  var cEvtBtn   = document.getElementById("ecat-event-"+msgId);
+  var cUrgBtn   = document.getElementById("ecat-urgent-"+msgId);
+  var cancelBtn = document.getElementById("edit-cancel-"+msgId);
+  var saveBtn   = document.getElementById("edit-save-"+msgId);
+  var fileInput = document.getElementById("eimg-file-"+msgId);
+  var addBtn    = document.getElementById("eimg-add-"+msgId);
+  var changeBtn = document.getElementById("eimg-change-"+msgId);
+  var removeBtn = document.getElementById("eimg-remove-"+msgId);
+
+  normalBtn.addEventListener("click", function(){ setEditPri(msgId,"normal"); });
+  highBtn.addEventListener("click",   function(){ setEditPri(msgId,"high"); });
+  cNotBtn.addEventListener("click",   function(){ setEditCat(msgId,"notice"); });
+  cEvtBtn.addEventListener("click",   function(){ setEditCat(msgId,"event"); });
+  cUrgBtn.addEventListener("click",   function(){ setEditCat(msgId,"urgent"); });
+  ta.value = rawText||"";
+  updateEditCount(msgId);
+  ta.addEventListener("input",   function(){ updateEditCount(msgId); });
+  ta.addEventListener("keydown", function(e){ if(e.key==="Escape") cancelEdit(msgId); });
+  cancelBtn.addEventListener("click", function(){ cancelEdit(msgId); });
+  saveBtn.addEventListener("click",   function(){ saveEdit(msgId); });
+
+  // 画像ボタン
+  if(fileInput){
+    fileInput.addEventListener("change", function(){
+      var file=fileInput.files&&fileInput.files[0];
+      if(!file) return;
+      if(!file.type.startsWith("image/")){ showToast("⚠️ 画像ファイルを選択してください", false); return; }
+      if(file.size>5*1024*1024){ showToast("⚠️ 5MB以下の画像を選択してください", false); return; }
+      // ファイルを保持してプレビューを更新
+      areaEl._pendingEditFile = file;
+      var reader=new FileReader();
+      reader.onload=function(e){ setEditImgPreview(msgId, e.target.result); };
+      reader.readAsDataURL(file);
+      fileInput.value="";
+    });
+  }
+  if(addBtn)    addBtn.addEventListener("click",    function(){ if(fileInput) fileInput.click(); });
+  if(changeBtn) changeBtn.addEventListener("click", function(){ if(fileInput) fileInput.click(); });
+  if(removeBtn) removeBtn.addEventListener("click", function(){
+    areaEl._pendingEditFile = null;
+    areaEl.dataset.imageUrl = "";  // 削除フラグ
+    setEditImgPreview(msgId, "");
+  });
+
+  setTimeout(function(){
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+  }, 50);
+}
+
+/* 編集中の画像プレビューを更新するヘルパー */
+function setEditImgPreview(msgId, dataUrl){
+  var areaEl  = document.getElementById("edit-area-"+msgId); if(!areaEl) return;
+  var imgArea = document.getElementById("eimg-area-"+msgId); if(!imgArea) return;
+  var fileInput = document.getElementById("eimg-file-"+msgId);
+  if(dataUrl){
+    imgArea.innerHTML =
+      '<img class="edit-img-thumb" id="eimg-thumb-'+msgId+'" src="'+esc(dataUrl)+'" alt="プレビュー">'
+      + '<div class="edit-img-actions">'
+      + '<button type="button" class="edit-img-btn" id="eimg-change-'+msgId+'">🔄 画像を変更</button>'
+      + '<button type="button" class="edit-img-btn remove" id="eimg-remove-'+msgId+'">🗑️ 画像を削除</button>'
+      + '</div>'
+      + '<input type="file" id="eimg-file-'+msgId+'" accept="image/*" style="display:none">';
+  } else {
+    imgArea.innerHTML =
+      '<button type="button" class="edit-img-btn" id="eimg-add-'+msgId+'">📷 写真を添付</button>'
+      + '<input type="file" id="eimg-file-'+msgId+'" accept="image/*" style="display:none">';
+  }
+  // イベントを再バインド
+  var fi2    = document.getElementById("eimg-file-"+msgId);
+  var add2   = document.getElementById("eimg-add-"+msgId);
+  var chg2   = document.getElementById("eimg-change-"+msgId);
+  var rem2   = document.getElementById("eimg-remove-"+msgId);
+  if(fi2) fi2.addEventListener("change", function(){
+    var file=fi2.files&&fi2.files[0]; if(!file) return;
+    if(!file.type.startsWith("image/")){ showToast("⚠️ 画像ファイルを選択してください", false); return; }
+    if(file.size>5*1024*1024){ showToast("⚠️ 5MB以下の画像を選択してください", false); return; }
+    areaEl._pendingEditFile=file;
+    var r=new FileReader(); r.onload=function(e){ setEditImgPreview(msgId,e.target.result); }; r.readAsDataURL(file);
+    fi2.value="";
+  });
+  if(add2) add2.addEventListener("click", function(){ fi2&&fi2.click(); });
+  if(chg2) chg2.addEventListener("click", function(){ fi2&&fi2.click(); });
+  if(rem2) rem2.addEventListener("click", function(){
+    areaEl._pendingEditFile=null; areaEl.dataset.imageUrl=""; setEditImgPreview(msgId,"");
+  });
+}
+
+function setEditPri(msgId, p){
+  var areaEl = document.getElementById("edit-area-"+msgId); if(!areaEl) return;
+  areaEl.dataset.priority = p;
+  var nb = document.getElementById("epri-normal-"+msgId);
+  var hb = document.getElementById("epri-high-"+msgId);
+  if(nb) nb.className = "edit-pri-btn"+(p==="normal"?" sel-normal":"");
+  if(hb) hb.className = "edit-pri-btn"+(p==="high"?" sel-high":"");
+}
+
+function setEditCat(msgId, c){
+  var areaEl = document.getElementById("edit-area-"+msgId); if(!areaEl) return;
+  areaEl.dataset.category = c;
+  ["notice","event","urgent"].forEach(function(k){
+    var btn = document.getElementById("ecat-"+k+"-"+msgId);
+    if(btn) btn.className = "category-btn"+(c===k?" sel-"+k:"");
+  });
+}
+
+function updateEditCount(msgId){
+  var ta = document.getElementById("edit-ta-"+msgId); if(!ta) return;
+  var cc = document.getElementById("edit-cc-"+msgId); if(!cc) return;
+  var len = ta.value.length;
+  cc.textContent = len+" / "+MAX_CHARS;
+  cc.className = "edit-char-count"+(len>MAX_CHARS?" over":len>120?" warn":"");
+  var sb = document.getElementById("edit-save-"+msgId);
+  if(sb) sb.disabled = (len===0||len>MAX_CHARS);
+}
+
+function cancelEdit(msgId){
+  var card    = document.getElementById("card-"+msgId); if(!card) return;
+  var textEl  = document.getElementById("text-"+msgId);
+  var areaEl  = document.getElementById("edit-area-"+msgId);
+  var editBtn = document.getElementById("edit-btn-"+msgId);
+  if(textEl)  textEl.style.display = "";
+  if(areaEl){ areaEl.innerHTML = ""; areaEl.style.display = "none"; }
+  if(editBtn) editBtn.style.display = "";
+  card.classList.remove("editing");
+  if(editingId===msgId) editingId = null;
+}
+
+function saveEdit(msgId){
+  var ta      = document.getElementById("edit-ta-"+msgId); if(!ta) return;
+  var areaEl  = document.getElementById("edit-area-"+msgId);
+  var newText = ta.value.trim();
+  var newPri  = (areaEl&&areaEl.dataset.priority)||"normal";
+  var newCat  = (areaEl&&areaEl.dataset.category)||"notice";
+  // imageUrl: "" = 削除、それ以外 = 既存URL（新規ファイルがあれば上書き）
+  var existingUrl = (areaEl&&areaEl.dataset.imageUrl)||"";
+  var newImageFile = areaEl&&areaEl._pendingEditFile||null;
+  if(!newText||newText.length>MAX_CHARS) return;
+
+  var saveBtn = document.getElementById("edit-save-"+msgId);
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent="保存中..."; }
+
+  if(!firebaseOk){
+    var msgs = getMsgsFallback(loggedInJid).map(function(m){
+      return m.id===msgId ? Object.assign({},m,{text:newText,priority:newPri,category:newCat}) : m;
+    });
+    localStorage.setItem("msgs_"+loggedInJid, JSON.stringify(msgs));
+    cancelEdit(msgId); editingId=null; renderAdminMsgsFallback(); showToast("✅ 更新しました", false); return;
+  }
+
+  // 画像アップロードが必要な場合
+  var uploadPromise;
+  if(newImageFile){
+    if(saveBtn) saveBtn.textContent="画像アップロード中...";
+    uploadPromise = uploadImage(newImageFile, loggedInJid);
+  } else {
+    uploadPromise = Promise.resolve(existingUrl||null);
+  }
+
+  uploadPromise.then(function(imageUrl){
+    var updateData = {text:newText, priority:newPri, category:newCat};
+    if(imageUrl){ updateData.imageUrl = imageUrl; }
+    else { updateData.imageUrl = firebase.firestore.FieldValue.delete(); }
+    return db.collection("messages").doc(msgId).update(updateData);
+  }).then(function(){
+    cancelEdit(msgId); editingId=null; showToast("✅ 更新しました", false);
+  }).catch(function(e){
+    console.error(e); showToast("❌ 更新に失敗しました", false);
+    if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent="💾 保存"; }
+  });
+}
+
+/* ── ユーティリティ ── */
+function tsAge(ts){
+  var t=ts&&ts.toDate?ts.toDate().getTime():new Date(ts).getTime();
+  var h=(Date.now()-t)/3600000;
+  if(h<24)  return "today";
+  if(h<168) return "week";
+  if(h<720) return "month";
+  return "old";
+}
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function updateCharCount(){
+  var len=document.getElementById("post-text").value.length;
+  var el=document.getElementById("char-count");
+  el.textContent=len+" / "+MAX_CHARS;
+  el.className="char-count"+(len>MAX_CHARS?" over":len>120?" warn":"");
+  document.getElementById("post-btn").disabled=len===0||len>MAX_CHARS;
+}
+
+
+/* ── 初期化 ── */
+initFirebase();
+buildLoginSelect();
+</script>
+</body>
+</html>
