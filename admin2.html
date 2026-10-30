@@ -236,8 +236,6 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .admin-cat-event  { background: #ebfbee; color: #2f9e44; border-color: #b2f2bb; }
 .admin-cat-urgent { background: #fff5f5; color: #c92a2a; border-color: #ffc9c9; }
 
-/* ── 画像添付 ── */
-.img-attach-area { margin: 0 0 12px; }
 /* ── 下書き ── */
 .draft-section-header { display: flex; align-items: center; justify-content: space-between; margin: 20px 0 8px; }
 .draft-section-title { font-size: 13px; font-weight: 700; color: var(--ink-mid); display: flex; align-items: center; gap: 6px; }
@@ -246,12 +244,16 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .draft-card { background: #fffbf0; border: 1.5px solid #f0d070; border-radius: var(--radius-md); padding: 12px 14px; display: flex; gap: 10px; }
 .draft-empty { text-align: center; color: var(--ink-faint); font-size: 13px; padding: 10px 0; }
 .draft-label { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; background: #fff8e8; color: #c07800; border: 1px solid #f0d070; margin-right: 4px; }
-.publish-draft-btn { background: var(--navy); color: white; border: none; border-radius: var(--radius-sm); padding: 7px 12px; font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; }
+.publish-draft-btn { background: var(--navy); color: white; border: none; border-radius: var(--radius-sm); padding: 7px 12px; font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap; }
 .publish-draft-btn:hover { background: var(--navy-mid); }
-.save-draft-btn { background: var(--surface); border: 1.5px solid #c09000; color: #8a6800; border-radius: var(--radius-md); padding: 10px 14px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+.publish-draft-btn:disabled { background: var(--ink-faint); cursor: not-allowed; }
+.save-draft-btn { background: var(--surface); border: 1.5px solid #c09000; color: #8a6800; border-radius: var(--radius-md); padding: 10px 14px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .save-draft-btn:hover { background: #fff8e8; border-color: #a07000; }
 .save-draft-btn:disabled { background: var(--bg); border-color: var(--border); color: var(--ink-faint); cursor: not-allowed; }
 .post-footer-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ── 画像添付 ── */
+.img-attach-area { margin: 0 0 12px; }
 .img-attach-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1.5px dashed var(--border); border-radius: var(--radius-md); background: var(--surface); color: var(--ink-mid); font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.15s; }
 .img-attach-btn:hover { border-color: var(--green-mid); color: var(--green-deep); }
 .img-preview-wrap { position: relative; display: inline-block; margin-top: 8px; }
@@ -280,13 +282,13 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 <header class="header">
   <div class="header-inner">
     <div class="logo">
-      <div class="logo-icon">🏛️</div>
+      <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path d="M10.707 2.293a1 1 0 0 0-1.414 0l-7 7a1 1 0 0 0 1.414 1.414L4 10.414V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0 1-1h2a1 1 0 0 0 1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-7-7z"/></svg></div>
       <div class="logo-text">
         <h1>読谷村 自治会ボード</h1>
         <p>Community Board Admin</p>
       </div>
     </div>
-    <div class="admin-badge">🔒 管理者</div>
+    <div class="admin-badge"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:3px"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0 1 10 0v2a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2zm8-2v2H7V7a3 3 0 1 1 6 0z" clip-rule="evenodd"/></svg>管理者</div>
   </div>
 </header>
 
@@ -294,7 +296,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   <!-- ログイン画面 -->
   <div id="login-screen">
     <div class="login-card">
-      <div class="login-title">🏘️ 管理者ログイン</div>
+      <div class="login-title"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M10.707 2.293a1 1 0 0 0-1.414 0l-7 7a1 1 0 0 0 1.414 1.414L4 10.414V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0 1-1h2a1 1 0 0 0 1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-7-7z"/></svg>管理者ログイン</div>
       <div class="login-sub">自治会を選択してパスワードを入力してください</div>
       <div class="error-box" id="err-box"></div>
       <div class="form-group">
@@ -326,41 +328,41 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
     <!-- 管理者画面：ボードタブ -->
     <div class="board-tabs">
-      <button class="board-tab tab-notice active" id="admintab-notice" onclick="switchAdminTab('notice')">📢 お知らせ投稿 <span class="tab-count-badge notice" id="admintabbadge-notice">0件</span></button>
-      <button class="board-tab tab-condolence" id="admintab-condolence" onclick="switchAdminTab('condolence')">🕯️ おくやみ投稿 <span class="tab-count-badge condolence" id="admintabbadge-condolence">0件</span></button>
+      <button class="board-tab tab-notice active" id="admintab-notice" onclick="switchAdminTab('notice')"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>お知らせ投稿 <span class="tab-count-badge notice" id="admintabbadge-notice">0件</span></button>
+      <button class="board-tab tab-condolence" id="admintab-condolence" onclick="switchAdminTab('condolence')"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>おくやみ投稿 <span class="tab-count-badge condolence" id="admintabbadge-condolence">0件</span></button>
     </div>
 
     <!-- お知らせ投稿パネル -->
     <div id="adminpanel-notice">
       <div class="post-box">
-        <div class="post-box-title">✏️ 新しいお知らせを投稿</div>
+        <div class="post-box-title"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>新しいお知らせを投稿</div>
         <!-- カテゴリ選択 -->
         <div class="category-selector">
-          <button class="category-btn sel-notice" id="cat-notice" onclick="selectCategory('notice')">📢 お知らせ</button>
-          <button class="category-btn" id="cat-event"  onclick="selectCategory('event')">🎉 イベント</button>
-          <button class="category-btn" id="cat-urgent" onclick="selectCategory('urgent')">🚨 緊急</button>
+          <button class="category-btn sel-notice" id="cat-notice" onclick="selectCategory('notice')"><svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;margin-right:3px"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>お知らせ</button>
+          <button class="category-btn" id="cat-event"  onclick="selectCategory('event')"><svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;margin-right:3px"><path fill-rule="evenodd" d="M6 2a1 1 0 0 0-1 1v1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V3a1 1 0 1 0-2 0v1H7V3a1 1 0 0 0-1-1zm0 5a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2H6z" clip-rule="evenodd"/></svg>イベント</button>
+          <button class="category-btn" id="cat-urgent" onclick="selectCategory('urgent')"><svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;margin-right:3px"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.645-1.743-2.98l5.58-9.92zM11 13a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-1-8a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0V6a1 1 0 0 0-1-1z" clip-rule="evenodd"/></svg>緊急</button>
         </div>
         <!-- 重要度選択 -->
         <div class="priority-selector">
-          <button class="priority-btn selected-normal" id="pri-normal" onclick="selectPriority('normal')">📋 通常</button>
-          <button class="priority-btn" id="pri-high"   onclick="selectPriority('high')">🔴 重要</button>
+          <button class="priority-btn selected-normal" id="pri-normal" onclick="selectPriority('normal')">通常</button>
+          <button class="priority-btn" id="pri-high"   onclick="selectPriority('high')">重要</button>
         </div>
         <textarea class="post-textarea" id="post-text"
           placeholder="お知らせ内容を入力してください（最大140文字）&#10;&#10;例：○月○日に地区清掃があります。午前9時に公民館前に集合してください。"
           maxlength="140" oninput="updateCharCount()"></textarea>
         <!-- 画像添付 -->
         <div class="img-attach-area" id="img-attach-area">
-          <button type="button" class="img-attach-btn" onclick="pickImage()">📷 写真を添付</button>
+          <button type="button" class="img-attach-btn" onclick="pickImage()"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path fill-rule="evenodd" d="M4 5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1.586a1 1 0 0 1-.707-.293l-1.121-1.121A2 2 0 0 0 11.172 3H8.828a2 2 0 0 0-1.414.586L6.293 4.707A1 1 0 0 1 5.586 5H4zm6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" clip-rule="evenodd"/></svg>写真を添付</button>
           <div id="img-preview-wrap" class="img-preview-wrap" style="display:none">
             <img id="img-preview" class="img-preview" src="" alt="プレビュー">
-            <button type="button" class="img-clear-btn" onclick="clearImage()" title="画像を削除">✕</button>
+            <button type="button" class="img-clear-btn" onclick="clearImage()" title="画像を削除"><svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414z" clip-rule="evenodd"/></svg></button>
           </div>
           <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImagePick(this)">
         </div>
         <div class="post-footer">
           <span class="char-count" id="char-count">0 / 140</span>
           <div class="post-footer-actions">
-            <button class="save-draft-btn" id="draft-btn" onclick="saveDraft()" disabled><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>下書き保存</button>
+            <button class="save-draft-btn" id="draft-btn" onclick="saveDraft()" disabled>📝 下書き保存</button>
             <button class="post-btn" id="post-btn" onclick="postMsg()" disabled><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>投稿する</button>
           </div>
         </div>
@@ -369,7 +371,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       <!-- 下書き一覧 -->
       <div class="draft-section-header">
         <div class="draft-section-title">
-          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="color:#c07800"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
           下書き <span class="draft-count-badge" id="draft-count-badge">0件</span>
         </div>
       </div>
@@ -378,7 +380,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       </div>
 
       <div class="msg-manage-header" style="margin-top:20px">
-        <div class="msg-manage-title">投稿済みお知らせ</div>
+        <div class="msg-manage-title"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path fill-rule="evenodd" d="M3 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z" clip-rule="evenodd"/></svg>投稿済みお知らせ</div>
         <span class="msg-limit-note">最大10件まで</span>
       </div>
       <div class="admin-msg-list" id="admin-msg-list">
@@ -389,19 +391,19 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     <!-- おくやみ投稿パネル -->
     <div id="adminpanel-condolence" style="display:none">
       <div class="post-box condolence-post-box">
-        <div class="post-box-title condolence-post-title">🕯️ おくやみ情報を投稿</div>
+        <div class="post-box-title condolence-post-title"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>おくやみ情報を投稿</div>
         <div class="condolence-admin-intro">訃報・お悔やみに関する情報を投稿します。通常のお知らせとは別のボードに表示されます。</div>
         <textarea class="post-textarea" id="condolence-text"
           placeholder="おくやみ情報を入力してください（最大140文字）&#10;&#10;例：〇〇様（〇〇班）が逝去されました。心よりお悔やみ申し上げます。"
           maxlength="140" oninput="updateCondolenceCharCount()"></textarea>
         <div class="post-footer">
           <span class="char-count" id="condolence-char-count">0 / 140</span>
-          <button class="post-btn condolence-post-btn" id="condolence-post-btn" onclick="postCondolence()" disabled>🕯️ 投稿する</button>
+          <button class="post-btn condolence-post-btn" id="condolence-post-btn" onclick="postCondolence()" disabled><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する</button>
         </div>
       </div>
 
       <div class="msg-manage-header">
-        <div class="msg-manage-title">📝 投稿済みおくやみ情報</div>
+        <div class="msg-manage-title"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path fill-rule="evenodd" d="M3 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z" clip-rule="evenodd"/></svg>投稿済みおくやみ情報</div>
         <span class="msg-limit-note">最大10件まで</span>
       </div>
       <div class="admin-msg-list" id="admin-condolence-list">
@@ -458,11 +460,18 @@ var JICHIKAI = [
 ];
 
 var MAX_MSGS=10, MAX_CHARS=140;
+
+/* ── SVGアイコン定数 ── */
+var ICN_NOTICE='<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;flex-shrink:0"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>';
+var ICN_EVENT ='<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;flex-shrink:0"><path fill-rule="evenodd" d="M6 2a1 1 0 0 0-1 1v1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V3a1 1 0 1 0-2 0v1H7V3a1 1 0 0 0-1-1zm0 5a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2H6z" clip-rule="evenodd"/></svg>';
+var ICN_URGENT='<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;flex-shrink:0"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.645-1.743-2.98l5.58-9.92zM11 13a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-1-8a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0V6a1 1 0 0 0-1-1z" clip-rule="evenodd"/></svg>';
+var ICN_COND  ='<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;flex-shrink:0"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>';
+
 var db=null, firebaseOk=false, loggedInJid=null, unsubscribeMsgs=null;
-var publishedCount=0; // 公開済み件数（下書きは含まない）
 var currentPriority="normal"; // "normal" | "high"
 var currentCategory="notice"; // "notice" | "event" | "urgent"
 var pendingImageFile=null;    // 投稿フォームで選択中の画像ファイル
+var publishedCount=0;         // 現在の公開済み件数（下書きは含まない）
 
 /* ── 重要度選択 ── */
 function selectPriority(p){
@@ -575,16 +584,18 @@ function doLogout(){
 /* ── メッセージ購読 ── */
 function subscribeAdminMsgs(){
   if(!firebaseOk){ renderAdminMsgsFallback(); return; }
+  // limitなし：下書き・公開済み両方取得してJS側で分離
   var q=db.collection("messages").where("jichiId","==",loggedInJid).orderBy("timestamp","desc");
   unsubscribeMsgs=q.onSnapshot(function(snap){
-    var all=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
-    var published=all.filter(function(m){ return !m.status||m.status==="published"; });
-    var drafts   =all.filter(function(m){ return m.status==="draft"; });
-    publishedCount=published.length;
-    renderAdminMsgs(published);
-    renderDrafts(drafts);
+    var allMsgs=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    // status未設定の既存投稿は "published" として扱う（後方互換）
+    var publishedMsgs=allMsgs.filter(function(m){ return !m.status||m.status==="published"; });
+    var draftMsgs=allMsgs.filter(function(m){ return m.status==="draft"; });
+    publishedCount=publishedMsgs.length;
+    renderAdminMsgs(publishedMsgs);
+    renderDrafts(draftMsgs);
     var bd=document.getElementById("admintabbadge-notice");
-    if(bd) bd.textContent=published.length+"件";
+    if(bd) bd.textContent=publishedMsgs.length+"件";
     setFbStatus("ok","● リアルタイム同期中");
   },function(err){ console.error(err); setFbStatus("err","✕ 読み込みエラー"); });
 }
@@ -644,8 +655,7 @@ function uploadImage(file, jichiId){
 }
 
 /* ── 投稿 ── */
-var POST_BTN_HTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>投稿する';
-var DRAFT_BTN_HTML='<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>下書き保存';
+var POST_BTN_INNER='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>投稿する';
 
 function postMsg(){
   var text=document.getElementById("post-text").value.trim();
@@ -657,27 +667,30 @@ function postMsg(){
   if(!firebaseOk){
     var allMsgs=getMsgsFallback(loggedInJid);
     var pubMsgs=allMsgs.filter(function(m){ return !m.status||m.status==="published"; });
-    if(pubMsgs.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.innerHTML=POST_BTN_HTML; return; }
+    if(pubMsgs.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.innerHTML=POST_BTN_INNER; return; }
     allMsgs.unshift({id:String(Date.now()),text:text,priority:currentPriority,category:currentCategory,status:"published",timestamp:new Date().toISOString()});
     localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(allMsgs));
-    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); renderAdminMsgsFallback(); showToast("投稿しました", false);
-    btn.disabled=false; btn.innerHTML=POST_BTN_HTML; return;
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); renderAdminMsgsFallback(); showToast("投稿しました！", false);
+    btn.disabled=false; btn.innerHTML=POST_BTN_INNER; return;
   }
 
+  // 公開済み件数チェック（subscriptionが管理するpublishedCountを利用）
   if(publishedCount>=MAX_MSGS){
     showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false);
-    btn.disabled=false; btn.innerHTML=POST_BTN_HTML; return;
+    btn.disabled=false; btn.innerHTML=POST_BTN_INNER; return;
   }
+
+  // 画像アップロード → Firestore追加
   if(imageFile) btn.textContent="画像アップロード中...";
   uploadImage(imageFile, loggedInJid).then(function(imageUrl){
     var data={jichiId:loggedInJid,text:text,priority:currentPriority,category:currentCategory,status:"published",timestamp:firebase.firestore.FieldValue.serverTimestamp()};
     if(imageUrl) data.imageUrl=imageUrl;
     return db.collection("messages").add(data);
   }).then(function(){
-    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); showToast("投稿しました", false);
-    btn.disabled=false; btn.innerHTML=POST_BTN_HTML;
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); showToast("投稿しました！", false);
+    btn.disabled=false; btn.innerHTML=POST_BTN_INNER;
   }).catch(function(e){
-    console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.innerHTML=POST_BTN_HTML;
+    console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.innerHTML=POST_BTN_INNER;
   });
 }
 
@@ -693,18 +706,19 @@ function saveDraft(){
     var msgs=getMsgsFallback(loggedInJid);
     msgs.unshift({id:String(Date.now()),text:text,priority:currentPriority,category:currentCategory,status:"draft",timestamp:new Date().toISOString()});
     localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
-    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); renderAdminMsgsFallback(); showToast("下書きを保存しました", false);
-    btn.disabled=false; btn.innerHTML=DRAFT_BTN_HTML; return;
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); renderAdminMsgsFallback(); showToast("📝 下書きを保存しました", false);
+    btn.disabled=false; btn.textContent="📝 下書き保存"; return;
   }
+
   uploadImage(imageFile, loggedInJid).then(function(imageUrl){
     var data={jichiId:loggedInJid,text:text,priority:currentPriority,category:currentCategory,status:"draft",timestamp:firebase.firestore.FieldValue.serverTimestamp()};
     if(imageUrl) data.imageUrl=imageUrl;
     return db.collection("messages").add(data);
   }).then(function(){
-    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); showToast("下書きを保存しました", false);
-    btn.disabled=false; btn.innerHTML=DRAFT_BTN_HTML;
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); showToast("📝 下書きを保存しました", false);
+    btn.disabled=false; btn.textContent="📝 下書き保存";
   }).catch(function(e){
-    console.error(e); showToast("❌ 保存に失敗しました", false); btn.disabled=false; btn.innerHTML=DRAFT_BTN_HTML;
+    console.error(e); showToast("❌ 保存に失敗しました", false); btn.disabled=false; btn.textContent="📝 下書き保存";
   });
 }
 
@@ -733,20 +747,20 @@ function postCondolence(){
   btn.disabled=true; btn.textContent="投稿中...";
   if(!firebaseOk){
     var items=getCondolencesFallback(loggedInJid);
-    if(items.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.textContent="🕯️ 投稿する"; return; }
+    if(items.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する'; return; }
     items.unshift({id:String(Date.now()),text:text,timestamp:new Date().toISOString()});
     localStorage.setItem("condolences_"+loggedInJid,JSON.stringify(items));
-    document.getElementById("condolence-text").value=""; updateCondolenceCharCount(); renderAdminCondolencesFallback(); showToast("🕯️ 投稿しました", false);
-    btn.disabled=false; btn.textContent="🕯️ 投稿する"; return;
+    document.getElementById("condolence-text").value=""; updateCondolenceCharCount(); renderAdminCondolencesFallback(); showToast("おくやみ投稿しました", false);
+    btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する'; return;
   }
   db.collection("condolences").where("jichiId","==",loggedInJid).get().then(function(snap){
-    if(snap.size>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false); btn.disabled=false; btn.textContent="🕯️ 投稿する"; return null; }
+    if(snap.size>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false); btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する'; return null; }
     return db.collection("condolences").add({jichiId:loggedInJid,text:text,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
   }).then(function(ref){
     if(!ref) return;
-    document.getElementById("condolence-text").value=""; updateCondolenceCharCount(); showToast("🕯️ 投稿しました", false);
-    btn.disabled=false; btn.textContent="🕯️ 投稿する";
-  }).catch(function(e){ console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.textContent="🕯️ 投稿する"; });
+    document.getElementById("condolence-text").value=""; updateCondolenceCharCount(); showToast("おくやみ投稿しました", false);
+    btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する';
+  }).catch(function(e){ console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する'; });
 }
 
 /* ── おくやみ：文字数カウント ── */
@@ -779,8 +793,8 @@ function renderAdminCondolences(items){
       +'<div class="edit-area" id="condedit-area-'+m.id+'" style="display:none"></div>'
       +'</div>'
       +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
-      +'<button class="edit-btn" id="condedit-btn-'+m.id+'" data-id="'+m.id+'" onclick="startCondEditById(this)" title="編集">✏️</button>'
-      +'<button class="delete-btn" data-id="'+m.id+'" onclick="deleteCondolenceById(this)" title="削除">🗑️</button>'
+      +'<button class="edit-btn" id="condedit-btn-'+m.id+'" data-id="'+m.id+'" onclick="startCondEditById(this)" title="編集"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg></button>'
+      +'<button class="delete-btn" data-id="'+m.id+'" onclick="deleteCondolenceById(this)" title="削除"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:2px"><path fill-rule="evenodd" d="M9 2a1 1 0 0 0-.894.553L7.382 4H4a1 1 0 0 0 0 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6a1 1 0 0 0 0-2h-3.382l-.724-1.447A1 1 0 0 0 11 2H9zm-1 9a1 1 0 0 1 2 0v3a1 1 0 1 1-2 0v-3zm4-1a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0v-3a1 1 0 0 0-1-1z" clip-rule="evenodd"/></svg></button>'
       +'</div>'
       +'</div>';
   }).join("");
@@ -800,11 +814,11 @@ function deleteCondolenceById(btn){
     var items=getCondolencesFallback(loggedInJid).filter(function(m){ return m.id!==id; });
     localStorage.setItem("condolences_"+loggedInJid, JSON.stringify(items));
     renderAdminCondolencesFallback();
-    showToast("🗑️ 削除しました", true);
+    showToast("削除しました", true);
     return;
   }
   db.collection("condolences").doc(id).delete()
-    .then(function(){ showToast("🗑️ 削除しました", true); })
+    .then(function(){ showToast("削除しました", true); })
     .catch(function(e){ console.error(e); deletedCondolence=null; showToast("❌ 削除に失敗しました", false); });
 }
 
@@ -838,7 +852,7 @@ function startCondEdit(id, rawText){
     + '<span class="edit-char-count" id="condedit-cc-'+id+'">0 / '+MAX_CHARS+'</span>'
     + '<div class="edit-actions">'
     + '<button class="edit-cancel-btn" id="condedit-cancel-'+id+'">キャンセル</button>'
-    + '<button class="edit-save-btn"   id="condedit-save-'+id+'">💾 保存</button>'
+    + '<button class="edit-save-btn"   id="condedit-save-'+id+'"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:3px"><path d="M7.707 10.293a1 1 0 1 0-1.414 1.414l3 3a1 1 0 0 0 1.414 0l3-3a1 1 0 0 0-1.414-1.414L11 11.586V6h5a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5v5.586l-1.293-1.293zM9 4a1 1 0 0 1 2 0v2H9V4z"/></svg>保存</button>'
     + '</div></div>';
   areaEl.style.display="block";
 
@@ -897,7 +911,7 @@ function saveCondEdit(id){
     .then(function(){ cancelCondEdit(id); editingCondId=null; showToast("✅ 更新しました", false); })
     .catch(function(e){
       console.error(e); showToast("❌ 更新に失敗しました", false);
-      if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent="💾 保存"; }
+      if(saveBtn){ saveBtn.disabled=false; saveBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:3px"><path d="M7.707 10.293a1 1 0 1 0-1.414 1.414l3 3a1 1 0 0 0 1.414 0l3-3a1 1 0 0 0-1.414-1.414L11 11.586V6h5a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5v5.586l-1.293-1.293zM9 4a1 1 0 0 1 2 0v2H9V4z"/></svg>保存'; }
     });
 }
 
@@ -918,7 +932,7 @@ var msgStore = {}; // {[id]:{text,priority,category}} テキストをJS変数で
 
 function renderAdminMsgs(msgs){
   var el=document.getElementById("admin-msg-list");
-  if(!msgs.length){ el.innerHTML='<div class="msg-empty-admin">📭 まだ投稿はありません</div>'; return; }
+  if(!msgs.length){ el.innerHTML='<div class="msg-empty-admin">まだ投稿はありません</div>'; return; }
   msgStore={};
   msgs.forEach(function(m){ msgStore[m.id]={text:m.text||"", priority:m.priority||"normal", category:m.category||"notice", imageUrl:m.imageUrl||""}; });
   el.innerHTML=msgs.map(function(m,i){
@@ -930,10 +944,10 @@ function renderAdminMsgs(msgs){
     var isHigh=(m.priority==="high");
     var cardStyle=isHigh?"background:#fff8f0;border-left:4px solid #e8520a;border-color:#f5c4a0":"";
     var priLabel=isHigh
-      ?'<span style="font-size:10px;font-weight:700;color:#e8520a;background:#fde8d8;padding:2px 7px;border-radius:10px;margin-right:4px">🔴 重要</span>'
-      :'<span style="font-size:10px;font-weight:700;color:var(--green-deep);background:var(--green-pale);padding:2px 7px;border-radius:10px;margin-right:4px">📋 通常</span>';
+      ?'<span style="font-size:10px;font-weight:700;color:#e8520a;background:#fde8d8;padding:2px 7px;border-radius:10px;margin-right:4px">重要</span>'
+      :'<span style="font-size:10px;font-weight:700;color:var(--green-deep);background:var(--green-pale);padding:2px 7px;border-radius:10px;margin-right:4px">通常</span>';
     var cat=m.category||"notice";
-    var catLabel=cat==="event"?"🎉 イベント":cat==="urgent"?"🚨 緊急":"📢 お知らせ";
+    var catLabel=cat==="event"?ICN_EVENT+" イベント":cat==="urgent"?ICN_URGENT+" 緊急":ICN_NOTICE+" お知らせ";
     var catCls="admin-cat-tag "+(cat==="event"?"admin-cat-event":cat==="urgent"?"admin-cat-urgent":"admin-cat-notice");
     var catTag='<span class="'+catCls+'">'+catLabel+'</span>';
     var thumbHtml=m.imageUrl?'<img class="admin-thumb" src="'+esc(m.imageUrl)+'" alt="添付画像" onclick="window.open(\''+esc(m.imageUrl)+'\',\'_blank\')" title="画像を開く">':"";
@@ -951,24 +965,24 @@ function renderAdminMsgs(msgs){
       +'<div class="edit-area" id="edit-area-'+m.id+'" style="display:none"></div>'
       +'</div>'
       +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
-      +'<button class="edit-btn" id="edit-btn-'+m.id+'" data-id="'+m.id+'" onclick="startEditById(this)" title="編集">✏️</button>'
-      +'<button class="delete-btn" data-id="'+m.id+'" onclick="deleteMsgById(this)" title="削除">🗑️</button>'
+      +'<button class="edit-btn" id="edit-btn-'+m.id+'" data-id="'+m.id+'" onclick="startEditById(this)" title="編集"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg></button>'
+      +'<button class="delete-btn" data-id="'+m.id+'" onclick="deleteMsgById(this)" title="削除"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:2px"><path fill-rule="evenodd" d="M9 2a1 1 0 0 0-.894.553L7.382 4H4a1 1 0 0 0 0 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6a1 1 0 0 0 0-2h-3.382l-.724-1.447A1 1 0 0 0 11 2H9zm-1 9a1 1 0 0 1 2 0v3a1 1 0 1 1-2 0v-3zm4-1a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0v-3a1 1 0 0 0-1-1z" clip-rule="evenodd"/></svg></button>'
       +'</div>'
       +'</div>';
   }).join("");
 }
 function getMsgsFallback(jid){ try{ return JSON.parse(localStorage.getItem("msgs_"+jid)||"[]"); }catch(e){ return []; } }
 function renderAdminMsgsFallback(){
-  var all=getMsgsFallback(loggedInJid);
-  var published=all.filter(function(m){ return !m.status||m.status==="published"; });
-  var drafts   =all.filter(function(m){ return m.status==="draft"; });
-  publishedCount=published.length;
-  renderAdminMsgs(published);
-  renderDrafts(drafts);
+  var allMsgs=getMsgsFallback(loggedInJid);
+  var publishedMsgs=allMsgs.filter(function(m){ return !m.status||m.status==="published"; });
+  var draftMsgs=allMsgs.filter(function(m){ return m.status==="draft"; });
+  publishedCount=publishedMsgs.length;
+  renderAdminMsgs(publishedMsgs);
+  renderDrafts(draftMsgs);
 }
 
 /* ── 下書き描画 ── */
-var draftStore={};
+var draftStore = {}; // {[id]:{text,priority,category,imageUrl}}
 
 function renderDrafts(drafts){
   var badge=document.getElementById("draft-count-badge");
@@ -980,24 +994,21 @@ function renderDrafts(drafts){
   drafts.forEach(function(d){ draftStore[d.id]={text:d.text||"",priority:d.priority||"normal",category:d.category||"notice",imageUrl:d.imageUrl||""}; });
   el.innerHTML=drafts.map(function(d){
     var catLabel={notice:"お知らせ",event:"イベント",urgent:"緊急",info:"情報"}[d.category||"notice"]||"お知らせ";
-    var priLabel={normal:"通常",high:"重要"}[d.priority||"normal"]||"通常";
-    var isHigh=d.priority==="high";
+    var priLabel={normal:"",high:"🔶 重要",urgent:"🔴 緊急"}[d.priority||"normal"]||"";
     var txt=d.text||"";
     var preview=txt.length>60?txt.slice(0,60)+"…":txt;
     return '<div class="draft-card" data-id="'+d.id+'">'
       +'<div style="flex:1;min-width:0">'
       +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">'
       +'<span class="draft-label">下書き</span>'
-      +'<span style="font-size:11px;color:var(--ink-mid);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1px 7px">'+esc(catLabel)+'</span>'
-      +(isHigh?'<span style="font-size:11px;font-weight:700;color:#e8520a">重要</span>':'')
+      +'<span style="font-size:11px;color:var(--ink-mid);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1px 7px">'+catLabel+'</span>'
+      +(priLabel?'<span style="font-size:11px">'+priLabel+'</span>':'')
       +'</div>'
       +'<div style="font-size:13px;color:var(--ink);line-height:1.55;word-break:break-all">'+esc(preview)+'</div>'
       +(d.imageUrl?'<div style="margin-top:6px"><img src="'+esc(d.imageUrl)+'" style="max-height:60px;border-radius:6px;border:1px solid var(--border)"></div>':'')
       +'</div>'
       +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
-      +'<button class="publish-draft-btn" onclick="publishDraft(\''+d.id+'\')">'
-      +'<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>'
-      +'公開</button>'
+      +'<button class="publish-draft-btn" onclick="publishDraft(\''+d.id+'\')">公開する</button>'
       +'<button onclick="deleteDraft(\''+d.id+'\')" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:11px;color:var(--ink-mid);cursor:pointer;font-family:inherit">削除</button>'
       +'</div>'
       +'</div>';
@@ -1006,18 +1017,18 @@ function renderDrafts(drafts){
 
 function publishDraft(draftId){
   if(publishedCount>=MAX_MSGS){
-    if(!confirm("公開済み投稿が"+MAX_MSGS+"件に達しています。\n古い投稿を削除してから公開することをお勧めします。\n\nそれでも公開しますか？")) return;
+    if(!confirm("公開済み投稿が"+MAX_MSGS+"件に達しています。\n古い投稿を削除してから公開してください。\n\nそれでも公開しますか？")) return;
   }
   if(!firebaseOk){
     var msgs=getMsgsFallback(loggedInJid);
-    var idx=-1; msgs.forEach(function(m,i){ if(m.id===draftId) idx=i; });
+    var idx=msgs.findIndex(function(m){ return m.id===draftId; });
     if(idx<0){ showToast("❌ 下書きが見つかりません", false); return; }
     msgs[idx].status="published";
     localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
-    renderAdminMsgsFallback(); showToast("公開しました", false); return;
+    renderAdminMsgsFallback(); showToast("✅ 公開しました", false); return;
   }
   db.collection("messages").doc(draftId).update({status:"published"}).then(function(){
-    showToast("公開しました", false);
+    showToast("✅ 公開しました", false);
   }).catch(function(e){ console.error(e); showToast("❌ 公開に失敗しました", false); });
 }
 
@@ -1026,10 +1037,10 @@ function deleteDraft(draftId){
   if(!firebaseOk){
     var msgs=getMsgsFallback(loggedInJid).filter(function(m){ return m.id!==draftId; });
     localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
-    renderAdminMsgsFallback(); showToast("下書きを削除しました", false); return;
+    renderAdminMsgsFallback(); showToast("🗑 下書きを削除しました", false); return;
   }
   db.collection("messages").doc(draftId).delete().then(function(){
-    showToast("下書きを削除しました", false);
+    showToast("🗑 下書きを削除しました", false);
   }).catch(function(e){ console.error(e); showToast("❌ 削除に失敗しました", false); });
 }
 
@@ -1057,11 +1068,11 @@ function deleteMsgById(btn){
     var msgs = getMsgsFallback(loggedInJid).filter(function(m){ return m.id!==msgId; });
     localStorage.setItem("msgs_"+loggedInJid, JSON.stringify(msgs));
     renderAdminMsgsFallback();
-    showToast("🗑️ 削除しました", true);
+    showToast("削除しました", true);
     return;
   }
   db.collection("messages").doc(msgId).delete()
-    .then(function(){ showToast("🗑️ 削除しました", true); })
+    .then(function(){ showToast("削除しました", true); })
     .catch(function(e){
       console.error(e);
       deletedMsg = null;
@@ -1081,7 +1092,7 @@ function undoDelete(){
     msgs.unshift({id: msg.id, text: msg.text, priority: msg.priority, category: msg.category||"notice", imageUrl: msg.imageUrl||"", timestamp: new Date().toISOString()});
     localStorage.setItem("msgs_"+loggedInJid, JSON.stringify(msgs));
     renderAdminMsgsFallback();
-    showToast("↩️ 元に戻しました", false);
+    showToast("元に戻しました", false);
     return;
   }
   // Firestoreに再投稿（新しいdocとして追加）
@@ -1094,7 +1105,7 @@ function undoDelete(){
   };
   if(msg.imageUrl) restoreData.imageUrl = msg.imageUrl;
   db.collection("messages").add(restoreData).then(function(){
-    showToast("↩️ 元に戻しました", false);
+    showToast("元に戻しました", false);
   }).catch(function(e){
     console.error(e);
     showToast("❌ 元に戻せませんでした", false);
@@ -1167,24 +1178,24 @@ function startEdit(msgId, rawText, currentPriority, currentCat, currentImageUrl)
   if(currentImageUrl){
     editImgHtml += '<img class="edit-img-thumb" id="eimg-thumb-'+msgId+'" src="'+esc(currentImageUrl)+'" alt="現在の画像">';
     editImgHtml += '<div class="edit-img-actions">'
-      + '<button type="button" class="edit-img-btn" id="eimg-change-'+msgId+'">🔄 画像を変更</button>'
-      + '<button type="button" class="edit-img-btn remove" id="eimg-remove-'+msgId+'">🗑️ 画像を削除</button>'
+      + '<button type="button" class="edit-img-btn" id="eimg-change-'+msgId+'"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:3px"><path fill-rule="evenodd" d="M4 2a1 1 0 0 1 1 1v2.101a7.002 7.002 0 0 1 11.601 2.566 1 1 0 1 1-1.885.666A5.002 5.002 0 0 0 5.999 7H9a1 1 0 0 1 0 2H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm.008 9.057a1 1 0 0 1 1.276.61A5.002 5.002 0 0 0 14.001 13H11a1 1 0 1 1 0-2h5a1 1 0 0 1 1 1v5a1 1 0 1 1-2 0v-2.101a7.002 7.002 0 0 1-11.601-2.566 1 1 0 0 1 .61-1.276z" clip-rule="evenodd"/></svg>画像を変更</button>'
+      + '<button type="button" class="edit-img-btn remove" id="eimg-remove-'+msgId+'"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:2px"><path fill-rule="evenodd" d="M9 2a1 1 0 0 0-.894.553L7.382 4H4a1 1 0 0 0 0 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6a1 1 0 0 0 0-2h-3.382l-.724-1.447A1 1 0 0 0 11 2H9zm-1 9a1 1 0 0 1 2 0v3a1 1 0 1 1-2 0v-3zm4-1a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0v-3a1 1 0 0 0-1-1z" clip-rule="evenodd"/></svg>画像を削除</button>'
       + '</div>';
   } else {
-    editImgHtml += '<button type="button" class="edit-img-btn" id="eimg-add-'+msgId+'">📷 写真を添付</button>';
+    editImgHtml += '<button type="button" class="edit-img-btn" id="eimg-add-'+msgId+'"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path fill-rule="evenodd" d="M4 5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1.586a1 1 0 0 1-.707-.293l-1.121-1.121A2 2 0 0 0 11.172 3H8.828a2 2 0 0 0-1.414.586L6.293 4.707A1 1 0 0 1 5.586 5H4zm6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" clip-rule="evenodd"/></svg>写真を添付</button>';
   }
   editImgHtml += '<input type="file" id="eimg-file-'+msgId+'" accept="image/*" style="display:none">';
   editImgHtml += '</div>';
 
   areaEl.innerHTML =
     '<div class="category-selector" style="margin-bottom:8px">'
-    + '<button class="category-btn'+cNotSel+'" id="ecat-notice-'+msgId+'">📢 お知らせ</button>'
-    + '<button class="category-btn'+cEvtSel+'" id="ecat-event-'+msgId+'">🎉 イベント</button>'
-    + '<button class="category-btn'+cUrgSel+'" id="ecat-urgent-'+msgId+'">🚨 緊急</button>'
+    + '<button class="category-btn'+cNotSel+'" id="ecat-notice-'+msgId+'">'+ ICN_NOTICE+' お知らせ</button>'
+    + '<button class="category-btn'+cEvtSel+'" id="ecat-event-'+msgId+'">'+ ICN_EVENT+' イベント</button>'
+    + '<button class="category-btn'+cUrgSel+'" id="ecat-urgent-'+msgId+'">'+ ICN_URGENT+' 緊急</button>'
     + '</div>'
     + '<div class="edit-priority-selector">'
-    + '<button class="edit-pri-btn'+normalSel+'" id="epri-normal-'+msgId+'">📋 通常</button>'
-    + '<button class="edit-pri-btn'+highSel+'"   id="epri-high-'+msgId+'">🔴 重要</button>'
+    + '<button class="edit-pri-btn'+normalSel+'" id="epri-normal-'+msgId+'">通常</button>'
+    + '<button class="edit-pri-btn'+highSel+'"   id="epri-high-'+msgId+'">重要</button>'
     + '</div>'
     + '<textarea class="edit-textarea" id="edit-ta-'+msgId+'" maxlength="'+MAX_CHARS+'"></textarea>'
     + editImgHtml
@@ -1192,7 +1203,7 @@ function startEdit(msgId, rawText, currentPriority, currentCat, currentImageUrl)
     + '<span class="edit-char-count" id="edit-cc-'+msgId+'">0 / '+MAX_CHARS+'</span>'
     + '<div class="edit-actions">'
     + '<button class="edit-cancel-btn" id="edit-cancel-'+msgId+'">キャンセル</button>'
-    + '<button class="edit-save-btn"   id="edit-save-'+msgId+'">💾 保存</button>'
+    + '<button class="edit-save-btn"   id="edit-save-'+msgId+'"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:3px"><path d="M7.707 10.293a1 1 0 1 0-1.414 1.414l3 3a1 1 0 0 0 1.414 0l3-3a1 1 0 0 0-1.414-1.414L11 11.586V6h5a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5v5.586l-1.293-1.293zM9 4a1 1 0 0 1 2 0v2H9V4z"/></svg>保存</button>'
     + '</div></div>';
 
   areaEl.style.display    = "block";
@@ -1265,13 +1276,13 @@ function setEditImgPreview(msgId, dataUrl){
     imgArea.innerHTML =
       '<img class="edit-img-thumb" id="eimg-thumb-'+msgId+'" src="'+esc(dataUrl)+'" alt="プレビュー">'
       + '<div class="edit-img-actions">'
-      + '<button type="button" class="edit-img-btn" id="eimg-change-'+msgId+'">🔄 画像を変更</button>'
-      + '<button type="button" class="edit-img-btn remove" id="eimg-remove-'+msgId+'">🗑️ 画像を削除</button>'
+      + '<button type="button" class="edit-img-btn" id="eimg-change-'+msgId+'"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:3px"><path fill-rule="evenodd" d="M4 2a1 1 0 0 1 1 1v2.101a7.002 7.002 0 0 1 11.601 2.566 1 1 0 1 1-1.885.666A5.002 5.002 0 0 0 5.999 7H9a1 1 0 0 1 0 2H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm.008 9.057a1 1 0 0 1 1.276.61A5.002 5.002 0 0 0 14.001 13H11a1 1 0 1 1 0-2h5a1 1 0 0 1 1 1v5a1 1 0 1 1-2 0v-2.101a7.002 7.002 0 0 1-11.601-2.566 1 1 0 0 1 .61-1.276z" clip-rule="evenodd"/></svg>画像を変更</button>'
+      + '<button type="button" class="edit-img-btn remove" id="eimg-remove-'+msgId+'"><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:2px"><path fill-rule="evenodd" d="M9 2a1 1 0 0 0-.894.553L7.382 4H4a1 1 0 0 0 0 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6a1 1 0 0 0 0-2h-3.382l-.724-1.447A1 1 0 0 0 11 2H9zm-1 9a1 1 0 0 1 2 0v3a1 1 0 1 1-2 0v-3zm4-1a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0v-3a1 1 0 0 0-1-1z" clip-rule="evenodd"/></svg>画像を削除</button>'
       + '</div>'
       + '<input type="file" id="eimg-file-'+msgId+'" accept="image/*" style="display:none">';
   } else {
     imgArea.innerHTML =
-      '<button type="button" class="edit-img-btn" id="eimg-add-'+msgId+'">📷 写真を添付</button>'
+      '<button type="button" class="edit-img-btn" id="eimg-add-'+msgId+'"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path fill-rule="evenodd" d="M4 5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1.586a1 1 0 0 1-.707-.293l-1.121-1.121A2 2 0 0 0 11.172 3H8.828a2 2 0 0 0-1.414.586L6.293 4.707A1 1 0 0 1 5.586 5H4zm6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" clip-rule="evenodd"/></svg>写真を添付</button>'
       + '<input type="file" id="eimg-file-'+msgId+'" accept="image/*" style="display:none">';
   }
   // イベントを再バインド
@@ -1374,7 +1385,7 @@ function saveEdit(msgId){
     cancelEdit(msgId); editingId=null; showToast("✅ 更新しました", false);
   }).catch(function(e){
     console.error(e); showToast("❌ 更新に失敗しました", false);
-    if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent="💾 保存"; }
+    if(saveBtn){ saveBtn.disabled=false; saveBtn.innerHTML='<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:3px"><path d="M7.707 10.293a1 1 0 1 0-1.414 1.414l3 3a1 1 0 0 0 1.414 0l3-3a1 1 0 0 0-1.414-1.414L11 11.586V6h5a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5v5.586l-1.293-1.293zM9 4a1 1 0 0 1 2 0v2H9V4z"/></svg>保存'; }
   });
 }
 
