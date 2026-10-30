@@ -76,28 +76,53 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .fav-banner-badge { background: rgba(255,255,255,0.25); color: white; font-size: 14px; font-weight: 700; padding: 4px 11px; border-radius: 20px; flex-shrink: 0; }
 
 /* ── 自治会リスト ── */
-.jichi-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-.jichi-item { background: var(--surface); border-radius: var(--radius-md); border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s; overflow: hidden; }
-.jichi-item:hover { border-color: var(--green-soft); }
-.jichi-item.active { border-color: var(--green-mid); border-width: 2px; }
-.jichi-item-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
-.jichi-dist { min-width: 46px; text-align: center; flex-shrink: 0; }
-.dist-n { font-size: 16px; font-weight: 600; color: var(--green-mid); font-family: 'DM Mono', monospace; }
-.dist-u { font-size: 9px; color: var(--ink-light); display: block; }
-.jichi-idx { font-size: 11px; color: var(--ink-faint); font-family: 'DM Mono', monospace; min-width: 46px; text-align: center; flex-shrink: 0; }
-.jichi-info { flex: 1; min-width: 0; }
-.jichi-name { font-size: 14px; font-weight: 700; color: var(--ink); }
-.jichi-addr { font-size: 11px; color: var(--ink-light); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* ── バッジ（件数 + 色で時期） ── */
-.jichi-badge { font-size: 14px; font-weight: 700; padding: 4px 11px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+/* ── 付箋グリッド（2カラム）── */
+.sticky-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.sticky-card { background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; position: relative; }
+.sticky-card:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+.sticky-card.fav-card { border: 2px solid var(--amber); }
+.sticky-top-bar { height: 5px; border-radius: 0; }
+/* 鮮度別カラー */
+.fresh-today  .sticky-top-bar { background: var(--green-mid); }
+.fresh-today  { background: #ffffff; }
+.fresh-week   .sticky-top-bar { background: #2a6cb5; }
+.fresh-week   { background: #fafcff; }
+.fresh-month  .sticky-top-bar { background: var(--amber); }
+.fresh-month  { background: #fffdf5; }
+.fresh-old    .sticky-top-bar { background: #bbb; }
+.fresh-old    { background: #f9f9f7; }
+.fresh-none   .sticky-top-bar { background: #ddd; }
+.fresh-none   { background: #f8f8f8; }
+/* ダークモード */
+@media (prefers-color-scheme: dark) {
+  .fresh-today { background: #1a2e22; }
+  .fresh-week  { background: #181f2a; }
+  .fresh-month { background: #272010; }
+  .fresh-old   { background: #1e1e1e; }
+  .fresh-none  { background: #1a1a1a; }
+}
+.sticky-body { padding: 10px 11px 9px; }
+.sticky-name { font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.3; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sticky-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-bottom: 4px; }
+.sticky-badge.bd-today { background: #e8f5ee; color: #1a6b3c; }
+.sticky-badge.bd-week  { background: #e6f0fa; color: #2a6cb5; }
+.sticky-badge.bd-month { background: #fff8e0; color: #c08000; }
+.sticky-badge.bd-old   { background: #f0f0f0; color: #888; }
+.sticky-badge.bd-none  { background: #f0f0f0; color: #bbb; }
+.sticky-count { font-size: 10.5px; color: var(--ink-faint); }
+.sticky-preview { font-size: 11.5px; color: var(--ink-mid); line-height: 1.5; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.06); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-all; }
+.sticky-days { position: absolute; top: 14px; right: 9px; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 8px; }
+.days-today { background: #e8f5ee; color: #1a6b3c; }
+.days-week  { background: #e6f0fa; color: #2a6cb5; }
+.days-month { background: #fff8e0; color: #c08000; }
+.days-old   { background: #f0f0f0; color: #888; }
+.days-none  { background: #f0f0f0; color: #bbb; }
+/* バッジ（メニュー・お気に入りバナー用） */
 .badge-today  { background: #e8f5ee; color: #1a6b3c; }
 .badge-week   { background: #e6f0fa; color: #2a6cb5; }
 .badge-month  { background: #fff8e8; color: #e8a020; }
 .badge-old    { background: #f0f4f8; color: #888; }
 .badge-none   { background: #f0f0f0; color: var(--ink-faint); }
-/* お気に入りカードは左ボーダーで強調 */
-.jichi-item.fav-item { border-left: 4px solid var(--amber); }
 
 /* ── 自治会詳細（展開エリア）── */
 .jichi-detail { display: none; border-top: 1px solid var(--border); padding: 14px; background: var(--green-faint); }
@@ -204,13 +229,15 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   margin-bottom: 6px;
 }
 .back-btn {
-  background: none; border: none; padding: 0;
-  font-size: 12px; font-weight: 500; font-family: inherit;
-  cursor: pointer; color: var(--ink-faint);
-  display: inline-flex; align-items: center; gap: 4px;
-  margin-bottom: 6px; transition: color 0.12s;
+  background: var(--surface); border: 1.5px solid var(--border);
+  padding: 8px 16px; border-radius: 8px;
+  font-size: 14px; font-weight: 700; font-family: inherit;
+  cursor: pointer; color: var(--ink-mid);
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 14px; transition: all 0.15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
-.back-btn:hover { color: var(--green-deep); }
+.back-btn:hover { border-color: var(--green-mid); color: var(--green-deep); background: var(--green-faint); }
 .board-view-name {
   font-size: 24px; font-weight: 700; color: var(--ink);
   font-family: 'Noto Serif JP', serif;
@@ -576,6 +603,49 @@ function buildBadge(jid){
   var cls=age==="today"?"badge-today":age==="week"?"badge-week":age==="month"?"badge-month":"badge-old";
   return{cls:cls,label:cnt+"件"};
 }
+/* ── sticky-grid ヘルパー ── */
+function latestAge(jid){
+  var msgs=getMsgs(jid);
+  if(!msgs.length) return"none";
+  return tsAge(msgs[0].timestamp)||"old";
+}
+function daysLabel(jid){
+  var msgs=getMsgs(jid); if(!msgs.length) return{cls:"days-none",label:"投稿なし"};
+  var d=tsToDate(msgs[0].timestamp);
+  var diff=Math.floor((Date.now()-d.getTime())/86400000);
+  if(diff===0) return{cls:"days-today",label:"今日"};
+  if(diff<=6)  return{cls:"days-week", label:diff+"日前"};
+  if(diff<=30) return{cls:"days-month",label:diff+"日前"};
+  return{cls:"days-old",label:diff+"日前"};
+}
+function buildStickyCard(j,distM,showDist){
+  var age=latestAge(j.id);
+  var msgs=getMsgs(j.id);
+  var cnt=msgs.length;
+  var dl=daysLabel(j.id);
+  var fav=isFav(j.id);
+  var bdCls="bd-"+age;
+  var ageLabel=age==="today"?"今日更新":age==="week"?"今週更新":age==="month"?"今月更新":age==="old"?"1ヶ月以上前":"まだ投稿なし";
+  var distHtml="";
+  if(showDist&&distM!==null){
+    var d=fmtDist(distM);
+    distHtml='<span style="font-size:9.5px;color:var(--ink-faint);font-family:'DM Mono',monospace;display:inline-flex;align-items:center;gap:2px;">'+ICN_MAP+' '+d.n+d.u+'</span> ';
+  }
+  var preview="";
+  if(cnt){var pt=msgs[0].text.replace(/\n/g," ").trim();preview=pt.length>30?pt.slice(0,30)+"…":pt;}
+  return'<div class="sticky-card fresh-'+age+(fav?" fav-card":"")+'" id="sc-'+j.id+'" onclick="openBoard(''+j.id+'')">'
+    +'<div class="sticky-top-bar"></div>'
+    +'<div class="sticky-body">'
+    +'<div class="sticky-days '+dl.cls+'">'+dl.label+'</div>'
+    +(fav?'<div style="position:absolute;top:12px;left:9px;color:#f59e0b;display:flex"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style="width:12px;height:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>':'')
+    +'<div class="sticky-name" style="padding-right:52px'+(fav?';padding-left:16px':'')+'">'+(distHtml)+esc(j.name)+'</div>'
+    +'<span class="sticky-badge '+bdCls+'">'+ageLabel+'</span>'
+    +'<div class="sticky-count">'+(cnt?cnt+'件の投稿':'投稿なし')+'</div>'
+    +(preview?'<div class="sticky-preview">'+esc(preview)+'</div>':'')
+    +'</div>'
+    +'</div>';
+}
+
 /* メニューバッジ用クラス */
 function menuBadgeCls(jid){
   var msgs=getMsgs(jid); if(!msgs.length) return"";
@@ -646,25 +716,6 @@ function renderCondolenceList(jid,name){
   }).join("");
 }
 
-/* リスト用カード */
-function buildListCard(j,distM,showDist,isFav){
-  var badge=buildBadge(j.id);
-  var idx=JICHIKAI.indexOf(j)+1;
-  var dist=distM!==null?fmtDist(distM):null;
-  var distHtml=showDist&&dist
-    ?'<div class="jichi-dist"><span class="dist-n">'+dist.n+'</span><span class="dist-u">'+dist.u+'</span></div>'
-    :'<span class="jichi-idx">'+(isFav?'⭐':String(idx).padStart(2,"0"))+'</span>';
-  return'<div class="jichi-item'+(isFav?" fav-item":"")+'\" id="li-'+j.id+'" onclick="openBoard(\''+j.id+'\')">'
-    +'<div class="jichi-item-head">'
-    +distHtml
-    +'<div class="jichi-info">'
-    +'<div class="jichi-name">'+esc(j.name)+'</div>'
-    +'<div class="jichi-addr">'+esc(j.addr)+'</div>'
-    +'</div>'
-    +'<div class="jichi-badge '+badge.cls+'" id="badge-'+j.id+'">'+badge.label+'</div>'
-    +'</div>'
-    +'</div>';
-}
 
 /* ══════════════════════════════════════════
    ビュー描画
@@ -772,20 +823,15 @@ function renderListView(){
     +'<button class="loc-btn" onclick="getLocation()">'+(userLat?'再取得':'現在地を取得')+'</button>'
     +'</div>';
 
-  /* 近隣3件のみ */
-  if(userLat){
-    html+='<div class="section-label">📡 現在地から近い自治会（上位3件）</div>';
-    html+='<div class="jichi-list">';
-    JICHIKAI.map(function(j){ return Object.assign({},j,{dist:calcDist(userLat,userLng,j.lat,j.lng)}); })
-            .sort(function(a,b){return a.dist-b.dist;}).slice(0,3)
-            .forEach(function(j){ html+=buildListCard(j,j.dist,true); subscribeMsgs(j.id); });
-    html+='</div>';
-  }else{
-    html+='<div class="msg-empty" style="padding:30px 0;color:var(--ink-faint);font-size:13px;text-align:center">'
-      +'📍 現在地を取得すると近くの自治会が表示されます<br>'
-      +'<small style="color:var(--ink-faint)">自治会一覧は メニューボタン からご覧いただけます</small>'
-      +'</div>';
-  }
+  /* 全自治会グリッド（GPS取得済みなら距離順、未取得なら番号順）*/
+  var jList=JICHIKAI.map(function(j){
+    return Object.assign({},j,{dist:userLat?calcDist(userLat,userLng,j.lat,j.lng):null});
+  });
+  if(userLat) jList.sort(function(a,b){return a.dist-b.dist;});
+  html+='<div class="section-label" style="display:flex;align-items:center;gap:6px">'+ICN_HOME+' 自治会ボード一覧</div>';
+  html+='<div class="sticky-grid" id="sticky-grid">';
+  jList.forEach(function(j){ html+=buildStickyCard(j,j.dist,userLat!==null); subscribeMsgs(j.id); });
+  html+='</div>';
 
   /* 新着情報セクション */
   html+='<div id="new-arrivals-container">'+renderNewArrivalsSection()+'</div>';
@@ -825,7 +871,7 @@ function renderBoardView(){
 
   var html=''
     +'<div class="board-view-header">'
-    +'<button class="back-btn" onclick="backToList()">‹ 一覧に戻る</button>'
+    +'<button class="back-btn" onclick="backToList()"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;flex-shrink:0"><path fill-rule="evenodd" d="M7.707 14.707a1 1 0 0 1-1.414 0l-5-5a1 1 0 0 1 0-1.414l5-5a1 1 0 0 1 1.414 1.414L4.414 9H17a1 1 0 1 1 0 2H4.414l3.293 3.293a1 1 0 0 1 0 1.414z" clip-rule="evenodd"/></svg> 一覧に戻る</button>'
     +'<button class="'+favBtnCls+'\" id="fav-btn" onclick="toggleFav(\''+jid+'\')" title="お気に入りに登録（最大3件）">'+favBtnLabel+'</button>'
     +'</div>'
     +'<div class="board-view-name">'+esc(j.name)+'</div>'
@@ -946,11 +992,13 @@ function toggleFav(jid){
   }
 }
 
-/* ── バッジ即時更新（リスト表示中）── */
+/* ── sticky-card 即時更新（リスト表示中）── */
 function refreshListBadge(jid){
-  var el=document.getElementById("badge-"+jid); if(!el) return;
-  var badge=buildBadge(jid);
-  el.className="jichi-badge "+badge.cls; el.textContent=badge.label;
+  var el=document.getElementById("sc-"+jid); if(!el) return;
+  var j=JICHIKAI.find(function(x){return x.id===jid;}); if(!j) return;
+  var distM=null;
+  if(userLat){try{distM=calcDist(userLat,userLng,j.lat,j.lng);}catch(e){}}
+  el.outerHTML=buildStickyCard(j,distM,userLat!==null);
 }
 
 /* ── サイドメニュー ── */
