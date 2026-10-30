@@ -881,7 +881,8 @@ function renderBoardView(){
     +'<button class="'+favBtnCls+'\" id="fav-btn" onclick="toggleFav(\''+jid+'\')" title="お気に入りに登録（最大3件）">'+favBtnLabel+'</button>'
     +'</div>'
     +'<div class="board-view-name">'+esc(j.name)+'</div>'
-    +'<div style="font-size:11px;color:var(--ink-faint);margin-bottom:14px">'+esc(j.addr)+'</div>'
+    +'<div style="font-size:11px;color:var(--ink-faint);margin-bottom:10px">'+esc(j.addr)+'</div>'
+    +'<div id="jichi-visitor-'+jid+'" style="margin-bottom:14px"></div>'
     +'<div class="detail-links" style="margin-bottom:14px">'+links.join("")+'</div>'
 
     /* タブ */
@@ -914,6 +915,7 @@ function renderBoardView(){
     +'</div>';
 
   document.getElementById("main-content").innerHTML=html;
+  loadJichiVisitorStats(jid);
 }
 
 /* ── ボード内タブ切替 ── */
@@ -1174,10 +1176,37 @@ function recordJichiVisit(jid){
     sessionStorage.setItem(key,"1");
   }catch(e){}
   var mk = visitorMonthKey();
+  var dk = visitorDayKey();
   var upd = { total: firebase.firestore.FieldValue.increment(1) };
   upd[mk] = firebase.firestore.FieldValue.increment(1);
+  upd[dk] = firebase.firestore.FieldValue.increment(1);
   db.collection("jichiStats").doc(jid).set(upd,{merge:true})
     .catch(function(e){ console.warn("jichiStats更新失敗:",e); });
+}
+function renderJichiVisitorBar(jid, todayN, totalN){
+  var el = document.getElementById("jichi-visitor-"+jid);
+  if(!el) return;
+  if(todayN === null){ el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="visitor-bar">'
+    +'<span class="visitor-icon">'+ICN_PEOPLE+'</span>'
+    +'<div class="visitor-stats">'
+    +'<div class="visitor-stat"><span class="visitor-label">今日</span> <span class="visitor-num">'+todayN+'</span><span class="visitor-unit">人</span></div>'
+    +'<span class="visitor-sep">／</span>'
+    +'<div class="visitor-stat"><span class="visitor-label">累計</span> <span class="visitor-num">'+totalN+'</span><span class="visitor-unit">人</span></div>'
+    +'<span class="visitor-suffix">が訪問</span>'
+    +'</div>'
+    +'</div>';
+}
+function loadJichiVisitorStats(jid){
+  if(!firebaseOk) return;
+  var dk = visitorDayKey();
+  db.collection("jichiStats").doc(jid).onSnapshot(function(doc){
+    if(!doc.exists){ renderJichiVisitorBar(jid, 0, 0); return; }
+    var data = doc.data();
+    var todayN = data[dk] || 0;
+    var totalN = data.total || 0;
+    renderJichiVisitorBar(jid, todayN, totalN);
+  }, function(e){ console.warn("jichiStats取得失敗:",e); });
 }
 
 /* ── 起動時の初期表示 ── */
