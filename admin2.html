@@ -329,7 +329,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     <!-- 管理者画面：ボードタブ -->
     <div class="board-tabs">
       <button class="board-tab tab-notice active" id="admintab-notice" onclick="switchAdminTab('notice')"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>お知らせ投稿 <span class="tab-count-badge notice" id="admintabbadge-notice">0件</span></button>
-      <button class="board-tab tab-condolence" id="admintab-condolence" onclick="switchAdminTab('condolence')"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>おくやみ投稿 <span class="tab-count-badge condolence" id="admintabbadge-condolence">0件</span></button>
+      <button class="board-tab tab-condolence" id="admintab-condolence" onclick="switchAdminTab('condolence')"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>おくやみ投稿 <span class="tab-count-badge condolence" id="admintabbadge-condolence">0件</span></button>
     </div>
 
     <!-- お知らせ投稿パネル -->
@@ -362,7 +362,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
         <div class="post-footer">
           <span class="char-count" id="char-count">0 / 140</span>
           <div class="post-footer-actions">
-            <button class="save-draft-btn" id="draft-btn" onclick="saveDraft()" disabled>📝 下書き保存</button>
+            <button class="save-draft-btn" id="draft-btn" onclick="saveDraft()" disabled><svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0;vertical-align:-1px;margin-right:4px"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>下書き保存</button>
             <button class="post-btn" id="post-btn" onclick="postMsg()" disabled><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>投稿する</button>
           </div>
         </div>
@@ -391,14 +391,14 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
     <!-- おくやみ投稿パネル -->
     <div id="adminpanel-condolence" style="display:none">
       <div class="post-box condolence-post-box">
-        <div class="post-box-title condolence-post-title"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>おくやみ情報を投稿</div>
+        <div class="post-box-title condolence-post-title"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>おくやみ情報を投稿</div>
         <div class="condolence-admin-intro">訃報・お悔やみに関する情報を投稿します。通常のお知らせとは別のボードに表示されます。</div>
         <textarea class="post-textarea" id="condolence-text"
           placeholder="おくやみ情報を入力してください（最大140文字）&#10;&#10;例：〇〇様（〇〇班）が逝去されました。心よりお悔やみ申し上げます。"
           maxlength="140" oninput="updateCondolenceCharCount()"></textarea>
         <div class="post-footer">
           <span class="char-count" id="condolence-char-count">0 / 140</span>
-          <button class="post-btn condolence-post-btn" id="condolence-post-btn" onclick="postCondolence()" disabled><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する</button>
+          <button class="post-btn condolence-post-btn" id="condolence-post-btn" onclick="postCondolence()" disabled><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>投稿する</button>
         </div>
       </div>
 
@@ -465,7 +465,7 @@ var MAX_MSGS=10, MAX_CHARS=140;
 var ICN_NOTICE='<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;flex-shrink:0"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>';
 var ICN_EVENT ='<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;flex-shrink:0"><path fill-rule="evenodd" d="M6 2a1 1 0 0 0-1 1v1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V3a1 1 0 1 0-2 0v1H7V3a1 1 0 0 0-1-1zm0 5a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2H6z" clip-rule="evenodd"/></svg>';
 var ICN_URGENT='<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;flex-shrink:0"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.645-1.743-2.98l5.58-9.92zM11 13a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-1-8a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0V6a1 1 0 0 0-1-1z" clip-rule="evenodd"/></svg>';
-var ICN_COND  ='<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;flex-shrink:0"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>';
+var ICN_COND  ='<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-1px;flex-shrink:0"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>';
 
 var db=null, firebaseOk=false, loggedInJid=null, unsubscribeMsgs=null;
 var currentPriority="normal"; // "normal" | "high"
@@ -695,6 +695,8 @@ function postMsg(){
 }
 
 /* ── 下書き保存 ── */
+var DRAFT_BTN_HTML='<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0;vertical-align:-1px;margin-right:4px"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>下書き保存';
+
 function saveDraft(){
   var text=document.getElementById("post-text").value.trim();
   if(!text||text.length>MAX_CHARS) return;
@@ -706,8 +708,8 @@ function saveDraft(){
     var msgs=getMsgsFallback(loggedInJid);
     msgs.unshift({id:String(Date.now()),text:text,priority:currentPriority,category:currentCategory,status:"draft",timestamp:new Date().toISOString()});
     localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
-    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); renderAdminMsgsFallback(); showToast("📝 下書きを保存しました", false);
-    btn.disabled=false; btn.textContent="📝 下書き保存"; return;
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); renderAdminMsgsFallback(); showToast("下書きを保存しました", false);
+    btn.disabled=false; btn.innerHTML=DRAFT_BTN_HTML; return;
   }
 
   uploadImage(imageFile, loggedInJid).then(function(imageUrl){
@@ -715,10 +717,10 @@ function saveDraft(){
     if(imageUrl) data.imageUrl=imageUrl;
     return db.collection("messages").add(data);
   }).then(function(){
-    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); showToast("📝 下書きを保存しました", false);
-    btn.disabled=false; btn.textContent="📝 下書き保存";
+    document.getElementById("post-text").value=""; updateCharCount(); selectPriority("normal"); selectCategory("notice"); clearImage(); showToast("下書きを保存しました", false);
+    btn.disabled=false; btn.innerHTML=DRAFT_BTN_HTML;
   }).catch(function(e){
-    console.error(e); showToast("❌ 保存に失敗しました", false); btn.disabled=false; btn.textContent="📝 下書き保存";
+    console.error(e); showToast("❌ 保存に失敗しました", false); btn.disabled=false; btn.innerHTML=DRAFT_BTN_HTML;
   });
 }
 
@@ -747,20 +749,20 @@ function postCondolence(){
   btn.disabled=true; btn.textContent="投稿中...";
   if(!firebaseOk){
     var items=getCondolencesFallback(loggedInJid);
-    if(items.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する'; return; }
+    if(items.length>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です", false); btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>投稿する'; return; }
     items.unshift({id:String(Date.now()),text:text,timestamp:new Date().toISOString()});
     localStorage.setItem("condolences_"+loggedInJid,JSON.stringify(items));
     document.getElementById("condolence-text").value=""; updateCondolenceCharCount(); renderAdminCondolencesFallback(); showToast("おくやみ投稿しました", false);
-    btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する'; return;
+    btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>投稿する'; return;
   }
   db.collection("condolences").where("jichiId","==",loggedInJid).get().then(function(snap){
-    if(snap.size>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false); btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する'; return null; }
+    if(snap.size>=MAX_MSGS){ showToast("⚠️ 最大"+MAX_MSGS+"件です。古い投稿を削除してください", false); btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>投稿する'; return null; }
     return db.collection("condolences").add({jichiId:loggedInJid,text:text,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
   }).then(function(ref){
     if(!ref) return;
     document.getElementById("condolence-text").value=""; updateCondolenceCharCount(); showToast("おくやみ投稿しました", false);
-    btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する';
-  }).catch(function(e){ console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z"/></svg>投稿する'; });
+    btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>投稿する';
+  }).catch(function(e){ console.error(e); showToast("❌ 投稿に失敗しました", false); btn.disabled=false; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>投稿する'; });
 }
 
 /* ── おくやみ：文字数カウント ── */
@@ -994,21 +996,29 @@ function renderDrafts(drafts){
   drafts.forEach(function(d){ draftStore[d.id]={text:d.text||"",priority:d.priority||"normal",category:d.category||"notice",imageUrl:d.imageUrl||""}; });
   el.innerHTML=drafts.map(function(d){
     var catLabel={notice:"お知らせ",event:"イベント",urgent:"緊急",info:"情報"}[d.category||"notice"]||"お知らせ";
-    var priLabel={normal:"",high:"🔶 重要",urgent:"🔴 緊急"}[d.priority||"normal"]||"";
+    var isHigh=d.priority==="high";
     var txt=d.text||"";
     var preview=txt.length>60?txt.slice(0,60)+"…":txt;
     return '<div class="draft-card" data-id="'+d.id+'">'
       +'<div style="flex:1;min-width:0">'
+      +'<div id="draft-text-'+d.id+'">'
       +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap">'
       +'<span class="draft-label">下書き</span>'
-      +'<span style="font-size:11px;color:var(--ink-mid);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1px 7px">'+catLabel+'</span>'
-      +(priLabel?'<span style="font-size:11px">'+priLabel+'</span>':'')
+      +'<span style="font-size:11px;color:var(--ink-mid);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:1px 7px">'+esc(catLabel)+'</span>'
+      +(isHigh?'<span style="font-size:11px;font-weight:700;color:#e8520a">重要</span>':'')
       +'</div>'
       +'<div style="font-size:13px;color:var(--ink);line-height:1.55;word-break:break-all">'+esc(preview)+'</div>'
       +(d.imageUrl?'<div style="margin-top:6px"><img src="'+esc(d.imageUrl)+'" style="max-height:60px;border-radius:6px;border:1px solid var(--border)"></div>':'')
       +'</div>'
+      +'<div class="edit-area" id="draft-edit-area-'+d.id+'" style="display:none"></div>'
+      +'</div>'
       +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
-      +'<button class="publish-draft-btn" onclick="publishDraft(\''+d.id+'\')">公開する</button>'
+      +'<button class="publish-draft-btn" id="draft-publish-btn-'+d.id+'" onclick="publishDraft(\''+d.id+'\')">'
+      +'<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>'
+      +'公開</button>'
+      +'<button id="draft-edit-btn-'+d.id+'" onclick="startDraftEdit(\''+d.id+'\')" title="編集" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:11px;color:var(--ink-mid);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:3px">'
+      +'<svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>'
+      +'編集</button>'
       +'<button onclick="deleteDraft(\''+d.id+'\')" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:11px;color:var(--ink-mid);cursor:pointer;font-family:inherit">削除</button>'
       +'</div>'
       +'</div>';
@@ -1037,15 +1047,173 @@ function deleteDraft(draftId){
   if(!firebaseOk){
     var msgs=getMsgsFallback(loggedInJid).filter(function(m){ return m.id!==draftId; });
     localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
-    renderAdminMsgsFallback(); showToast("🗑 下書きを削除しました", false); return;
+    renderAdminMsgsFallback(); showToast("下書きを削除しました", false); return;
   }
   db.collection("messages").doc(draftId).delete().then(function(){
-    showToast("🗑 下書きを削除しました", false);
-  }).catch(function(e){ console.error(e); showToast("❌ 削除に失敗しました", false); });
+    showToast("下書きを削除しました", false);
+  }).catch(function(e){ console.error(e); showToast("削除に失敗しました", false); });
 }
 
+/* ── 下書き インライン編集 ── */
+var editingDraftId = null;
 
+function startDraftEdit(draftId){
+  if(editingDraftId && editingDraftId!==draftId) cancelDraftEdit(editingDraftId);
+  editingDraftId = draftId;
+  var d = draftStore[draftId];
+  if(!d){ showToast("データが見つかりません", false); return; }
 
+  var textEl   = document.getElementById("draft-text-"+draftId);
+  var areaEl   = document.getElementById("draft-edit-area-"+draftId);
+  var editBtn  = document.getElementById("draft-edit-btn-"+draftId);
+  var pubBtn   = document.getElementById("draft-publish-btn-"+draftId);
+  if(!areaEl) return;
+
+  var curPri = d.priority||"normal";
+  var curCat = d.category||"notice";
+  var curTxt = d.text||"";
+  var curImg = d.imageUrl||"";
+
+  var cats=["notice","event","urgent","info"];
+  var catLabels={"notice":"お知らせ","event":"イベント","urgent":"緊急","info":"情報"};
+  var catBtns=cats.map(function(c){
+    var sel=c===curCat?"background:var(--accent);color:#fff;border-color:var(--accent)":"background:var(--surface);color:var(--ink-mid);border-color:var(--border)";
+    return '<button id="decat-'+c+'-'+draftId+'" onclick="setDraftEditCat(\''+draftId+'\',\''+c+'\')" style="'+sel+';border:1px solid;border-radius:var(--radius-sm);padding:3px 9px;font-size:11px;cursor:pointer;font-family:inherit">'+catLabels[c]+'</button>';
+  }).join("");
+
+  var priNSel=curPri==="normal"?"background:var(--accent);color:#fff;border-color:var(--accent)":"background:var(--surface);color:var(--ink-mid);border-color:var(--border)";
+  var priHSel=curPri==="high"  ?"background:var(--accent);color:#fff;border-color:var(--accent)":"background:var(--surface);color:var(--ink-mid);border-color:var(--border)";
+
+  var imgHtml='';
+  if(curImg){
+    imgHtml='<div id="de-img-wrap-'+draftId+'" style="margin-top:8px;display:flex;align-items:center;gap:8px">'
+      +'<img id="de-img-prev-'+draftId+'" src="'+esc(curImg)+'" style="max-height:60px;border-radius:6px;border:1px solid var(--border)">'
+      +'<button onclick="setDraftEditImgPreview(\''+draftId+'\',document.getElementById(\'draft-edit-area-\'+\''+draftId+'\'),\'\')" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px 8px;font-size:11px;color:var(--ink-mid);cursor:pointer;font-family:inherit">画像削除</button>'
+      +'</div>';
+  } else {
+    imgHtml='<div id="de-img-wrap-'+draftId+'" style="margin-top:8px">'
+      +'<label style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--ink-mid);cursor:pointer;border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px 9px;background:var(--surface)">'
+      +'<svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H4zm0 2h12v6.586l-2.293-2.293a1 1 0 0 0-1.414 0L9 12.586 7.707 11.293a1 1 0 0 0-1.414 0L4 13.586V5zm4 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>'
+      +'画像追加<input type="file" accept="image/*" style="display:none" onchange="(function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){setDraftEditImgPreview(\''+draftId+'\',document.getElementById(\'draft-edit-area-\'+\''+draftId+'\'),ev.target.result)};r.readAsDataURL(f)})(event)">'
+      +'</label>'
+      +'</div>';
+  }
+
+  areaEl.innerHTML=
+    '<div style="padding:10px 0 4px;border-top:1px solid var(--border);margin-top:8px">'
+    +'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">'+catBtns+'</div>'
+    +'<div style="display:flex;gap:4px;margin-bottom:8px">'
+    +'<button id="depri-normal-'+draftId+'" onclick="setDraftEditPri(\''+draftId+'\',\'normal\')" style="'+priNSel+';border:1px solid;border-radius:var(--radius-sm);padding:3px 9px;font-size:11px;cursor:pointer;font-family:inherit">通常</button>'
+    +'<button id="depri-high-'+draftId+'"  onclick="setDraftEditPri(\''+draftId+'\',\'high\')"  style="'+priHSel+';border:1px solid;border-radius:var(--radius-sm);padding:3px 9px;font-size:11px;cursor:pointer;font-family:inherit">重要</button>'
+    +'</div>'
+    +'<textarea id="de-ta-'+draftId+'" maxlength="'+MAX_CHARS+'" rows="4" oninput="updateDraftEditCount(\''+draftId+'\')" style="width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;font-size:13px;font-family:inherit;color:var(--ink);background:var(--bg);resize:vertical">'+esc(curTxt)+'</textarea>'
+    +'<div style="text-align:right;font-size:11px;color:var(--ink-mid);margin-top:2px"><span id="de-cnt-'+draftId+'">'+curTxt.length+'</span>/'+MAX_CHARS+'</div>'
+    +imgHtml
+    +'<div style="display:flex;gap:6px;margin-top:10px">'
+    +'<button onclick="saveDraftEdit(\''+draftId+'\')" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:8px;font-size:12px;cursor:pointer;font-family:inherit">保存</button>'
+    +'<button onclick="cancelDraftEdit(\''+draftId+'\')" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--ink-mid);cursor:pointer;font-family:inherit">キャンセル</button>'
+    +'</div>'
+    +'</div>';
+
+  if(textEl) textEl.style.display="none";
+  areaEl.style.display="block";
+  if(editBtn) editBtn.style.display="none";
+  if(pubBtn)  pubBtn.style.display="none";
+}
+
+function setDraftEditImgPreview(draftId, areaEl, dataUrl){
+  var wrap=document.getElementById("de-img-wrap-"+draftId);
+  if(!wrap) return;
+  if(!dataUrl){
+    wrap.innerHTML='<label style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--ink-mid);cursor:pointer;border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px 9px;background:var(--surface)">'
+      +'<svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H4zm0 2h12v6.586l-2.293-2.293a1 1 0 0 0-1.414 0L9 12.586 7.707 11.293a1 1 0 0 0-1.414 0L4 13.586V5zm4 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>'
+      +'画像追加<input type="file" accept="image/*" style="display:none" onchange="(function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){setDraftEditImgPreview(\''+draftId+'\',document.getElementById(\'draft-edit-area-\'+\''+draftId+'\'),ev.target.result)};r.readAsDataURL(f)})(event)">'
+      +'</label>';
+  } else {
+    wrap.innerHTML='<div style="display:flex;align-items:center;gap:8px">'
+      +'<img id="de-img-prev-'+draftId+'" src="'+esc(dataUrl)+'" style="max-height:60px;border-radius:6px;border:1px solid var(--border)">'
+      +'<button onclick="setDraftEditImgPreview(\''+draftId+'\',document.getElementById(\'draft-edit-area-\'+\''+draftId+'\'),\'\')" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px 8px;font-size:11px;color:var(--ink-mid);cursor:pointer;font-family:inherit">画像削除</button>'
+      +'</div>';
+  }
+}
+
+function setDraftEditPri(draftId, p){
+  ["normal","high"].forEach(function(v){
+    var btn=document.getElementById("depri-"+v+"-"+draftId);
+    if(!btn) return;
+    var sel=v===p;
+    btn.style.background=sel?"var(--accent)":"var(--surface)";
+    btn.style.color=sel?"#fff":"var(--ink-mid)";
+    btn.style.borderColor=sel?"var(--accent)":"var(--border)";
+  });
+}
+
+function setDraftEditCat(draftId, c){
+  ["notice","event","urgent","info"].forEach(function(v){
+    var btn=document.getElementById("decat-"+v+"-"+draftId);
+    if(!btn) return;
+    var sel=v===c;
+    btn.style.background=sel?"var(--accent)":"var(--surface)";
+    btn.style.color=sel?"#fff":"var(--ink-mid)";
+    btn.style.borderColor=sel?"var(--accent)":"var(--border)";
+  });
+}
+
+function updateDraftEditCount(draftId){
+  var ta=document.getElementById("de-ta-"+draftId);
+  var cnt=document.getElementById("de-cnt-"+draftId);
+  if(ta && cnt) cnt.textContent=ta.value.length;
+}
+
+function cancelDraftEdit(draftId){
+  var textEl  = document.getElementById("draft-text-"+draftId);
+  var areaEl  = document.getElementById("draft-edit-area-"+draftId);
+  var editBtn = document.getElementById("draft-edit-btn-"+draftId);
+  var pubBtn  = document.getElementById("draft-publish-btn-"+draftId);
+  if(areaEl){ areaEl.style.display="none"; areaEl.innerHTML=""; }
+  if(textEl)  textEl.style.display="block";
+  if(editBtn) editBtn.style.display="";
+  if(pubBtn)  pubBtn.style.display="";
+  if(editingDraftId===draftId) editingDraftId=null;
+}
+
+function saveDraftEdit(draftId){
+  var ta     = document.getElementById("de-ta-"+draftId);
+  var priN   = document.getElementById("depri-normal-"+draftId);
+  var priH   = document.getElementById("depri-high-"+draftId);
+  var imgPre = document.getElementById("de-img-prev-"+draftId);
+  if(!ta){ showToast("入力欄が見つかりません", false); return; }
+
+  var newText = ta.value.trim();
+  if(!newText){ showToast("本文を入力してください", false); ta.focus(); return; }
+
+  var newPri  = (priH && priH.style.background&&priH.style.background.indexOf("accent")>-1) ? "high" : "normal";
+  var newCat  = "notice";
+  ["notice","event","urgent","info"].forEach(function(c){
+    var b=document.getElementById("decat-"+c+"-"+draftId);
+    if(b && b.style.background && b.style.background.indexOf("accent")>-1) newCat=c;
+  });
+  var newImg = (imgPre && imgPre.src && imgPre.src.length>0 && imgPre.src!==location.href) ? imgPre.src : "";
+
+  var updates = { text:newText, priority:newPri, category:newCat, status:"draft" };
+  if(newImg) updates.imageUrl=newImg; else updates.imageUrl=firebase.firestore.FieldValue.delete();
+
+  if(!firebaseOk){
+    var msgs=getMsgsFallback(loggedInJid).map(function(m){
+      if(m.id!==draftId) return m;
+      return Object.assign({},m,{text:newText,priority:newPri,category:newCat,imageUrl:newImg||undefined});
+    });
+    localStorage.setItem("msgs_"+loggedInJid,JSON.stringify(msgs));
+    cancelDraftEdit(draftId); renderAdminMsgsFallback(); showToast("下書きを更新しました", false); return;
+  }
+
+  var saveBtn=document.querySelector("#draft-edit-area-"+draftId+" button");
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent="保存中…"; }
+
+  db.collection("messages").doc(draftId).update(updates).then(function(){
+    cancelDraftEdit(draftId); showToast("下書きを更新しました", false);
+  }).catch(function(e){ console.error(e); showToast("更新に失敗しました", false); if(saveBtn){saveBtn.disabled=false;saveBtn.textContent="保存";} });
+}
 
 /* ── 削除（元に戻す付き）── */
 var deletedMsg = null; // 直前に削除したメッセージを保持
