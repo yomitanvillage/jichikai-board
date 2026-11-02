@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>自治会ボード管理ダッシュボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --g-deep:#1a6b3c;--g-mid:#2d8f54;--g-soft:#4aad70;--g-pale:#e8f5ee;
+  --blue:#2a6cb5;--blue-pale:#e6f0fa;
+  --amber:#d08000;--amber-pale:#fff8e0;
+  --red:#c0392b;--red-pale:#fff0ee;
+  --purple:#7b5cb8;--purple-pale:#f0ecfa;
+  --ink:#1a1a1a;--ink-mid:#444;--ink-light:#777;--ink-faint:#aaa;
+  --surface:#ffffff;--bg:#f0f5f2;--border:#cce4d6;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;
+  color-scheme:light;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --g-deep:#3aad6c;--g-mid:#2d8f54;--g-soft:#4aad70;--g-pale:#1a3828;
+  --blue:#5a9fd4;--blue-pale:#162840;
+  --amber:#e09030;--amber-pale:#2a2010;
+  --red:#e05050;--red-pale:#2a1010;
+  --purple:#a07cd8;--purple-pale:#2a1a40;
+  --ink:#f0f0f0;--ink-mid:#c0c0c0;--ink-light:#999;--ink-faint:#666;
+  --surface:#1e2922;--bg:#141a17;--border:#2a4535;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --g-deep:#3aad6c;--g-mid:#2d8f54;--g-soft:#4aad70;--g-pale:#1a3828;
+  --blue:#5a9fd4;--blue-pale:#162840;
+  --amber:#e09030;--amber-pale:#2a2010;
+  --red:#e05050;--red-pale:#2a1010;
+  --purple:#a07cd8;--purple-pale:#2a1a40;
+  --ink:#f0f0f0;--ink-mid:#c0c0c0;--ink-light:#999;--ink-faint:#666;
+  --surface:#1e2922;--bg:#141a17;--border:#2a4535;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:16px;}
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:var(--bg);color:var(--ink);min-height:100vh;
+  padding-left:max(0px,env(safe-area-inset-left,0px));
+  padding-right:max(0px,env(safe-area-inset-right,0px));
+}
+
+/* ── ヘッダー ── */
+.hdr{
+  background:var(--g-deep);padding:0 16px;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 10px rgba(0,0,0,0.2);
+}
+.hdr-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:52px;gap:10px;}
+.hdr-title{font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;flex:1;min-width:0;overflow:hidden;}
+.hdr-title-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hdr-badge{font-size:10px;background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.35);border-radius:8px;padding:2px 8px;flex-shrink:0;}
+.hdr-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.hdr-btn{
+  display:flex;align-items:center;gap:5px;
+  color:rgba(255,255,255,0.8);font-size:13px;font-weight:700;font-family:inherit;
+  background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.28);
+  border-radius:8px;padding:5px 11px;cursor:pointer;white-space:nowrap;
+  text-decoration:none;transition:background 0.15s;
+}
+.hdr-btn:hover{background:rgba(255,255,255,0.24);}
+.hdr-btn:disabled{opacity:0.5;cursor:default;}
+
+/* ── メイン ── */
+.main{max-width:960px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-left,0px)) 60px;}
+
+/* ── 認証ゲート ── */
+.auth-wrap{display:flex;align-items:center;justify-content:center;min-height:70vh;}
+.auth-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--r-lg);padding:32px 28px;width:100%;max-width:360px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1);text-align:center;
+}
+.auth-icon{display:flex;justify-content:center;margin-bottom:12px;color:var(--g-deep);}
+.auth-title{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.auth-sub{font-size:12px;color:var(--ink-faint);margin-bottom:20px;line-height:1.7;}
+.auth-input{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:var(--r-md);
+  font-size:15px;font-family:inherit;outline:none;background:var(--surface);color:var(--ink);
+  transition:border-color 0.15s;margin-bottom:10px;
+}
+.auth-input:focus{border-color:var(--g-mid);}
+.auth-btn{
+  width:100%;background:var(--g-deep);color:#fff;border:none;border-radius:var(--r-md);
+  padding:11px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;
+  transition:opacity 0.15s;
+}
+.auth-btn:hover{opacity:0.9;}
+.auth-err{font-size:12px;color:var(--red);margin-top:6px;display:none;}
+
+/* ── セクション共通 ── */
+.sec-head{font-size:13px;font-weight:700;letter-spacing:0.06em;color:var(--ink-light);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec-head::after{content:"";flex:1;height:1px;background:var(--border);}
+.sec-head svg{flex-shrink:0;}
+
+/* ── サマリーカード ── */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:28px;}
+.sum-card{
+  background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);
+  padding:16px 18px;position:relative;overflow:hidden;
+}
+.sum-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;}
+.sum-card.c-visitors::before{background:var(--g-mid);}
+.sum-card.c-monthly::before{background:var(--blue);}
+.sum-card.c-posts::before{background:var(--amber);}
+.sum-card.c-likes::before{background:#e05a7a;}
+.sum-label{font-size:11px;color:var(--ink-faint);font-weight:700;letter-spacing:0.05em;margin-bottom:6px;}
+.sum-num{font-size:28px;font-weight:700;color:var(--ink);font-family:'DM Mono',monospace;line-height:1.1;}
+.sum-unit{font-size:12px;color:var(--ink-mid);margin-left:2px;}
+.sum-sub{font-size:11px;color:var(--ink-faint);margin-top:4px;}
+.sum-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);opacity:0.11;width:44px;height:44px;}
+.sum-icon svg{width:100%;height:100%;}
+
+/* ── 期間セレクタ ── */
+.period-bar{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.period-label{font-size:12px;color:var(--ink-mid);font-weight:700;flex-shrink:0;}
+.period-btn{
+  padding:6px 16px;border-radius:20px;border:1.5px solid var(--border);
+  background:var(--surface);color:var(--ink-mid);font-size:13px;font-weight:700;
+  font-family:inherit;cursor:pointer;transition:all 0.15s;
+}
+.period-btn.active{background:var(--g-deep);color:#fff;border-color:var(--g-deep);}
+.period-btn:hover:not(.active){border-color:var(--g-mid);color:var(--g-deep);}
+.range-wrap{display:none;align-items:center;gap:6px;flex-wrap:wrap;}
+.range-input{
+  padding:5px 10px;border:1.5px solid var(--border);border-radius:var(--r-sm);
+  font-size:13px;font-family:inherit;color:var(--ink);background:var(--surface);
+  outline:none;cursor:pointer;transition:border-color 0.15s;
+}
+.range-input:focus{border-color:var(--g-mid);}
+.range-sep{color:var(--ink-faint);font-size:13px;}
+
+/* ── テーブル ── */
+.tbl-wrap{overflow-x:auto;margin-bottom:28px;}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{
+  text-align:left;padding:9px 12px;
+  background:var(--g-pale);color:var(--g-deep);
+  font-weight:700;font-size:11.5px;letter-spacing:0.04em;
+  border-bottom:2px solid var(--border);white-space:nowrap;
+}
+.tbl th.sortable{cursor:pointer;user-select:none;transition:background 0.12s;}
+.tbl th.sortable:hover{background:var(--border);}
+.sort-arrow{display:inline-block;width:14px;text-align:center;color:var(--g-mid);font-size:10px;}
+.tbl td{
+  padding:9px 12px;border-bottom:1px solid var(--border);
+  vertical-align:middle;
+}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:var(--g-pale);}
+.tbl .num{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;text-align:right;}
+.tbl .name-cell{font-weight:700;color:var(--ink);}
+.tbl .zero{color:var(--ink-faint);font-size:12px;}
+
+/* ── チャート ── */
+.chart-wrap{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-bottom:28px;}
+.chart-title{font-size:13px;font-weight:700;color:var(--ink-mid);margin-bottom:16px;display:flex;align-items:center;gap:7px;}
+.chart-container{position:relative;height:240px;}
+
+/* ── 最近の投稿 ── */
+.recent-list{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;}
+.recent-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);
+  padding:12px 14px;display:flex;align-items:flex-start;gap:10px;
+}
+.recent-jichi{font-size:11px;font-weight:700;color:var(--g-deep);flex-shrink:0;min-width:100px;}
+.recent-text{font-size:13px;color:var(--ink-mid);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.recent-time{font-size:11px;color:var(--ink-faint);font-family:'DM Mono',monospace;flex-shrink:0;}
+.recent-likes{font-size:12px;color:#e05a7a;flex-shrink:0;display:flex;align-items:center;gap:3px;}
+
+/* ── フッター ── */
+.footer-bar{text-align:center;font-size:11px;color:var(--ink-faint);margin-top:20px;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;}
+
+/* ── ローディング ── */
+.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--g-mid);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px;}
+.spinner-sm{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:4px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-wrap{padding:60px 0;text-align:center;color:var(--ink-faint);font-size:13px;}
+.err-msg{background:var(--red-pale);border:1px solid var(--red);border-radius:var(--r-md);padding:12px 16px;font-size:13px;color:var(--red);margin-bottom:16px;}
+
+/* ── レスポンシブ ── */
+@media(max-width:600px){
+  .summary-grid{grid-template-columns:1fr 1fr;}
+  .tbl th,.tbl td{padding:8px 8px;font-size:12px;}
+  .hdr-title{font-size:13px;}
+}
+
+/* ── フォントサイズ拡大（iPad / タブレット 768px+） ── */
+@media(min-width:768px){
+  .hdr-title      { font-size: 15px; }
+  .hdr-badge      { font-size: 11px; }
+  .hdr-btn        { font-size: 14px; }
+  .auth-title     { font-size: 20px; }
+  .auth-sub       { font-size: 13px; }
+  .auth-input     { font-size: 16px; }
+  .auth-btn       { font-size: 15px; }
+  .auth-err       { font-size: 13px; }
+  .sec-head       { font-size: 14px; }
+  .sum-label      { font-size: 12px; }
+  .sum-num        { font-size: 32px; }
+  .sum-unit       { font-size: 13px; }
+  .sum-sub        { font-size: 12px; }
+  .period-label   { font-size: 13px; }
+  .period-btn     { font-size: 14px; }
+  .range-input    { font-size: 14px; }
+  .range-sep      { font-size: 14px; }
+  .tbl            { font-size: 14px; }
+  .tbl th         { font-size: 12.5px; }
+  .tbl .num       { font-size: 15px; }
+  .tbl .zero      { font-size: 13px; }
+  .chart-title    { font-size: 14px; }
+  .recent-jichi   { font-size: 12px; }
+  .recent-text    { font-size: 14px; }
+  .recent-time    { font-size: 12px; }
+  .recent-likes   { font-size: 13px; }
+  .footer-bar     { font-size: 12px; }
+  .loading-wrap   { font-size: 14px; }
+  .err-msg        { font-size: 14px; }
+}
+
+/* ── フォントサイズ拡大（PC 1200px+） ── */
+@media(min-width:1200px){
+  .hdr-title      { font-size: 16px; }
+  .auth-btn       { font-size: 16px; }
+  .sec-head       { font-size: 15px; }
+  .sum-label      { font-size: 13px; }
+  .sum-num        { font-size: 36px; }
+  .sum-unit       { font-size: 14px; }
+  .period-label   { font-size: 14px; }
+  .period-btn     { font-size: 15px; }
+  .tbl            { font-size: 15px; }
+  .tbl th         { font-size: 13px; }
+  .tbl .num       { font-size: 16px; }
+  .chart-title    { font-size: 15px; }
+  .recent-jichi   { font-size: 13px; }
+  .recent-text    { font-size: 15px; }
+  .footer-bar     { font-size: 13px; }
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-title">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="14" width="4" height="7" rx="1"/><rect x="10" y="9" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="17" rx="1"/></svg>
+      <span class="hdr-title-text">自治会ボード管理ダッシュボード</span>
+      <span class="hdr-badge">管理者専用</span>
+    </div>
+    <div class="hdr-actions">
+      <a class="hdr-btn" href="index.html">← ボードに戻る</a>
+      <button class="hdr-btn" id="logout-btn" onclick="doLogout()" hidden>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        ログアウト
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- 認証ゲート -->
+<div id="auth-gate">
+  <div class="main">
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-icon">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg>
+        </div>
+        <div class="auth-title">管理者ログイン</div>
+        <div class="auth-sub">このダッシュボードは運営担当者専用です。<br>パスワードを入力してください。</div>
+        <input class="auth-input" id="dash-pass" type="password" placeholder="ダッシュボードパスワード"
+          onkeydown="if(event.key==='Enter')doAuth()">
+        <button class="auth-btn" onclick="doAuth()">ログイン</button>
+        <div class="auth-err" id="auth-err">パスワードが正しくありません</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ダッシュボード本体 -->
+<div id="dashboard" hidden>
+  <div class="main">
+
+    <!-- サマリーカード -->
+    <div class="sec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      全体サマリー
+    </div>
+    <div class="summary-grid">
+      <div class="sum-card c-visitors">
+        <div class="sum-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="sum-label">全期間ユニーク訪問者</div>
+        <div class="sum-num" id="s-total-visitors">—<span class="sum-unit">人</span></div>
+        <div class="sum-sub" id="s-total-visitors-sub"></div>
+      </div>
+      <div class="sum-card c-monthly">
+        <div class="sum-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="sum-label">今月のユニーク訪問者</div>
+        <div class="sum-num" id="s-month-visitors">—<span class="sum-unit">人</span></div>
+        <div class="sum-sub" id="s-month-visitors-sub"></div>
+      </div>
+      <div class="sum-card c-posts">
+        <div class="sum-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="sum-label">総投稿数</div>
+        <div class="sum-num" id="s-posts">—<span class="sum-unit">件</span></div>
+        <div class="sum-sub" id="s-posts-sub"></div>
+      </div>
+      <div class="sum-card c-likes">
+        <div class="sum-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <div class="sum-label">総いいね数</div>
+        <div class="sum-num" id="s-likes">—<span class="sum-unit">件</span></div>
+        <div class="sum-sub" id="s-likes-sub"></div>
+      </div>
+    </div>
+
+    <!-- 期間セレクタ -->
+    <div class="period-bar">
+      <span class="period-label">表示期間：</span>
+      <button class="period-btn active" id="pb-month" onclick="setPeriod('month')">今月</button>
+      <button class="period-btn" id="pb-prev" onclick="setPeriod('prev')">先月</button>
+      <button class="period-btn" id="pb-all" onclick="setPeriod('all')">全期間</button>
+      <button class="period-btn" id="pb-custom" onclick="setPeriod('custom')">カスタム</button>
+      <div class="range-wrap" id="custom-range">
+        <input type="month" id="range-start" class="range-input" onchange="applyCustomRange()">
+        <span class="range-sep">〜</span>
+        <input type="month" id="range-end" class="range-input" onchange="applyCustomRange()">
+      </div>
+    </div>
+
+    <!-- 訪問者バーチャート -->
+    <div class="chart-wrap">
+      <div class="chart-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        自治会別 訪問者数（選択期間）
+      </div>
+      <div class="chart-container"><canvas id="visitor-chart"></canvas></div>
+    </div>
+
+    <!-- 自治会別テーブル -->
+    <div class="sec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      自治会別詳細
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th class="sortable" onclick="sortTable('num')"># <span class="sort-arrow" id="sa-num">▲</span></th>
+            <th>自治会名</th>
+            <th class="sortable" style="text-align:right" onclick="sortTable('periodVisitors')">
+              訪問者数 <span class="sort-arrow" id="sa-periodVisitors"></span><br>
+              <span id="th-period-label" style="font-size:10px;font-weight:400;opacity:0.7">今月</span>
+            </th>
+            <th class="sortable" style="text-align:right" onclick="sortTable('totalVisitors')">全期間<br>訪問者 <span class="sort-arrow" id="sa-totalVisitors"></span></th>
+            <th class="sortable" style="text-align:right" onclick="sortTable('posts')">投稿数 <span class="sort-arrow" id="sa-posts"></span></th>
+            <th class="sortable" style="text-align:right" onclick="sortTable('likes')">いいね <span class="sort-arrow" id="sa-likes"></span></th>
+          </tr>
+        </thead>
+        <tbody id="jichi-tbody">
+          <tr><td colspan="6" class="loading-wrap"><div class="spinner"></div>読み込み中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- いいねランキングチャート -->
+    <div class="chart-wrap">
+      <div class="chart-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="#e05a7a" stroke="#e05a7a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        自治会別 いいね数（全期間）
+      </div>
+      <div class="chart-container"><canvas id="likes-chart"></canvas></div>
+    </div>
+
+    <!-- 最近の投稿 -->
+    <div class="sec-head">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      最近の投稿（全自治会）
+    </div>
+    <div id="recent-list" class="recent-list">
+      <div class="loading-wrap"><div class="spinner"></div>読み込み中...</div>
+    </div>
+
+    <div class="footer-bar">
+      <span>最終更新：<span id="last-updated">—</span></span>
+      <button class="hdr-btn" id="refresh-btn" onclick="reloadData()" style="font-size:12px;padding:4px 12px;color:var(--g-deep);background:var(--g-pale);border-color:var(--border);">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        <span id="refresh-label">データ更新</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ━━━━━ 設定 ━━━━━ */
+var DASH_PASS = "yomitan-jichikai";
+var FB_CFG = {
+  apiKey:"AIzaSyBuqb9l1sNOC8rV5bnbsB0IGQY02mm7NOk",
+  authDomain:"yomitan-jichikai-board.firebaseapp.com",
+  projectId:"yomitan-jichikai-board",
+  storageBucket:"yomitan-jichikai-board.firebasestorage.app",
+  messagingSenderId:"374597777571",
+  appId:"1:374597777571:web:a2937dfb13b8f11b226716"
+};
+
+var JICHIKAI=[
+  {id:"j01",name:"長浜自治会"},{id:"j02",name:"瀬名波自治会"},{id:"j03",name:"宇座自治会"},
+  {id:"j04",name:"儀間自治会"},{id:"j05",name:"渡慶次自治会"},{id:"j06",name:"高志保自治会"},
+  {id:"j07",name:"波平自治会"},{id:"j08",name:"上地自治会"},{id:"j09",name:"都屋自治会"},
+  {id:"j10",name:"喜名自治会"},{id:"j11",name:"親志自治会"},{id:"j12",name:"座喜味自治会"},
+  {id:"j13",name:"横田自治会"},{id:"j14",name:"楚辺自治会"},{id:"j15",name:"大添自治会"},
+  {id:"j16",name:"大木自治会"},{id:"j17",name:"伊良皆自治会"},{id:"j18",name:"牧原自治会"},
+  {id:"j19",name:"長田自治会"},{id:"j20",name:"渡具知自治会"},{id:"j21",name:"古堅自治会"},
+  {id:"j22",name:"大湾自治会"},{id:"j23",name:"比謝矼自治会"},{id:"j24",name:"比謝自治会"}
+];
+
+/* 表示順インデックス */
+var JICHI_ORDER={};
+JICHIKAI.forEach(function(j,i){JICHI_ORDER[j.id]=i;});
+
+/* ━━━━━ 状態 ━━━━━ */
+var db=null;
+var currentPeriod="month";
+var allData={siteStats:null,jichiStats:{},messages:[]};
+var visitorChart=null,likesChart=null;
+var sortBy="num",sortDir=1;
+
+/* ━━━━━ 認証 ━━━━━ */
+function doAuth(){
+  var f=document.getElementById("dash-pass");
+  var err=document.getElementById("auth-err");
+  if(f.value===DASH_PASS){
+    try{sessionStorage.setItem("dash_auth","1");}catch(e){}
+    showDashboard();
+  } else {
+    f.value="";f.focus();
+    err.style.display="block";
+    setTimeout(function(){err.style.display="none";},2500);
+  }
+}
+
+function showDashboard(){
+  document.getElementById("auth-gate").hidden=true;
+  document.getElementById("dashboard").hidden=false;
+  document.getElementById("logout-btn").hidden=false;
+  initDashboard();
+}
+
+function doLogout(){
+  try{sessionStorage.removeItem("dash_auth");}catch(e){}
+  allData={siteStats:null,jichiStats:{},messages:[]};
+  document.getElementById("dashboard").hidden=true;
+  document.getElementById("auth-gate").hidden=false;
+  document.getElementById("logout-btn").hidden=true;
+  document.getElementById("dash-pass").value="";
+  if(visitorChart){visitorChart.destroy();visitorChart=null;}
+  if(likesChart){likesChart.destroy();likesChart=null;}
+  document.getElementById("jichi-tbody").innerHTML=
+    '<tr><td colspan="6" class="loading-wrap"><div class="spinner"></div>読み込み中...</td></tr>';
+  document.getElementById("recent-list").innerHTML=
+    '<div class="loading-wrap"><div class="spinner"></div>読み込み中...</div>';
+  document.getElementById("last-updated").textContent="—";
+}
+
+/* ━━━━━ Firebase初期化 ━━━━━ */
+function initDashboard(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FB_CFG);
+    db=firebase.firestore();
+    loadAllData();
+  }catch(e){
+    showErr("Firebase初期化エラー: "+e.message);
+  }
+}
+
+function showErr(msg){
+  var el=document.createElement("div");
+  el.className="err-msg";el.textContent=msg;
+  var m=document.querySelector("#dashboard .main");
+  if(m) m.prepend(el);
+}
+
+/* ━━━━━ データ読み込み ━━━━━ */
+function loadAllData(){
+  var p1=db.collection("siteStats").doc("global").get();
+  var p2=db.collection("jichiStats").get();
+  var p3=db.collection("messages").orderBy("timestamp","desc").limit(500).get();
+
+  Promise.all([p1,p2,p3]).then(function(results){
+    allData.siteStats=results[0].exists?results[0].data():{};
+    allData.jichiStats={};
+    results[1].forEach(function(d){allData.jichiStats[d.id]=d.data();});
+    allData.messages=results[2].docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderAll();
+    document.getElementById("last-updated").textContent=new Date().toLocaleString("ja-JP");
+  }).catch(function(e){
+    showErr("データ読み込みエラー: "+e.message);
+  });
+}
+
+function reloadData(){
+  if(!db) return;
+  var btn=document.getElementById("refresh-btn");
+  var lbl=document.getElementById("refresh-label");
+  if(btn) btn.disabled=true;
+  if(lbl) lbl.textContent="更新中...";
+  loadAllData();
+  setTimeout(function(){
+    if(btn) btn.disabled=false;
+    if(lbl) lbl.textContent="データ更新";
+  },2000);
+}
+
+/* ━━━━━ 期間キー ━━━━━ */
+function curMonthKey(){var d=new Date();return"m_"+d.getFullYear()+"_"+(d.getMonth()+1);}
+function prevMonthKey(){var d=new Date();d.setMonth(d.getMonth()-1);return"m_"+d.getFullYear()+"_"+(d.getMonth()+1);}
+
+function customMonthKeys(){
+  var sv=document.getElementById("range-start").value;
+  var ev=document.getElementById("range-end").value;
+  if(!sv||!ev) return [];
+  if(sv>ev){var t=sv;sv=ev;ev=t;}
+  var keys=[];
+  var sy=parseInt(sv),sm=parseInt(sv.split("-")[1]);
+  var ey=parseInt(ev),em=parseInt(ev.split("-")[1]);
+  sy=parseInt(sv.split("-")[0]);
+  ey=parseInt(ev.split("-")[0]);
+  var y=sy,m=sm;
+  while(y<ey||(y===ey&&m<=em)){
+    keys.push("m_"+y+"_"+m);
+    m++;if(m>12){m=1;y++;}
+    if(y>ey+2) break;
+  }
+  return keys;
+}
+
+function getPeriodLabel(){
+  if(currentPeriod==="month"){var d=new Date();return(d.getMonth()+1)+"月";}
+  if(currentPeriod==="prev"){var d=new Date();d.setMonth(d.getMonth()-1);return(d.getMonth()+1)+"月";}
+  if(currentPeriod==="custom"){
+    var sv=document.getElementById("range-start").value;
+    var ev=document.getElementById("range-end").value;
+    if(sv&&ev){
+      return sv.replace("-","年")+"月〜"+ev.replace("-","年")+"月";
+    }
+    return "カスタム";
+  }
+  return "全期間";
+}
+
+/* ━━━━━ 期間切り替え ━━━━━ */
+function setPeriod(p){
+  currentPeriod=p;
+  ["month","prev","all","custom"].forEach(function(id){
+    var btn=document.getElementById("pb-"+id);
+    if(btn) btn.classList.toggle("active",p===id);
+  });
+  var cr=document.getElementById("custom-range");
+  if(cr) cr.style.display=p==="custom"?"flex":"none";
+  if(p==="custom"){
+    var d=new Date();
+    var ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+    var rs=document.getElementById("range-start");
+    var re=document.getElementById("range-end");
+    if(!rs.value) rs.value=ym;
+    if(!re.value) re.value=ym;
+  }
+  document.getElementById("th-period-label").textContent=getPeriodLabel();
+  renderTable();
+  renderCharts();
+}
+
+function applyCustomRange(){
+  var sv=document.getElementById("range-start").value;
+  var ev=document.getElementById("range-end").value;
+  if(sv&&ev){
+    document.getElementById("th-period-label").textContent=getPeriodLabel();
+    renderTable();
+    renderCharts();
+  }
+}
+
+/* ━━━━━ 訪問者数を期間から取得 ━━━━━ */
+function getVisitorCount(stats){
+  if(!stats) return 0;
+  if(currentPeriod==="all") return stats.total||0;
+  if(currentPeriod==="month") return stats[curMonthKey()]||0;
+  if(currentPeriod==="prev") return stats[prevMonthKey()]||0;
+  if(currentPeriod==="custom"){
+    return customMonthKeys().reduce(function(sum,mk){return sum+(stats[mk]||0);},0);
+  }
+  return 0;
+}
+
+/* ━━━━━ メッセージ集計 ━━━━━ */
+function aggregateMsgs(){
+  var byJichi={};
+  JICHIKAI.forEach(function(j){byJichi[j.id]={posts:0,likes:0};});
+  allData.messages.forEach(function(m){
+    if(!byJichi[m.jichiId]) byJichi[m.jichiId]={posts:0,likes:0};
+    byJichi[m.jichiId].posts++;
+    byJichi[m.jichiId].likes+=(m.likes||0);
+  });
+  return byJichi;
+}
+
+/* ━━━━━ サマリー描画 ━━━━━ */
+function renderSummary(){
+  var s=allData.siteStats||{};
+  var d=new Date();
+  var mk=curMonthKey();
+  var curMonthLabel=(d.getMonth()+1)+"月";
+  var totalVisitors=s.total||0;
+  var monthVisitors=s[mk]||0;
+  var totalLikes=allData.messages.reduce(function(a,m){return a+(m.likes||0);},0);
+  var totalPosts=allData.messages.length;
+  var monthStart=new Date();monthStart.setDate(1);monthStart.setHours(0,0,0,0);
+  var monthPosts=allData.messages.filter(function(m){
+    if(!m.timestamp) return false;
+    var t=m.timestamp.toDate?m.timestamp.toDate():new Date(m.timestamp);
+    return t>=monthStart;
+  }).length;
+
+  setText("s-total-visitors",totalVisitors.toLocaleString());
+  setText("s-total-visitors-sub","全自治会への累計訪問");
+  setText("s-month-visitors",monthVisitors.toLocaleString());
+  setText("s-month-visitors-sub","今月（"+curMonthLabel+"）の訪問");
+  setText("s-posts",totalPosts.toLocaleString());
+  setText("s-posts-sub","今月 "+monthPosts+"件 / 総計 "+totalPosts+"件");
+  setText("s-likes",totalLikes.toLocaleString());
+}
+
+function setText(id,v){
+  var el=document.getElementById(id);
+  if(el){var n=el.querySelector(".sum-unit");el.innerHTML=v+(n?n.outerHTML:"");}
+}
+
+/* ━━━━━ ソート ━━━━━ */
+function sortTable(col){
+  if(sortBy===col){
+    sortDir=-sortDir;
+  } else {
+    sortBy=col;
+    sortDir=col==="num"?1:-1;
+  }
+  updateSortIndicators();
+  renderTable();
+}
+
+function updateSortIndicators(){
+  ["num","periodVisitors","totalVisitors","posts","likes"].forEach(function(c){
+    var el=document.getElementById("sa-"+c);
+    if(!el) return;
+    el.textContent=sortBy===c?(sortDir===1?"▲":"▼"):"";
+  });
+}
+
+/* ━━━━━ テーブル描画 ━━━━━ */
+function renderTable(){
+  if(!allData.siteStats&&Object.keys(allData.jichiStats).length===0) return;
+  var msgs=aggregateMsgs();
+  var rows=JICHIKAI.map(function(j){
+    var s=allData.jichiStats[j.id]||{};
+    var pm=msgs[j.id]||{};
+    return{id:j.id,name:j.name,periodVisitors:getVisitorCount(s),totalVisitors:s.total||0,posts:pm.posts||0,likes:pm.likes||0};
+  });
+  rows.sort(function(a,b){
+    if(sortBy==="num") return(JICHI_ORDER[a.id]-JICHI_ORDER[b.id])*sortDir;
+    var diff=(a[sortBy]-b[sortBy])*sortDir;
+    return diff||(JICHI_ORDER[a.id]-JICHI_ORDER[b.id]);
+  });
+  var html=rows.map(function(r,i){
+    var pv=r.periodVisitors>0?'<span class="num">'+r.periodVisitors+'</span>':'<span class="zero">0</span>';
+    var tv=r.totalVisitors>0?'<span class="num">'+r.totalVisitors+'</span>':'<span class="zero">0</span>';
+    var ps=r.posts>0?'<span class="num">'+r.posts+'</span>':'<span class="zero">0</span>';
+    var lk=r.likes>0?'<span class="num" style="color:#e05a7a">'+r.likes+'</span>':'<span class="zero">0</span>';
+    return'<tr>'
+      +'<td style="color:var(--ink-faint);font-size:12px;font-family:\'DM Mono\',monospace">'+(i+1)+'</td>'
+      +'<td class="name-cell">'+esc(r.name)+'</td>'
+      +'<td style="text-align:right">'+pv+'</td>'
+      +'<td style="text-align:right">'+tv+'</td>'
+      +'<td style="text-align:right">'+ps+'</td>'
+      +'<td style="text-align:right">'+lk+'</td>'
+      +'</tr>';
+  }).join("");
+  document.getElementById("jichi-tbody").innerHTML=html||'<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--ink-faint)">データなし</td></tr>';
+}
+
+/* ━━━━━ チャート描画 ━━━━━ */
+function renderCharts(){
+  var msgs=aggregateMsgs();
+  var rows=JICHIKAI.map(function(j){
+    var s=allData.jichiStats[j.id]||{};
+    var pm=msgs[j.id]||{};
+    return{name:j.name.replace("自治会",""),periodVisitors:getVisitorCount(s),likes:pm.likes||0};
+  }).filter(function(r){return r.periodVisitors>0||r.likes>0;});
+  rows.sort(function(a,b){return b.periodVisitors-a.periodVisitors;});
+  var top=rows.slice(0,15);
+
+  if(visitorChart) visitorChart.destroy();
+  var vCtx=document.getElementById("visitor-chart").getContext("2d");
+  visitorChart=new Chart(vCtx,{
+    type:"bar",
+    data:{
+      labels:top.map(function(r){return r.name;}),
+      datasets:[{
+        label:"訪問者数（"+getPeriodLabel()+"）",
+        data:top.map(function(r){return r.periodVisitors;}),
+        backgroundColor:"rgba(45,143,84,0.7)",
+        borderColor:"rgba(45,143,84,1)",
+        borderWidth:1,borderRadius:4
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{beginAtZero:true,ticks:{precision:0,color:getCssVar("--ink-light")},grid:{color:getCssVar("--border")}},
+        x:{ticks:{color:getCssVar("--ink-mid"),font:{size:11}},grid:{display:false}}
+      }
+    }
+  });
+
+  var likeRows=JICHIKAI.map(function(j){
+    var pm=msgs[j.id]||{};
+    return{name:j.name.replace("自治会",""),likes:pm.likes||0};
+  }).filter(function(r){return r.likes>0;});
+  likeRows.sort(function(a,b){return b.likes-a.likes;});
+  var topLike=likeRows.slice(0,15);
+
+  if(likesChart) likesChart.destroy();
+  var lCtx=document.getElementById("likes-chart").getContext("2d");
+  likesChart=new Chart(lCtx,{
+    type:"bar",
+    data:{
+      labels:topLike.map(function(r){return r.name;}),
+      datasets:[{
+        label:"いいね数",
+        data:topLike.map(function(r){return r.likes;}),
+        backgroundColor:"rgba(224,90,122,0.7)",
+        borderColor:"rgba(224,90,122,1)",
+        borderWidth:1,borderRadius:4
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{beginAtZero:true,ticks:{precision:0,color:getCssVar("--ink-light")},grid:{color:getCssVar("--border")}},
+        x:{ticks:{color:getCssVar("--ink-mid"),font:{size:11}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+function getCssVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim()||"#ccc";
+}
+
+/* ━━━━━ 最近の投稿 ━━━━━ */
+function renderRecent(){
+  var jichiMap={};JICHIKAI.forEach(function(j){jichiMap[j.id]=j.name;});
+  var recent=allData.messages.slice(0,10);
+  if(!recent.length){
+    document.getElementById("recent-list").innerHTML='<div style="text-align:center;color:var(--ink-faint);padding:20px;">投稿がありません</div>';
+    return;
+  }
+  var heartSvg='<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+  var html=recent.map(function(m){
+    var t=m.timestamp&&m.timestamp.toDate?m.timestamp.toDate():new Date(m.timestamp);
+    var ds=t.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    var txt=(m.text||"").replace(/\n/g," ").trim();
+    if(txt.length>60) txt=txt.slice(0,60)+"…";
+    var jname=jichiMap[m.jichiId]||m.jichiId;
+    return'<div class="recent-card">'
+      +'<span class="recent-jichi">'+esc(jname)+'</span>'
+      +'<span class="recent-text">'+esc(txt)+'</span>'
+      +'<span class="recent-time">'+ds+'</span>'
+      +((m.likes>0)?'<span class="recent-likes">'+heartSvg+m.likes+'</span>':"")
+      +'</div>';
+  }).join("");
+  document.getElementById("recent-list").innerHTML=html;
+}
+
+/* ━━━━━ 全体描画 ━━━━━ */
+function renderAll(){
+  renderSummary();
+  updateSortIndicators();
+  renderTable();
+  renderCharts();
+  renderRecent();
+  document.getElementById("th-period-label").textContent=getPeriodLabel();
+}
+
+/* ━━━━━ ユーティリティ ━━━━━ */
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+/* ━━━━━ 起動 ━━━━━ */
+document.addEventListener("DOMContentLoaded",function(){
+  document.getElementById("dash-pass").addEventListener("keydown",function(e){
+    if(e.key==="Enter") doAuth();
+  });
+  try{
+    if(sessionStorage.getItem("dash_auth")==="1") showDashboard();
+  }catch(e){}
+});
+</script>
+</body>
+</html>
