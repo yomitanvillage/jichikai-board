@@ -125,24 +125,38 @@ body { font-family: "M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sa
 .visitor-suffix { font-size: 11px; color: var(--ink-faint); }
 
 /* ── セクションラベル ── */
-.section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-light); text-transform: uppercase; margin-bottom: 8px; }
+.section-label { font-size: 13px; font-weight: 700; color: var(--ink-mid); margin-bottom: 10px; }
 
-/* ── ソート切替ボタン ── */
-.sort-toggle-btn {
-  margin-left: auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 3px 10px 3px 8px;
-  font-size: 10px; font-weight: 700; font-family: inherit;
+/* ── ソートセグメント ── */
+.sort-tabs {
+  margin-left: auto; flex-shrink: 0;
+  display: flex;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  padding: 3px;
+  gap: 2px;
+}
+.sort-tab {
+  background: transparent; border: none; border-radius: 20px;
+  padding: 5px 13px;
+  font-size: 12px; font-weight: 700; font-family: inherit;
   color: var(--ink-light);
   cursor: pointer;
-  display: flex; align-items: center; gap: 4px;
+  display: flex; align-items: center; gap: 5px;
   white-space: nowrap;
-  transition: background 0.1s, border-color 0.1s, color 0.1s;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
 }
-.sort-toggle-btn:hover { background: var(--green-faint); border-color: var(--green-mid); color: var(--green-deep); }
-.sort-toggle-btn.sort-active { background: var(--green-pale); border-color: var(--green-mid); color: var(--green-deep); }
+.sort-tab:hover { color: var(--ink-mid); }
+.sort-tab.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+.sort-tab.sort-newest.active {
+  background: var(--green-pale);
+  color: var(--green-deep);
+}
 
 /* ── お気に入りバナー ── */
 .fav-banner {
@@ -900,28 +914,29 @@ function getSortedJList(){
   }
   return jList;
 }
-function _sortBtnInner(){
-  if(currentSort==="newest")
-    return'<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10V6z" clip-rule="evenodd"/></svg> 新着順';
+function _sortDefaultLabel(){
   if(userLat)
-    return'<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg> 距離順';
-  return'<svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg> 番号順';
+    return'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg> 距離順';
+  return'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg> 番号順';
 }
-function toggleSort(){
-  currentSort=currentSort==="newest"?"default":"newest";
-  // グリッドとボタンだけ差し替え（ページ全体を再描画しない）
+function _updateSortTabs(){
+  var t0=document.querySelector(".sort-tab:not(.sort-newest)");
+  var t1=document.querySelector(".sort-tab.sort-newest");
+  if(!t0||!t1) return;
+  t0.className="sort-tab"+(currentSort!=="newest"?" active":"");
+  t0.innerHTML=_sortDefaultLabel();
+  t1.className="sort-tab sort-newest"+(currentSort==="newest"?" active":"");
+}
+function setSort(mode){
+  if(currentSort===mode) return;
+  currentSort=mode;
   var jList=getSortedJList();
   var grid=document.getElementById("sticky-grid");
   if(grid){
-    var html="";
-    jList.forEach(function(j){ html+=buildStickyCard(j,j.dist,userLat!==null); });
+    var html=""; jList.forEach(function(j){ html+=buildStickyCard(j,j.dist,userLat!==null); });
     grid.innerHTML=html;
   }
-  var btn=document.getElementById("sort-toggle-btn");
-  if(btn){
-    btn.innerHTML=_sortBtnInner();
-    btn.className="sort-toggle-btn"+(currentSort==="newest"?" sort-active":"");
-  }
+  _updateSortTabs();
 }
 
 /* ── リスト表示 ── */
@@ -962,9 +977,14 @@ function renderListView(){
 
   /* 全自治会グリッド */
   var jList=getSortedJList();
-  html+='<div class="section-label" style="display:flex;align-items:center;gap:6px">'
+  html+='<div class="section-label" style="display:flex;align-items:center;gap:8px">'
     +ICN_HOME+' 自治会ボード一覧'
-    +'<button id="sort-toggle-btn" class="sort-toggle-btn'+(currentSort==="newest"?" sort-active":"")+'" onclick="toggleSort()">'+_sortBtnInner()+'</button>'
+    +'<div class="sort-tabs">'
+    +'<button class="sort-tab'+(currentSort!=="newest"?" active":"")+'" onclick="setSort(\'default\')">'+_sortDefaultLabel()+'</button>'
+    +'<button class="sort-tab sort-newest'+(currentSort==="newest"?" active":"")+'" onclick="setSort(\'newest\')">'
+    +'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10V6z" clip-rule="evenodd"/></svg> 新着順'
+    +'</button>'
+    +'</div>'
     +'</div>';
   html+='<div class="sticky-grid" id="sticky-grid">';
   jList.forEach(function(j){ html+=buildStickyCard(j,j.dist,userLat!==null); subscribeMsgs(j.id); });
