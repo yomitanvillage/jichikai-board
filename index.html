@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>読谷村 自治会ボード</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
@@ -36,14 +36,14 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { font-size: 16px; }
-body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; overscroll-behavior: none; }
+body { font-family: "M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans",system-ui,sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; overscroll-behavior: none; }
 
 /* ── ヘッダー ── */
 .header { background: var(--green-deep); padding: 0 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
 .header-inner { max-width: 480px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 52px; }
 .logo { display: flex; align-items: center; gap: 10px; }
 .logo-icon { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.logo-text h1 { font-size: 15px; font-weight: 700; color: white; line-height: 1.2; font-family: 'Noto Serif JP', serif; }
+.logo-text h1 { font-size: 15px; font-weight: 800; color: white; line-height: 1.2; }
 .logo-text p  { font-size: 10px; color: rgba(255,255,255,0.55); }
 .menu-btn { background: rgba(255,255,255,0.15); border: none; border-radius: 8px; height: 38px; padding: 0 12px; cursor: pointer; color: white; font-size: 18px; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 
@@ -56,6 +56,17 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .loc-text { flex: 1; font-size: 12px; color: var(--ink-light); }
 .loc-text strong { color: var(--green-deep); font-size: 12px; }
 .loc-btn { background: var(--green-deep); color: white; border: none; border-radius: var(--radius-sm); padding: 5px 11px; font-size: 12px; font-family: inherit; cursor: pointer; white-space: nowrap; font-weight: 500; }
+
+/* ── 訪問者カウンターバー ── */
+.visitor-bar { display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--surface); border-radius: var(--radius-md); border: 1.5px solid var(--border); padding: 8px 14px; margin-bottom: 14px; }
+.visitor-icon { color: var(--green-mid); display: flex; align-items: center; flex-shrink: 0; }
+.visitor-stats { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-light); }
+.visitor-stat { display: flex; align-items: baseline; gap: 2px; }
+.visitor-label { font-size: 11px; color: var(--ink-light); }
+.visitor-num { font-size: 16px; font-weight: 700; color: var(--green-deep); font-family: 'DM Mono', monospace; line-height: 1; }
+.visitor-unit { font-size: 11px; color: var(--ink-mid); }
+.visitor-sep { font-size: 13px; color: var(--border); font-weight: 300; }
+.visitor-suffix { font-size: 11px; color: var(--ink-faint); }
 
 /* ── セクションラベル ── */
 .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-light); text-transform: uppercase; margin-bottom: 8px; }
@@ -71,33 +82,50 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .fav-banner-icon { font-size: 22px; flex-shrink: 0; }
 .fav-banner-info { flex: 1; min-width: 0; }
 .fav-banner-label { font-size: 10px; color: rgba(255,255,255,0.7); font-weight: 700; letter-spacing: 0.08em; }
-.fav-banner-name { font-size: 16px; font-weight: 700; color: white; font-family: 'Noto Serif JP', serif; }
+.fav-banner-name { font-size: 16px; font-weight: 800; color: white; }
 .fav-banner-arrow { color: rgba(255,255,255,0.7); font-size: 18px; flex-shrink: 0; }
 .fav-banner-badge { background: rgba(255,255,255,0.25); color: white; font-size: 14px; font-weight: 700; padding: 4px 11px; border-radius: 20px; flex-shrink: 0; }
 
 /* ── 自治会リスト ── */
-.jichi-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-.jichi-item { background: var(--surface); border-radius: var(--radius-md); border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s; overflow: hidden; }
-.jichi-item:hover { border-color: var(--green-soft); }
-.jichi-item.active { border-color: var(--green-mid); border-width: 2px; }
-.jichi-item-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; }
-.jichi-dist { min-width: 46px; text-align: center; flex-shrink: 0; }
-.dist-n { font-size: 16px; font-weight: 600; color: var(--green-mid); font-family: 'DM Mono', monospace; }
-.dist-u { font-size: 9px; color: var(--ink-light); display: block; }
-.jichi-idx { font-size: 11px; color: var(--ink-faint); font-family: 'DM Mono', monospace; min-width: 46px; text-align: center; flex-shrink: 0; }
-.jichi-info { flex: 1; min-width: 0; }
-.jichi-name { font-size: 14px; font-weight: 700; color: var(--ink); }
-.jichi-addr { font-size: 11px; color: var(--ink-light); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* ── バッジ（件数 + 色で時期） ── */
-.jichi-badge { font-size: 14px; font-weight: 700; padding: 4px 11px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+/* ── 付箋グリッド（2カラム）── */
+.sticky-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.sticky-card { background: var(--surface); border-radius: var(--radius-md); border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; position: relative; }
+.sticky-card:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+.sticky-card.fav-card { border: 2px solid var(--amber); }
+.sticky-top-bar { height: 5px; border-radius: 0; }
+/* 鮮度別カラー */
+.fresh-today  .sticky-top-bar { background: var(--green-mid); }
+.fresh-today  { background: #ffffff; }
+.fresh-week   .sticky-top-bar { background: #2a6cb5; }
+.fresh-week   { background: #fafcff; }
+.fresh-month  .sticky-top-bar { background: var(--amber); }
+.fresh-month  { background: #fffdf5; }
+.fresh-old    .sticky-top-bar { background: #bbb; }
+.fresh-old    { background: #f9f9f7; }
+.fresh-none   .sticky-top-bar { background: #ddd; }
+.fresh-none   { background: #f8f8f8; }
+.sticky-body { padding: 10px 11px 9px; }
+.sticky-name { font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.3; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sticky-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-bottom: 4px; }
+.sticky-badge.bd-today { background: #e8f5ee; color: #1a6b3c; }
+.sticky-badge.bd-week  { background: #e6f0fa; color: #2a6cb5; }
+.sticky-badge.bd-month { background: #fff8e0; color: #c08000; }
+.sticky-badge.bd-old   { background: #f0f0f0; color: #888; }
+.sticky-badge.bd-none  { background: #f0f0f0; color: #bbb; }
+.sticky-count { font-size: 10.5px; color: var(--ink-faint); }
+.sticky-preview { font-size: 11.5px; color: var(--ink-mid); line-height: 1.5; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.06); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-all; }
+.sticky-days { position: absolute; top: 14px; right: 9px; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 8px; }
+.days-today { background: #e8f5ee; color: #1a6b3c; }
+.days-week  { background: #e6f0fa; color: #2a6cb5; }
+.days-month { background: #fff8e0; color: #c08000; }
+.days-old   { background: #f0f0f0; color: #888; }
+.days-none  { background: #f0f0f0; color: #bbb; }
+/* バッジ（メニュー・お気に入りバナー用） */
 .badge-today  { background: #e8f5ee; color: #1a6b3c; }
 .badge-week   { background: #e6f0fa; color: #2a6cb5; }
 .badge-month  { background: #fff8e8; color: #e8a020; }
 .badge-old    { background: #f0f4f8; color: #888; }
 .badge-none   { background: #f0f0f0; color: var(--ink-faint); }
-/* お気に入りカードは左ボーダーで強調 */
-.jichi-item.fav-item { border-left: 4px solid var(--amber); }
 
 /* ── 自治会詳細（展開エリア）── */
 .jichi-detail { display: none; border-top: 1px solid var(--border); padding: 14px; background: var(--green-faint); }
@@ -204,16 +232,18 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
   margin-bottom: 6px;
 }
 .back-btn {
-  background: none; border: none; padding: 0;
-  font-size: 12px; font-weight: 500; font-family: inherit;
-  cursor: pointer; color: var(--ink-faint);
-  display: inline-flex; align-items: center; gap: 4px;
-  margin-bottom: 6px; transition: color 0.12s;
+  background: var(--surface); border: 1.5px solid var(--border);
+  padding: 8px 16px; border-radius: 8px;
+  font-size: 14px; font-weight: 700; font-family: inherit;
+  cursor: pointer; color: var(--ink-mid);
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-bottom: 14px; transition: all 0.15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
-.back-btn:hover { color: var(--green-deep); }
+.back-btn:hover { border-color: var(--green-mid); color: var(--green-deep); background: var(--green-faint); }
 .board-view-name {
   font-size: 24px; font-weight: 700; color: var(--ink);
-  font-family: 'Noto Serif JP', serif;
+  font-weight: 800;
   line-height: 1.3; margin-bottom: 4px;
 }
 
@@ -304,7 +334,7 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .side-menu { position: fixed; top: 0; left: -320px; bottom: 0; width: 300px; background: var(--surface); z-index: 201; transition: left 0.25s ease; display: flex; flex-direction: column; box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
 .side-menu.open { left: 0; }
 .menu-header { background: var(--green-deep); padding: 16px; display: flex; align-items: center; justify-content: space-between; }
-.menu-header h2 { font-size: 15px; color: white; font-family: 'Noto Serif JP', serif; }
+.menu-header h2 { font-size: 15px; color: white; font-weight: 800; }
 .menu-close { background: rgba(255,255,255,0.15); border: none; border-radius: 6px; color: white; font-size: 16px; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .menu-body { flex: 1; overflow-y: auto; padding: 6px 0; }
 .menu-section-title { font-size: 12px; font-weight: 700; letter-spacing: 0.05em; color: var(--ink-faint); padding: 10px 16px 4px; text-transform: uppercase; }
@@ -315,6 +345,24 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 .menu-jichi-num { font-size: 13px; color: var(--ink-faint); font-family: 'DM Mono', monospace; min-width: 26px; flex-shrink: 0; }
 .menu-jichi-name-text { flex: 1; }
 .menu-msg-badge { font-size: 13px; padding: 3px 9px; border-radius: 10px; font-weight: 700; flex-shrink: 0; }
+
+/* ── カテゴリタグ ── */
+.cat-tag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 700; border: 1px solid; margin-right: 4px; vertical-align: middle; flex-shrink: 0; }
+.cat-notice { background: #eef2ff; color: #3b5bdb; border-color: #c5d0fa; }
+.cat-event  { background: #ebfbee; color: #2f9e44; border-color: #b2f2bb; }
+.cat-urgent { background: #fff5f5; color: #c92a2a; border-color: #ffc9c9; }
+
+/* ── 添付画像 ── */
+.msg-img { max-width: 100%; max-height: 280px; border-radius: 10px; border: 1px solid var(--border); margin-top: 10px; display: block; object-fit: contain; cursor: pointer; }
+.msg-card.urgent-cat { border-top: 3px solid #c92a2a; }
+
+/* ── カテゴリフィルターチップ ── */
+.cat-filter-bar { display: flex; gap: 6px; padding: 0 0 12px; flex-wrap: wrap; }
+.cat-chip { padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface); font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; color: var(--ink-light); transition: all 0.15s; }
+.cat-chip.chip-all.active    { border-color: var(--green-mid); background: var(--green-pale); color: var(--green-deep); }
+.cat-chip.chip-notice.active { border-color: #3b5bdb; background: #eef2ff; color: #3b5bdb; }
+.cat-chip.chip-event.active  { border-color: #2f9e44; background: #ebfbee; color: #2f9e44; }
+.cat-chip.chip-urgent.active { border-color: #c92a2a; background: #fff5f5; color: #c92a2a; }
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-GENYF89C83"></script>
@@ -330,21 +378,21 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 <header class="header">
   <div class="header-inner">
     <div class="logo">
-      <div class="logo-icon">🏘️</div>
+      <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path d="M10.707 2.293a1 1 0 0 0-1.414 0l-7 7a1 1 0 0 0 1.414 1.414L4 10.414V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0 1-1h2a1 1 0 0 0 1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-7-7z"/></svg></div>
       <div class="logo-text">
         <h1>読谷村 自治会ボード</h1>
         <p>Yomitan Community Board</p>
       </div>
     </div>
-    <button class="menu-btn" onclick="openMenu()">☰ <span style="font-size:12px;font-weight:700;letter-spacing:0.03em">自治会リスト</span></button>
+    <button class="menu-btn" onclick="openMenu()"><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path fill-rule="evenodd" d="M3 5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zM3 10a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zM3 15a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z" clip-rule="evenodd"/></svg><span style="font-size:12px;font-weight:700;letter-spacing:0.03em">自治会リスト</span></button>
   </div>
 </header>
 
 <div class="menu-overlay" id="menu-overlay" onclick="closeMenu()"></div>
 <nav class="side-menu" id="side-menu">
   <div class="menu-header">
-    <h2>🏘️ 自治会一覧</h2>
-    <button class="menu-close" onclick="closeMenu()">✕</button>
+    <h2><svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M10.707 2.293a1 1 0 0 0-1.414 0l-7 7a1 1 0 0 0 1.414 1.414L4 10.414V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0 1-1h2a1 1 0 0 0 1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-7-7z"/></svg>自治会一覧</h2>
+    <button class="menu-close" onclick="closeMenu()"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414z" clip-rule="evenodd"/></svg></button>
   </div>
   <div class="menu-body" id="menu-body"></div>
 </nav>
@@ -405,6 +453,25 @@ var userLat=null, userLng=null;
 var currentView="list";   // "list" | "board"
 var boardJid=null;        // 現在ボード表示中のjid
 var currentBoardTab="notice"; // "notice" | "condolence" — ボード内タブ状態
+var currentCatFilter="all";   // カテゴリフィルター "all"|"notice"|"event"|"urgent"
+
+/* ── SVGアイコン定数 ── */
+var ICN_NOTICE='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>';
+var ICN_EVENT ='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path fill-rule="evenodd" d="M6 2a1 1 0 0 0-1 1v1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1V3a1 1 0 1 0-2 0v1H7V3a1 1 0 0 0-1-1zm0 5a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2H6z" clip-rule="evenodd"/></svg>';
+var ICN_URGENT='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.645-1.743-2.98l5.58-9.92zM11 13a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-1-8a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0V6a1 1 0 0 0-1-1z" clip-rule="evenodd"/></svg>';
+var ICN_COND  ='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path d="M10 1 C8 3 7 5 7 7 C7 9 8.5 11 10 11 C11.5 11 13 9 13 7 C13 5 12 3 10 1Z M8 11.5 L8 18 Q8 19 9 19 L11 19 Q12 19 12 18 L12 11.5Z"/></svg>';
+var ICN_BELL  ='<svg width="15" height="15" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path d="M10 2a6 6 0 0 0-6 6v3.586l-.707.707A1 1 0 0 0 4 14h12a1 1 0 0 0 .707-1.707L16 11.586V8a6 6 0 0 0-6-6zm0 16a2 2 0 0 0 2-2H8a2 2 0 0 0 2 2z"/></svg>';
+var ICN_MAP   ='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 1 1 9.9 9.9L10 18.9l-4.95-4.95a7 7 0 0 1 0-9.9zM10 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" clip-rule="evenodd"/></svg>';
+var ICN_PHONE ='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path d="M2 3a1 1 0 0 1 1-1h2.153a1 1 0 0 1 .986.836l.74 4.435a1 1 0 0 1-.54 1.06l-1.548.773a11.037 11.037 0 0 0 6.105 6.105l.774-1.548a1 1 0 0 1 1.059-.54l4.435.74a1 1 0 0 1 .836.986V17a1 1 0 0 1-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>';
+var ICN_PHOTO ='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path fill-rule="evenodd" d="M4 5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1.586a1 1 0 0 1-.707-.293l-1.121-1.121A2 2 0 0 0 11.172 3H8.828a2 2 0 0 0-1.414.586L6.293 4.707A1 1 0 0 1 5.586 5H4zm6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" clip-rule="evenodd"/></svg>';
+var ICN_CAM   ='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path fill-rule="evenodd" d="M4 5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1.586a1 1 0 0 1-.707-.293l-1.121-1.121A2 2 0 0 0 11.172 3H8.828a2 2 0 0 0-1.414.586L6.293 4.707A1 1 0 0 1 5.586 5H4zm6 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" clip-rule="evenodd"/></svg>';
+var ICN_HOME  ='<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path d="M10.707 2.293a1 1 0 0 0-1.414 0l-7 7a1 1 0 0 0 1.414 1.414L4 10.414V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0 1-1h2a1 1 0 0 0 1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-7-7z"/></svg>';
+var ICN_MENU  ='<svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path fill-rule="evenodd" d="M3 5a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zM3 10a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zM3 15a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z" clip-rule="evenodd"/></svg>';
+var ICN_CLOSE ='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414z" clip-rule="evenodd"/></svg>';
+var ICN_EDIT  ='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>';
+var ICN_LIST  ='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path fill-rule="evenodd" d="M3 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z" clip-rule="evenodd"/></svg>';
+var ICN_WARN  ='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16zm1-11a1 1 0 1 0-2 0v3.586l-1.707 1.707a1 1 0 0 0 1.414 1.414l2-2A1 1 0 0 0 11 11V7z" clip-rule="evenodd"/></svg>';
+
 var msgCache={}, msgListeners={};
 var db=null, firebaseOk=false;
 
@@ -539,6 +606,49 @@ function buildBadge(jid){
   var cls=age==="today"?"badge-today":age==="week"?"badge-week":age==="month"?"badge-month":"badge-old";
   return{cls:cls,label:cnt+"件"};
 }
+/* ── sticky-grid ヘルパー ── */
+function latestAge(jid){
+  var msgs=getMsgs(jid);
+  if(!msgs.length) return"none";
+  return tsAge(msgs[0].timestamp)||"old";
+}
+function daysLabel(jid){
+  var msgs=getMsgs(jid); if(!msgs.length) return{cls:"days-none",label:"投稿なし"};
+  var d=tsToDate(msgs[0].timestamp);
+  var diff=Math.floor((Date.now()-d.getTime())/86400000);
+  if(diff===0) return{cls:"days-today",label:"今日"};
+  if(diff<=6)  return{cls:"days-week", label:diff+"日前"};
+  if(diff<=30) return{cls:"days-month",label:diff+"日前"};
+  return{cls:"days-old",label:diff+"日前"};
+}
+function buildStickyCard(j,distM,showDist){
+  var age=latestAge(j.id);
+  var msgs=getMsgs(j.id);
+  var cnt=msgs.length;
+  var dl=daysLabel(j.id);
+  var fav=isFav(j.id);
+  var bdCls="bd-"+age;
+  var ageLabel=age==="today"?"今日更新":age==="week"?"今週更新":age==="month"?"今月更新":age==="old"?"1ヶ月以上前":"まだ投稿なし";
+  var distHtml="";
+  if(showDist&&distM!==null){
+    var d=fmtDist(distM);
+    distHtml='<span style="font-size:9.5px;color:var(--ink-faint);font-family:monospace;display:inline-flex;align-items:center;gap:2px;">'+ICN_MAP+' '+d.n+d.u+'</span> ';
+  }
+  var preview="";
+  if(cnt){var pt=msgs[0].text.replace(/\n/g," ").trim();preview=pt.length>30?pt.slice(0,30)+"…":pt;}
+  return'<div class="sticky-card fresh-'+age+(fav?" fav-card":"")+'" id="sc-'+j.id+'" onclick="openBoard(\''+j.id+'\')">'
+    +'<div class="sticky-top-bar"></div>'
+    +'<div class="sticky-body">'
+    +'<div class="sticky-days '+dl.cls+'">'+dl.label+'</div>'
+    +(fav?'<div style="position:absolute;top:12px;left:9px;color:#f59e0b;display:flex"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style="width:12px;height:12px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>':'')
+    +'<div class="sticky-name" style="padding-right:52px'+(fav?';padding-left:16px':'')+'">'+(distHtml)+esc(j.name)+'</div>'
+    +'<span class="sticky-badge '+bdCls+'">'+ageLabel+'</span>'
+    +'<div class="sticky-count">'+(cnt?cnt+'件の投稿':'投稿なし')+'</div>'
+    +(preview?'<div class="sticky-preview">'+esc(preview)+'</div>':'')
+    +'</div>'
+    +'</div>';
+}
+
 /* メニューバッジ用クラス */
 function menuBadgeCls(jid){
   var msgs=getMsgs(jid); if(!msgs.length) return"";
@@ -554,24 +664,34 @@ function menuBadgeCls(jid){
 ══════════════════════════════════════════ */
 function renderMsgList(jid,name){
   var msgs=getMsgs(jid);
-  if(!msgs.length) return'<div class="msg-empty">📭 まだお知らせはありません</div>';
-  return msgs.map(function(m){
+  if(!msgs.length) return'<div class="msg-empty">まだお知らせはありません</div>';
+  var filtered=currentCatFilter==="all"?msgs:msgs.filter(function(m){ return (m.category||"notice")===currentCatFilter; });
+  if(!filtered.length) return'<div class="msg-empty">該当するお知らせはありません</div>';
+  return filtered.map(function(m){
     var age=tsAge(m.timestamp);
     var ageCls=age==="today"?"age-today":age==="week"?"age-week":age==="month"?"age-month":"age-old";
     var ageLabel=age==="today"?"今日":age==="week"?"今週":age==="month"?"今月":"";
     var isHigh=(m.priority==="high");
-    var cardCls="msg-card"+(isHigh?" priority-high":"");
-    var priorityLabel=isHigh?'<span class="msg-priority-label">🔴 重要</span>':"";
+    var cat=m.category||"notice";
+    var isUrgent=(cat==="urgent");
+    var cardCls="msg-card"+(isHigh?" priority-high":"")+(isUrgent?" urgent-cat":"");
+    var priorityLabel=isHigh?'<span class="msg-priority-label">重要</span>':"";
+    var catLabel=cat==="event"?ICN_EVENT+" イベント":cat==="urgent"?ICN_URGENT+" 緊急":ICN_NOTICE+" お知らせ";
+    var catCls="cat-tag "+(cat==="event"?"cat-event":cat==="urgent"?"cat-urgent":"cat-notice");
+    var catTag='<span class="'+catCls+'">'+catLabel+'</span>';
     var likes=m.likes||0;
     var liked=isLiked(m.id);
     var likedCls=liked?" liked":"";
     return'<div class="'+cardCls+'" id="msgcard-'+m.id+'">'
       +'<div class="msg-meta">'
       +priorityLabel
+      +catTag
       +'<span class="msg-jichi-name">'+esc(name)+'</span>'
       +'<span class="msg-time">'+fmtTs(m.timestamp)+'</span>'
-      +(ageLabel?'<span class="msg-age-badge '+ageCls+'">'+ageLabel+'</span>':"")      +'</div>'
+      +(ageLabel?'<span class="msg-age-badge '+ageCls+'">'+ageLabel+'</span>':"")
+      +'</div>'
       +'<div class="msg-text">'+linkify(m.text)+'</div>'
+      +(m.imageUrl?'<img class="msg-img" src="'+esc(m.imageUrl)+'" alt="添付画像" loading="lazy" onclick="window.open(\''+esc(m.imageUrl)+'\',\'_blank\')" title="画像を拡大">':"")
       +'<div class="msg-footer">'
       +'<button class="like-btn'+likedCls+'" id="like-'+m.id+'" onclick="toggleLike(\''+jid+'\',\''+m.id+'\')">'
       +'<span class="like-heart">'+(liked?'❤️':'🤍')+'</span>'
@@ -599,25 +719,6 @@ function renderCondolenceList(jid,name){
   }).join("");
 }
 
-/* リスト用カード */
-function buildListCard(j,distM,showDist,isFav){
-  var badge=buildBadge(j.id);
-  var idx=JICHIKAI.indexOf(j)+1;
-  var dist=distM!==null?fmtDist(distM):null;
-  var distHtml=showDist&&dist
-    ?'<div class="jichi-dist"><span class="dist-n">'+dist.n+'</span><span class="dist-u">'+dist.u+'</span></div>'
-    :'<span class="jichi-idx">'+(isFav?'⭐':String(idx).padStart(2,"0"))+'</span>';
-  return'<div class="jichi-item'+(isFav?" fav-item":"")+'\" id="li-'+j.id+'" onclick="openBoard(\''+j.id+'\')">'
-    +'<div class="jichi-item-head">'
-    +distHtml
-    +'<div class="jichi-info">'
-    +'<div class="jichi-name">'+esc(j.name)+'</div>'
-    +'<div class="jichi-addr">'+esc(j.addr)+'</div>'
-    +'</div>'
-    +'<div class="jichi-badge '+badge.cls+'" id="badge-'+j.id+'">'+badge.label+'</div>'
-    +'</div>'
-    +'</div>';
-}
 
 /* ══════════════════════════════════════════
    ビュー描画
@@ -668,7 +769,7 @@ function renderNewArrivalsSection(){
 
   return'<div class="new-arrivals-section">'
     +'<div class="new-arrivals-header">'
-    +'<div class="new-arrivals-title">🔔 新着情報</div>'
+    +'<div class="new-arrivals-title">'+ICN_BELL+' 新着情報</div>'
     +'<div style="display:flex;align-items:center;gap:8px">'
     +(items.length?'<span class="na-total-badge">'+items.length+'件</span>':'')
     +'<button class="na-refresh-btn" id="na-refresh-btn" onclick="triggerRefreshNewArrivals()" title="新着情報を再取得">'
@@ -711,7 +812,7 @@ function renderListView(){
         +'<div class="fav-banner-label">お気に入りの自治会</div>'
         +'<div class="fav-banner-name">'+esc(favJ.name)+'</div>'
         +'</div>'
-        +'<span class="fav-banner-badge" id="fav-badge-'+favJ.id+'">'+badge.label+'</span>'
+        +'<span class="fav-banner-badge">'+badge.label+'</span>'
         +'<span class="fav-banner-arrow">›</span>'
         +'</div>';
       subscribeMsgs(favJ.id);
@@ -725,23 +826,21 @@ function renderListView(){
     +'<button class="loc-btn" onclick="getLocation()">'+(userLat?'再取得':'現在地を取得')+'</button>'
     +'</div>';
 
-  /* 近隣3件のみ */
-  if(userLat){
-    html+='<div class="section-label">📡 現在地から近い自治会（上位3件）</div>';
-    html+='<div class="jichi-list">';
-    JICHIKAI.map(function(j){ return Object.assign({},j,{dist:calcDist(userLat,userLng,j.lat,j.lng)}); })
-            .sort(function(a,b){return a.dist-b.dist;}).slice(0,3)
-            .forEach(function(j){ html+=buildListCard(j,j.dist,true); subscribeMsgs(j.id); });
-    html+='</div>';
-  }else{
-    html+='<div class="msg-empty" style="padding:30px 0;color:var(--ink-faint);font-size:13px;text-align:center">'
-      +'📍 現在地を取得すると近くの自治会が表示されます<br>'
-      +'<small style="color:var(--ink-faint)">自治会一覧は ☰ メニューからご覧いただけます</small>'
-      +'</div>';
-  }
+  /* 訪問者カウンターバー */
+  html+='<div id="visitor-bar-container"></div>';
 
   /* 新着情報セクション */
   html+='<div id="new-arrivals-container">'+renderNewArrivalsSection()+'</div>';
+
+  /* 全自治会グリッド（GPS取得済みなら距離順、未取得なら番号順）*/
+  var jList=JICHIKAI.map(function(j){
+    return Object.assign({},j,{dist:userLat?calcDist(userLat,userLng,j.lat,j.lng):null});
+  });
+  if(userLat) jList.sort(function(a,b){return a.dist-b.dist;});
+  html+='<div class="section-label" style="display:flex;align-items:center;gap:6px">'+ICN_HOME+' 自治会ボード一覧</div>';
+  html+='<div class="sticky-grid" id="sticky-grid">';
+  jList.forEach(function(j){ html+=buildStickyCard(j,j.dist,userLat!==null); subscribeMsgs(j.id); });
+  html+='</div>';
 
   document.getElementById("main-content").innerHTML=html;
 }
@@ -762,13 +861,13 @@ function renderBoardView(){
 
   /* 連絡先リンク */
   var links=[];
-  if(j.tel)       links.push('<a class="detail-link-btn" href="tel:'+j.tel+'">📞 '+j.tel+'</a>');
+  if(j.tel)       links.push('<a class="detail-link-btn" href="tel:'+j.tel+'">'+ICN_PHONE+' '+j.tel+'</a>');
   if(j.email)     links.push('<a class="detail-link-btn" href="mailto:'+j.email+'">✉️ メール</a>');
   if(j.hp)        links.push('<a class="detail-link-btn" href="'+j.hp+'" target="_blank" rel="noopener">🌐 HP</a>');
   if(j.youtube)   links.push('<a class="detail-link-btn" href="'+j.youtube+'" target="_blank" rel="noopener">▶️ YouTube</a>');
-  if(j.instagram) links.push('<a class="detail-link-btn" href="'+j.instagram+'" target="_blank" rel="noopener">📸 Instagram</a>');
+  if(j.instagram) links.push('<a class="detail-link-btn" href="'+j.instagram+'" target="_blank" rel="noopener">'+ICN_PHOTO+' Instagram</a>');
   if(j.sns)       links.push('<a class="detail-link-btn" href="'+j.sns+'" target="_blank" rel="noopener">📱 SNS</a>');
-  links.push('<a class="detail-link-btn" href="https://maps.google.com/maps?q='+j.lat+','+j.lng+'" target="_blank" rel="noopener">🗺️ 地図</a>');
+  links.push('<a class="detail-link-btn" href="https://maps.google.com/maps?q='+j.lat+','+j.lng+'" target="_blank" rel="noopener">'+ICN_MAP+' 地図</a>');
 
   /* お気に入りボタン状態 */
   var favBtnCls="fav-toggle-btn"+(isFavNow?" is-fav":"")+((!isFavNow&&!canAdd)?" disabled":"");
@@ -778,37 +877,45 @@ function renderBoardView(){
 
   var html=''
     +'<div class="board-view-header">'
-    +'<button class="back-btn" onclick="backToList()">‹ 一覧に戻る</button>'
+    +'<button class="back-btn" onclick="backToList()"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;flex-shrink:0"><path fill-rule="evenodd" d="M7.707 14.707a1 1 0 0 1-1.414 0l-5-5a1 1 0 0 1 0-1.414l5-5a1 1 0 0 1 1.414 1.414L4.414 9H17a1 1 0 1 1 0 2H4.414l3.293 3.293a1 1 0 0 1 0 1.414z" clip-rule="evenodd"/></svg> 一覧に戻る</button>'
     +'<button class="'+favBtnCls+'\" id="fav-btn" onclick="toggleFav(\''+jid+'\')" title="お気に入りに登録（最大3件）">'+favBtnLabel+'</button>'
     +'</div>'
     +'<div class="board-view-name">'+esc(j.name)+'</div>'
-    +'<div style="font-size:11px;color:var(--ink-faint);margin-bottom:14px">'+esc(j.addr)+'</div>'
+    +'<div style="font-size:11px;color:var(--ink-faint);margin-bottom:10px">'+esc(j.addr)+'</div>'
+    +'<div id="jichi-visitor-'+jid+'" style="margin-bottom:14px"></div>'
     +'<div class="detail-links" style="margin-bottom:14px">'+links.join("")+'</div>'
 
     /* タブ */
     +'<div class="board-tabs">'
-    +'<button class="board-tab tab-notice'+(noticeActive?" active":"")+'\" onclick="switchBoardTab(\'notice\')">📢 お知らせ <span class="tab-count-badge notice" id="tabbadge-notice-'+jid+'">'+msgCnt+'件</span></button>'
-    +'<button class="board-tab tab-condolence'+(!noticeActive?" active":"")+'\" onclick="switchBoardTab(\'condolence\')">🕯️ おくやみ <span class="tab-count-badge condolence" id="tabbadge-condolence-'+jid+'">'+condCnt+'件</span></button>'
+    +'<button class="board-tab tab-notice'+(noticeActive?" active":"")+'\" onclick="switchBoardTab(\'notice\')">'+ICN_NOTICE+' お知らせ <span class="tab-count-badge notice" id="tabbadge-notice-'+jid+'">'+msgCnt+'件</span></button>'
+    +'<button class="board-tab tab-condolence'+(!noticeActive?" active":"")+'\" onclick="switchBoardTab(\'condolence\')">'+ICN_COND+' おくやみ <span class="tab-count-badge condolence" id="tabbadge-condolence-'+jid+'">'+condCnt+'件</span></button>'
     +'</div>'
 
     /* お知らせボード（パネル） */
     +'<div id="panel-notice-'+jid+'\" style="'+(noticeActive?"":"display:none")+'">'
     +'<div class="msg-board-header">'
-    +'<div class="msg-board-title">📢 お知らせボード <span class="msg-count-badge" id="msgcount-'+jid+'">'+msgCnt+'件</span></div>'
+    +'<div class="msg-board-title">'+ICN_NOTICE+' お知らせボード <span class="msg-count-badge" id="msgcount-'+jid+'">'+msgCnt+'件</span></div>'
+    +'</div>'
+    +'<div class="cat-filter-bar">'
+    +'<button class="cat-chip chip-all'+(currentCatFilter==="all"?" active":"")+'\" onclick="setCatFilter(\'all\',\''+jid+'\')">すべて</button>'
+    +'<button class="cat-chip chip-notice'+(currentCatFilter==="notice"?" active":"")+'\" onclick="setCatFilter(\'notice\',\''+jid+'\')">'+ICN_NOTICE+' お知らせ</button>'
+    +'<button class="cat-chip chip-event'+(currentCatFilter==="event"?" active":"")+'\" onclick="setCatFilter(\'event\',\''+jid+'\')">'+ICN_EVENT+' イベント</button>'
+    +'<button class="cat-chip chip-urgent'+(currentCatFilter==="urgent"?" active":"")+'\" onclick="setCatFilter(\'urgent\',\''+jid+'\')">'+ICN_URGENT+' 緊急</button>'
     +'</div>'
     +'<div class="msg-list" id="msglist-'+jid+'">'+renderMsgList(jid,j.name)+'</div>'
     +'</div>'
 
     /* おくやみボード（パネル） */
     +'<div id="panel-condolence-'+jid+'\" style="'+(noticeActive?"display:none":"")+'">'
-    +'<div class="condolence-intro">🕯️ 訃報・お悔やみに関するお知らせです。</div>'
+    +'<div class="condolence-intro">'+ICN_COND+' 訃報・お悔やみに関するお知らせです。</div>'
     +'<div class="msg-board-header">'
-    +'<div class="condolence-board-title">🕯️ おくやみボード <span class="condolence-count-badge" id="condolencecount-'+jid+'">'+condCnt+'件</span></div>'
+    +'<div class="condolence-board-title">'+ICN_COND+' おくやみボード <span class="condolence-count-badge" id="condolencecount-'+jid+'">'+condCnt+'件</span></div>'
     +'</div>'
     +'<div class="msg-list" id="condolencelist-'+jid+'">'+renderCondolenceList(jid,j.name)+'</div>'
     +'</div>';
 
   document.getElementById("main-content").innerHTML=html;
+  loadJichiVisitorStats(jid);
 }
 
 /* ── ボード内タブ切替 ── */
@@ -840,8 +947,20 @@ function refreshTabBadge(jid,type){
 }
 
 
+/* ── カテゴリフィルター ── */
+function setCatFilter(cat,jid){
+  currentCatFilter=cat;
+  document.querySelectorAll(".cat-chip").forEach(function(c){ c.classList.remove("active"); });
+  var ac=document.querySelector(".cat-chip.chip-"+cat);
+  if(ac) ac.classList.add("active");
+  var j=JICHIKAI.find(function(x){return x.id===jid;});
+  var el=document.getElementById("msglist-"+jid);
+  if(el&&j) el.innerHTML=renderMsgList(jid,j.name);
+}
+
 /* ── ボード遷移 ── */
 function openBoard(jid){
+  currentCatFilter="all"; // ボードを開くたびにフィルターをリセット
   currentView="board"; boardJid=jid; currentBoardTab="notice"; // 常にお知らせタブをデフォルト表示
   subscribeMsgs(jid);
   subscribeCondolences(jid);
@@ -881,16 +1000,13 @@ function toggleFav(jid){
   }
 }
 
-/* ── バッジ即時更新（リスト表示中）── */
+/* ── sticky-card 即時更新（リスト表示中）── */
 function refreshListBadge(jid){
-  var el=document.getElementById("badge-"+jid); if(!el) return;
-  var badge=buildBadge(jid);
-  el.className="jichi-badge "+badge.cls; el.textContent=badge.label;
-}
-function refreshFavBannerBadge(jid){
-  var el=document.getElementById("fav-badge-"+jid); if(!el) return;
-  var badge=buildBadge(jid);
-  el.textContent=badge.label;
+  var el=document.getElementById("sc-"+jid); if(!el) return;
+  var j=JICHIKAI.find(function(x){return x.id===jid;}); if(!j) return;
+  var distM=null;
+  if(userLat){try{distM=calcDist(userLat,userLng,j.lat,j.lng);}catch(e){}}
+  el.outerHTML=buildStickyCard(j,distM,userLat!==null);
 }
 
 /* ── サイドメニュー ── */
@@ -915,7 +1031,7 @@ function buildMenu(){
     var c=getMsgs(j.id).length;
     var bc=menuBadgeCls(j.id);
     html+='<div class="menu-jichi-item" id="mi-'+j.id+'" onclick="selectFromMenu(\''+j.id+'\')">'
-      +'<span class="menu-jichi-icon">🏘️</span>'
+      +'<span class="menu-jichi-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="display:block"><path d="M10.707 2.293a1 1 0 0 0-1.414 0l-7 7a1 1 0 0 0 1.414 1.414L4 10.414V17a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0 1-1h2a1 1 0 0 0 1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-6.586l.293.293a1 1 0 0 0 1.414-1.414l-7-7z"/></svg></span>'
       +'<span class="menu-jichi-num">'+String(i+1).padStart(2,"0")+'</span>'
       +'<span class="menu-jichi-name-text">'+esc(j.name)+'</span>'
       +(c?'<span class="'+bc+'" id="mb-'+j.id+'">'+c+'件</span>':'<span id="mb-'+j.id+'"></span>')
@@ -1002,6 +1118,10 @@ function visitorMonthKey(){
   var d = new Date();
   return "m_" + d.getFullYear() + "_" + (d.getMonth()+1);
 }
+function visitorDayKey(){
+  var d = new Date();
+  return "d_" + d.getFullYear() + "_" + (d.getMonth()+1) + "_" + d.getDate();
+}
 function recordSiteVisit(){
   if(!firebaseOk) return;
   try{
@@ -1009,10 +1129,44 @@ function recordSiteVisit(){
     sessionStorage.setItem("sv_counted","1");
   }catch(e){}
   var mk = visitorMonthKey();
+  var dk = visitorDayKey();
   var upd = { total: firebase.firestore.FieldValue.increment(1) };
   upd[mk] = firebase.firestore.FieldValue.increment(1);
+  upd[dk] = firebase.firestore.FieldValue.increment(1);
   db.collection("siteStats").doc("global").set(upd,{merge:true})
     .catch(function(e){ console.warn("siteStats更新失敗:",e); });
+}
+
+/* ICN_PEOPLE SVG */
+var ICN_PEOPLE='<svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" style="flex-shrink:0"><path d="M9 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM17 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 0 0-1.5-4.33A5 5 0 0 1 19 16v1h-6.07zM6 11a5 5 0 0 1 5 5v1H1v-1a5 5 0 0 1 5-5z"/></svg>';
+
+function renderVisitorBar(todayN, totalN){
+  var el = document.getElementById("visitor-bar-container");
+  if(!el) return;
+  if(todayN === null){
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML = '<div class="visitor-bar">'
+    +'<span class="visitor-icon">'+ICN_PEOPLE+'</span>'
+    +'<div class="visitor-stats">'
+    +'<div class="visitor-stat"><span class="visitor-label">今日</span> <span class="visitor-num">'+todayN+'</span><span class="visitor-unit">人</span></div>'
+    +'<span class="visitor-sep">／</span>'
+    +'<div class="visitor-stat"><span class="visitor-label">累計</span> <span class="visitor-num">'+totalN+'</span><span class="visitor-unit">人</span></div>'
+    +'<span class="visitor-suffix">が訪問</span>'
+    +'</div>'
+    +'</div>';
+}
+function loadVisitorStats(){
+  if(!firebaseOk) return;
+  var dk = visitorDayKey();
+  db.collection("siteStats").doc("global").onSnapshot(function(doc){
+    if(!doc.exists){ renderVisitorBar(0, 0); return; }
+    var data = doc.data();
+    var todayN = data[dk] || 0;
+    var totalN = data.total || 0;
+    renderVisitorBar(todayN, totalN);
+  }, function(e){ console.warn("siteStats取得失敗:",e); });
 }
 function recordJichiVisit(jid){
   if(!firebaseOk) return;
@@ -1022,10 +1176,37 @@ function recordJichiVisit(jid){
     sessionStorage.setItem(key,"1");
   }catch(e){}
   var mk = visitorMonthKey();
+  var dk = visitorDayKey();
   var upd = { total: firebase.firestore.FieldValue.increment(1) };
   upd[mk] = firebase.firestore.FieldValue.increment(1);
+  upd[dk] = firebase.firestore.FieldValue.increment(1);
   db.collection("jichiStats").doc(jid).set(upd,{merge:true})
     .catch(function(e){ console.warn("jichiStats更新失敗:",e); });
+}
+function renderJichiVisitorBar(jid, todayN, totalN){
+  var el = document.getElementById("jichi-visitor-"+jid);
+  if(!el) return;
+  if(todayN === null){ el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="visitor-bar">'
+    +'<span class="visitor-icon">'+ICN_PEOPLE+'</span>'
+    +'<div class="visitor-stats">'
+    +'<div class="visitor-stat"><span class="visitor-label">今日</span> <span class="visitor-num">'+todayN+'</span><span class="visitor-unit">人</span></div>'
+    +'<span class="visitor-sep">／</span>'
+    +'<div class="visitor-stat"><span class="visitor-label">累計</span> <span class="visitor-num">'+totalN+'</span><span class="visitor-unit">人</span></div>'
+    +'<span class="visitor-suffix">が訪問</span>'
+    +'</div>'
+    +'</div>';
+}
+function loadJichiVisitorStats(jid){
+  if(!firebaseOk) return;
+  var dk = visitorDayKey();
+  db.collection("jichiStats").doc(jid).onSnapshot(function(doc){
+    if(!doc.exists){ renderJichiVisitorBar(jid, 0, 0); return; }
+    var data = doc.data();
+    var todayN = data[dk] || 0;
+    var totalN = data.total || 0;
+    renderJichiVisitorBar(jid, todayN, totalN);
+  }, function(e){ console.warn("jichiStats取得失敗:",e); });
 }
 
 /* ── 起動時の初期表示 ── */
@@ -1033,6 +1214,7 @@ function startup(){
   // 全自治会を購読してリアルタイムバッジ更新
   JICHIKAI.forEach(function(j){ subscribeMsgs(j.id); subscribeCondolences(j.id); });
   recordSiteVisit();
+  loadVisitorStats();
   var favList=getFavList();
   if(favList.length===1&&JICHIKAI.find(function(x){return x.id===favList[0];})){
     /* お気に入りが1件だけならすぐそのボードを表示 */
