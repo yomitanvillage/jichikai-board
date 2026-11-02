@@ -608,6 +608,7 @@ var JICHIKAI = [
 var userLat=null, userLng=null;
 var currentView="list";   // "list" | "board"
 var boardJid=null;        // 現在ボード表示中のjid
+var _cachedSiteToday=null, _cachedSiteTotal=null; // 訪問者数キャッシュ（DOM再生成時に再描画用）
 var currentBoardTab="notice"; // "notice" | "condolence" — ボード内タブ状態
 var currentCatFilter="all";   // カテゴリフィルター "all"|"notice"|"event"|"urgent"
 var currentSort="default";    // "default"(距離順 or 番号順) | "newest"(新着順)
@@ -1356,8 +1357,8 @@ function linkify(text){
 function getLocation(){
   if(!navigator.geolocation){ alert("このブラウザではGPSが使えません"); return; }
   navigator.geolocation.getCurrentPosition(
-    function(p){ userLat=p.coords.latitude; userLng=p.coords.longitude; if(currentView==="list") renderListView(); buildSidebar(); },
-    function(){ if(currentView==="list") renderListView(); buildSidebar(); },
+    function(p){ userLat=p.coords.latitude; userLng=p.coords.longitude; if(currentView==="list"){ renderListView(); if(_cachedSiteToday!==null) renderVisitorBar(_cachedSiteToday,_cachedSiteTotal); } buildSidebar(); },
+    function(){ if(currentView==="list"){ renderListView(); if(_cachedSiteToday!==null) renderVisitorBar(_cachedSiteToday,_cachedSiteTotal); } buildSidebar(); },
     {enableHighAccuracy:true,timeout:8000}
   );
 }
@@ -1410,10 +1411,10 @@ function loadVisitorStats(){
   if(!firebaseOk) return;
   var dk = visitorDayKey();
   db.collection("siteStats").doc("global").onSnapshot(function(doc){
-    if(!doc.exists){ renderVisitorBar(0, 0); return; }
-    var data = doc.data();
-    var todayN = data[dk] || 0;
-    var totalN = data.total || 0;
+    var todayN, totalN;
+    if(!doc.exists){ todayN=0; totalN=0; }
+    else { var data=doc.data(); todayN=data[dk]||0; totalN=data.total||0; }
+    _cachedSiteToday=todayN; _cachedSiteTotal=totalN;
     renderVisitorBar(todayN, totalN);
   }, function(e){ console.warn("siteStats取得失敗:",e); });
 }
