@@ -1296,8 +1296,8 @@ function linkify(text){
 function getLocation(){
   if(!navigator.geolocation){ alert("このブラウザではGPSが使えません"); return; }
   navigator.geolocation.getCurrentPosition(
-    function(p){ userLat=p.coords.latitude; userLng=p.coords.longitude; if(currentView==="list") renderListView(); },
-    function(){ if(currentView==="list") renderListView(); },
+    function(p){ userLat=p.coords.latitude; userLng=p.coords.longitude; if(currentView==="list") renderListView(); buildSidebar(); },
+    function(){ if(currentView==="list") renderListView(); buildSidebar(); },
     {enableHighAccuracy:true,timeout:8000}
   );
 }
@@ -1423,8 +1423,7 @@ function startup(){
 }
 
 /* ── 初期化 ── */
-initFirebase();
-// initFirebase内でrenderMain→startupに差し替え
+// initFirebase内でstartupを呼ぶ（重複呼び出しに注意）
 function initFirebase(){
   if(FIREBASE_CONFIG.apiKey==="YOUR_API_KEY"){ startup(); return; }
   try{
