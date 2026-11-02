@@ -46,6 +46,25 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
 .main { max-width: 520px; margin: 0 auto; padding: 24px 16px 60px; }
 
+/* ══ レスポンシブ2カラムレイアウト ══ */
+@media (min-width: 768px) {
+  .header-inner { max-width: none; }
+  .main { max-width: none; padding: 20px 24px 60px; }
+
+  .adm-body { display: flex; align-items: flex-start; gap: 0; }
+  .adm-compose {
+    width: 320px; flex-shrink: 0;
+    border-right: 1.5px solid var(--border);
+    padding-right: 24px; margin-right: 24px;
+  }
+  .adm-posts { flex: 1; min-width: 0; }
+}
+
+@media (min-width: 1200px) {
+  .main { padding: 24px 40px 60px; }
+  .adm-compose { width: 380px; padding-right: 32px; margin-right: 32px; }
+}
+
 /* ── ログイン ── */
 .login-card { background: var(--surface); border-radius: var(--radius-lg); border: 1.5px solid var(--border); padding: 28px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
 .login-title { font-size: 18px; font-weight: 700; color: var(--navy); font-family: 'Noto Serif JP', serif; text-align: center; margin-bottom: 6px; }
@@ -334,6 +353,8 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
 
     <!-- お知らせ投稿パネル -->
     <div id="adminpanel-notice">
+    <div class="adm-body">
+    <div class="adm-compose">
       <div class="post-box">
         <div class="post-box-title"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M13.586 3.586a2 2 0 1 1 2.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>新しいお知らせを投稿</div>
         <!-- カテゴリ選択 -->
@@ -368,6 +389,8 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
         </div>
       </div>
 
+    </div><!-- /.adm-compose -->
+    <div class="adm-posts">
       <!-- 下書き一覧 -->
       <div class="draft-section-header">
         <div class="draft-section-title">
@@ -386,10 +409,14 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       <div class="admin-msg-list" id="admin-msg-list">
         <div class="msg-empty-admin">読み込み中...</div>
       </div>
-    </div>
+    </div><!-- /.adm-posts -->
+    </div><!-- /.adm-body -->
+    </div><!-- /#adminpanel-notice -->
 
     <!-- おくやみ投稿パネル -->
     <div id="adminpanel-condolence" style="display:none">
+    <div class="adm-body">
+    <div class="adm-compose">
       <div class="post-box condolence-post-box">
         <div class="post-box-title condolence-post-title"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>おくやみ情報を投稿</div>
         <div class="condolence-admin-intro">訃報・お悔やみに関する情報を投稿します。通常のお知らせとは別のボードに表示されます。</div>
@@ -401,7 +428,8 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
           <button class="post-btn condolence-post-btn" id="condolence-post-btn" onclick="postCondolence()" disabled><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path d="M10 3a1 1 0 011 1v2a1 1 0 01-2 0V4a1 1 0 011-1zm0 11a1 1 0 011 1v2a1 1 0 01-2 0v-2a1 1 0 011-1zM3 10a1 1 0 011-1h2a1 1 0 010 2H4a1 1 0 01-1-1zm11 0a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1zM5.05 5.05a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414L5.05 6.464a1 1 0 010-1.414zm8.486 8.486a1 1 0 011.414 0l1.414 1.414a1 1 0 11-1.414 1.414l-1.414-1.414a1 1 0 010-1.414zM5.05 14.95a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L6.464 14.95a1 1 0 01-1.414 0zm8.486-8.486a1 1 0 010-1.414l1.414-1.414a1 1 0 111.414 1.414L14.95 6.464a1 1 0 01-1.414 0zM10 7a3 3 0 100 6 3 3 0 000-6z"/></svg>投稿する</button>
         </div>
       </div>
-
+    </div><!-- /.adm-compose -->
+    <div class="adm-posts">
       <div class="msg-manage-header">
         <div class="msg-manage-title"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-2px;margin-right:4px"><path fill-rule="evenodd" d="M3 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1zm0 4a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H4a1 1 0 0 1-1-1z" clip-rule="evenodd"/></svg>投稿済みおくやみ情報</div>
         <span class="msg-limit-note">最大10件まで</span>
@@ -409,7 +437,9 @@ body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: va
       <div class="admin-msg-list" id="admin-condolence-list">
         <div class="msg-empty-admin">読み込み中...</div>
       </div>
-    </div>
+    </div><!-- /.adm-posts -->
+    </div><!-- /.adm-body -->
+    </div><!-- /#adminpanel-condolence -->
   </div>
 </main>
 
