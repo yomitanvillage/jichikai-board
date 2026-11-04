@@ -213,9 +213,17 @@ body { font-family: "M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sa
   color: var(--ink);
   box-shadow: 0 1px 4px rgba(0,0,0,0.12);
 }
+.sort-tab.sort-number.active {
+  background: var(--surface);
+  color: var(--ink);
+}
 .sort-tab.sort-newest.active {
   background: var(--green-pale);
   color: var(--green-deep);
+}
+.sort-tab.sort-distance.active {
+  background: var(--surface);
+  color: var(--ink);
 }
 
 /* ── お気に入りバナー ── */
@@ -609,10 +617,9 @@ var userLat=null, userLng=null;
 var currentView="list";   // "list" | "board"
 var boardJid=null;        // 現在ボード表示中のjid
 var _cachedSiteToday=null, _cachedSiteTotal=null; // 訪問者数キャッシュ（DOM再生成時に再描画用）
-var _initialSnapCount=0; // startup時の初回スナップショット受信カウンター
 var currentBoardTab="notice"; // "notice" | "condolence" — ボード内タブ状態
 var currentCatFilter="all";   // カテゴリフィルター "all"|"notice"|"event"|"urgent"
-var currentSort="newest";    // "default"(距離順 or 番号順) | "newest"(新着順)
+var currentSort="number";    // "number"(番号順) | "newest"(新着順) | "distance"(距離順)
 
 /* ── SVGアイコン定数 ── */
 var ICN_NOTICE='<svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:-3px;flex-shrink:0"><path d="M18 3a1 1 0 0 0-1.447-.894L8.763 6H5a3 3 0 0 0 0 6h.28l1.771 5.316A1 1 0 0 0 8 18h1a1 1 0 0 0 1-1v-4.382l7.553 3.276A1 1 0 0 0 18 15V3z"/></svg>';
@@ -697,14 +704,10 @@ function subscribeMsgs(jid){
     buildSidebar();
     // 新着情報セクションを即時更新
     refreshNewArrivals();
-    // 新着順表示中ならグリッドを再ソート（初回 or リアルタイム更新）
+    // 新着順表示中ならグリッドを再ソート
     if(currentView==="list"&&currentSort==="newest"){
-      // 初回ロード中はカウントし、全自治会分揃ったら一括再ソート
-      _initialSnapCount++;
-      if(_initialSnapCount>=JICHIKAI.length){
-        var grid=document.getElementById("sticky-grid");
-        if(grid){ var jl=getSortedJList(); var gh=""; jl.forEach(function(jx){ gh+=buildStickyCard(jx,jx.dist,userLat!==null); }); grid.innerHTML=gh; }
-      }
+      var grid=document.getElementById("sticky-grid");
+      if(grid){ var jl=getSortedJList(); var gh=""; jl.forEach(function(jx){ gh+=buildStickyCard(jx,jx.dist,userLat!==null); }); grid.innerHTML=gh; }
     }
   });
 }
@@ -979,22 +982,19 @@ function getSortedJList(){
       if(!mb.length) return -1;
       return tsToDate(mb[0].timestamp).getTime()-tsToDate(ma[0].timestamp).getTime();
     });
-  } else {
-    // デフォルト: GPS取得済みなら距離順、未取得ならJICHIKAI配列順（番号順）
+  } else if(currentSort==="distance"){
     if(userLat) jList.sort(function(a,b){ return a.dist-b.dist; });
   }
+  // "number": JICHIKAI配列順のまま（sort不要）
   return jList;
 }
-function _sortDefaultLabel(){
-  return'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg> 距離順';
-}
 function _updateSortTabs(){
-  var t0=document.querySelector(".sort-tab.sort-newest");
-  var t1=document.querySelector(".sort-tab:not(.sort-newest)");
-  if(!t0||!t1) return;
-  t0.className="sort-tab sort-newest"+(currentSort==="newest"?" active":"");
-  t1.className="sort-tab"+(currentSort!=="newest"?" active":"");
-  t1.innerHTML=_sortDefaultLabel();
+  var tn=document.querySelector(".sort-tab.sort-number");
+  var tw=document.querySelector(".sort-tab.sort-newest");
+  var td=document.querySelector(".sort-tab.sort-distance");
+  if(tn) tn.className="sort-tab sort-number"+(currentSort==="number"?" active":"");
+  if(tw) tw.className="sort-tab sort-newest"+(currentSort==="newest"?" active":"");
+  if(td) td.className="sort-tab sort-distance"+(currentSort==="distance"?" active":"");
 }
 function setSort(mode){
   if(currentSort===mode) return;
@@ -1049,10 +1049,15 @@ function renderListView(){
   html+='<div class="section-label" style="display:flex;align-items:center;gap:8px">'
     +ICN_HOME+' 自治会ボード一覧'
     +'<div class="sort-tabs">'
+    +'<button class="sort-tab sort-number'+(currentSort==="number"?" active":"")+'" onclick="setSort(\'number\')">'
+    +'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M3 4a1 1 0 000 2h14a1 1 0 100-2H3zm0 4a1 1 0 000 2h14a1 1 0 100-2H3zm0 4a1 1 0 000 2h14a1 1 0 100-2H3z" clip-rule="evenodd"/></svg> 番号順'
+    +'</button>'
     +'<button class="sort-tab sort-newest'+(currentSort==="newest"?" active":"")+'" onclick="setSort(\'newest\')">'
     +'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10V6z" clip-rule="evenodd"/></svg> 新着順'
     +'</button>'
-    +'<button class="sort-tab'+(currentSort!=="newest"?" active":"")+'" onclick="setSort(\'default\')">'+_sortDefaultLabel()+'</button>'
+    +'<button class="sort-tab sort-distance'+(currentSort==="distance"?" active":"")+'" onclick="setSort(\'distance\')">'
+    +'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg> 距離順'
+    +'</button>'
     +'</div>'
     +'</div>';
   html+='<div class="sticky-grid" id="sticky-grid">';
