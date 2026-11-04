@@ -1483,9 +1483,13 @@ function startup(){
       });
     }
   }
-  renderMain();
-  buildSidebar();
-  getLocation();
+  // setTimeout(0) でFirebaseキャッシュのコールバックを先に完了させてから描画する
+  // → msgCacheが埋まった状態でgetSortedJList()が動き、新着順が正しく反映される
+  setTimeout(function(){
+    renderMain();
+    buildSidebar();
+    getLocation();
+  }, 0);
 }
 
 /* ── 初期化 ── */
