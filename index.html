@@ -696,6 +696,11 @@ function subscribeMsgs(jid){
     buildSidebar();
     // 新着情報セクションを即時更新
     refreshNewArrivals();
+    // 新着順表示中ならグリッドを再ソート
+    if(currentView==="list"&&currentSort==="newest"){
+      var grid=document.getElementById("sticky-grid");
+      if(grid){ var jl=getSortedJList(); var gh=""; jl.forEach(function(j){ gh+=buildStickyCard(j,j.dist,userLat!==null); }); grid.innerHTML=gh; }
+    }
   });
 }
 
@@ -981,12 +986,12 @@ function _sortDefaultLabel(){
   return'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg> 番号順';
 }
 function _updateSortTabs(){
-  var t0=document.querySelector(".sort-tab:not(.sort-newest)");
-  var t1=document.querySelector(".sort-tab.sort-newest");
+  var t0=document.querySelector(".sort-tab.sort-newest");
+  var t1=document.querySelector(".sort-tab:not(.sort-newest)");
   if(!t0||!t1) return;
-  t0.className="sort-tab"+(currentSort!=="newest"?" active":"");
-  t0.innerHTML=_sortDefaultLabel();
-  t1.className="sort-tab sort-newest"+(currentSort==="newest"?" active":"");
+  t0.className="sort-tab sort-newest"+(currentSort==="newest"?" active":"");
+  t1.className="sort-tab"+(currentSort!=="newest"?" active":"");
+  t1.innerHTML=_sortDefaultLabel();
 }
 function setSort(mode){
   if(currentSort===mode) return;
@@ -1041,10 +1046,10 @@ function renderListView(){
   html+='<div class="section-label" style="display:flex;align-items:center;gap:8px">'
     +ICN_HOME+' 自治会ボード一覧'
     +'<div class="sort-tabs">'
-    +'<button class="sort-tab'+(currentSort!=="newest"?" active":"")+'" onclick="setSort(\'default\')">'+_sortDefaultLabel()+'</button>'
     +'<button class="sort-tab sort-newest'+(currentSort==="newest"?" active":"")+'" onclick="setSort(\'newest\')">'
     +'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10V6z" clip-rule="evenodd"/></svg> 新着順'
     +'</button>'
+    +'<button class="sort-tab'+(currentSort!=="newest"?" active":"")+'" onclick="setSort(\'default\')">'+_sortDefaultLabel()+'</button>'
     +'</div>'
     +'</div>';
   html+='<div class="sticky-grid" id="sticky-grid">';
