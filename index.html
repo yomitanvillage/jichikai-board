@@ -609,6 +609,7 @@ var userLat=null, userLng=null;
 var currentView="list";   // "list" | "board"
 var boardJid=null;        // 現在ボード表示中のjid
 var _cachedSiteToday=null, _cachedSiteTotal=null; // 訪問者数キャッシュ（DOM再生成時に再描画用）
+var _initialSnapCount=0; // startup時の初回スナップショット受信カウンター
 var currentBoardTab="notice"; // "notice" | "condolence" — ボード内タブ状態
 var currentCatFilter="all";   // カテゴリフィルター "all"|"notice"|"event"|"urgent"
 var currentSort="newest";    // "default"(距離順 or 番号順) | "newest"(新着順)
@@ -696,10 +697,14 @@ function subscribeMsgs(jid){
     buildSidebar();
     // 新着情報セクションを即時更新
     refreshNewArrivals();
-    // 新着順表示中ならグリッドを再ソート
+    // 新着順表示中ならグリッドを再ソート（初回 or リアルタイム更新）
     if(currentView==="list"&&currentSort==="newest"){
-      var grid=document.getElementById("sticky-grid");
-      if(grid){ var jl=getSortedJList(); var gh=""; jl.forEach(function(j){ gh+=buildStickyCard(j,j.dist,userLat!==null); }); grid.innerHTML=gh; }
+      // 初回ロード中はカウントし、全自治会分揃ったら一括再ソート
+      _initialSnapCount++;
+      if(_initialSnapCount>=JICHIKAI.length){
+        var grid=document.getElementById("sticky-grid");
+        if(grid){ var jl=getSortedJList(); var gh=""; jl.forEach(function(jx){ gh+=buildStickyCard(jx,jx.dist,userLat!==null); }); grid.innerHTML=gh; }
+      }
     }
   });
 }
@@ -981,9 +986,7 @@ function getSortedJList(){
   return jList;
 }
 function _sortDefaultLabel(){
-  if(userLat)
-    return'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg> 距離順';
-  return'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg> 番号順';
+  return'<svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor" style="flex-shrink:0"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg> 距離順';
 }
 function _updateSortTabs(){
   var t0=document.querySelector(".sort-tab.sort-newest");
@@ -1483,13 +1486,9 @@ function startup(){
       });
     }
   }
-  // setTimeout(0) でFirebaseキャッシュのコールバックを先に完了させてから描画する
-  // → msgCacheが埋まった状態でgetSortedJList()が動き、新着順が正しく反映される
-  setTimeout(function(){
-    renderMain();
-    buildSidebar();
-    getLocation();
-  }, 0);
+  renderMain();
+  buildSidebar();
+  getLocation();
 }
 
 /* ── 初期化 ── */
