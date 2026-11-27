@@ -722,9 +722,10 @@ function subscribeMsgs(jid){
   var q=db.collection("messages")
           .where("jichiId","==",jid)
           .orderBy("timestamp","desc")
-          .limit(10);
+          .limit(20); // 下書きが混ざっても公開分を10件確保できるよう多めに取得
   msgListeners[jid]=q.onSnapshot(function(snap){
-    msgCache[jid]=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    // 下書き（status:"draft"）は住民に見せない。status未設定の旧投稿は公開扱い（admin.htmlと同じ判定）
+    msgCache[jid]=snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); }).filter(isPublishedMsg).slice(0,10);
     // ボード表示中なら即時更新
     if(currentView==="board"&&boardJid===jid&&currentBoardTab==="notice"){
       var j=JICHIKAI.find(function(x){return x.id===jid;});
@@ -781,9 +782,10 @@ function getCondolences(jid){
 }
 function unsubMsgs(jid){ if(msgListeners[jid]){ msgListeners[jid](); delete msgListeners[jid]; } }
 
+function isPublishedMsg(m){ return !m.status||m.status==="published"; }
 function getMsgs(jid){
   if(firebaseOk) return msgCache[jid]||[];
-  try{ return JSON.parse(localStorage.getItem("msgs_"+jid)||"[]"); }catch(e){ return []; }
+  try{ return JSON.parse(localStorage.getItem("msgs_"+jid)||"[]").filter(isPublishedMsg); }catch(e){ return []; }
 }
 
 /* ══════════════════════════════════════════
