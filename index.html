@@ -1312,6 +1312,13 @@ function refreshListBadge(jid){
   if(userLat){try{distM=calcDist(userLat,userLng,j.lat,j.lng);}catch(e){}}
   el.outerHTML=buildStickyCard(j,distM,userLat!==null);
 }
+/* お気に入りバナーのバッジ更新（要素が無ければ何もしない）。
+   subscribeMsgs() から呼ばれるため削除しないこと（消えるとサイドバー更新が止まる） */
+function refreshFavBannerBadge(jid){
+  var el=document.getElementById("fav-badge-"+jid); if(!el) return;
+  var badge=buildBadge(jid);
+  el.textContent=badge.label;
+}
 
 /* ── サイドメニュー ── */
 function buildMenu(){
